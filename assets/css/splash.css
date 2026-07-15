@@ -244,8 +244,8 @@ body::before {
 }
 
 /* ============================================================
-   Meta information (degree / section / group)
-   ============================================================ */
+    Meta information (degree / section / group)
+    ============================================================ */
 .splash__meta {
     display: flex;
     flex-wrap: wrap;
@@ -260,14 +260,24 @@ body::before {
     animation: fadeIn 0.8s ease-out 1.05s both;
 }
 
-.splash__meta-item {
-    font-weight: 500;
+.splash__meta-degree {
+    width: 100%;
+    text-align: center;
 }
 
-.splash__meta-item:not(:last-child)::after {
-    content: "•";
-    margin-left: 18px;
+.splash__meta-row {
+    display: inline-flex;
+    align-items: center;
+    gap: 18px;
+}
+
+.splash__meta-separator {
     color: #C7D2E0;
+    user-select: none;
+}
+
+.splash__meta-item {
+    font-weight: 500;
 }
 
 /* ============================================================
