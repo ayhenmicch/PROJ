@@ -96,16 +96,8 @@ body::before {
 }
 
 /* ============================================================
-   Institution logos (School + BSIT)
-   ============================================================ */
-.splash__institutions {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 22px;
-    animation: fadeIn 0.8s ease-out 0.15s both;
-}
-
+    Institution logos (School)
+    ============================================================ */
 .splash__logo {
     object-fit: contain;
     border-radius: 50%;
@@ -113,23 +105,31 @@ body::before {
     box-shadow: var(--shadow-logo);
 }
 
-.splash__logo--school,
-.splash__logo--bsit {
-    width: 64px;
-    height: 64px;
-    /* Zoom-in entrance */
+.splash__logo--school {
     animation: zoomIn 0.8s cubic-bezier(0.22, 1, 0.36, 1) both;
+    animation-delay: 0.2s;
 }
 
-.splash__logo--school { animation-delay: 0.2s; }
-.splash__logo--bsit { animation-delay: 0.35s; }
+.splash__school-logo {
+    position: absolute;
+    top: 32px;
+    left: 32px;
+    width: auto;
+    height: auto;
+    max-width: 90px;
+    max-height: 90px;
+    z-index: 2;
+    object-fit: contain;
+    border-radius: 0;
+    background-color: transparent;
+}
 
 /* ============================================================
    System logo inside a glass card
    ============================================================ */
 .splash__system-card {
     width: 132px;
-    height: 132px;
+    height: 80px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -151,10 +151,14 @@ body::before {
 }
 
 .splash__logo--system {
-    width: 96px;
-    height: 96px;
-    background: transparent;
-    box-shadow: none;
+    width: 150%;
+    height: auto;
+    max-width: auto;
+    max-height: auto;
+    object-fit: contain;
+    
+    border-radius: 10;
+    box-shadow: 0 4px 12px rgba(13, 59, 115, 0.25);
 }
 
 /* ============================================================
