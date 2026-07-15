@@ -1,0 +1,322 @@
+/* ============================================================
+   Ashure Heaben Resort Management System
+   Splash Screen Styles (Screen 1) — Premium / App-like
+   Theme: Bestlink College of the Philippines (BCP)
+   Colors: #0D3B73 / #2F80ED / #F8FAFC
+   Font: Poppins (300–800, italic)
+   ============================================================ */
+
+/* ---- Design tokens (CSS custom properties) ---- */
+:root {
+    --color-primary: #0D3B73;      /* Primary blue */
+    --color-secondary: #2F80ED;    /* Secondary blue */
+    --color-light: #F8FAFC;        /* Light */
+    --color-white: #FFFFFF;
+    --color-text-muted: #5B6B82;
+
+    --radius-card: 24px;           /* Rounded corners */
+    --radius-pill: 999px;
+
+    --shadow-card: 0 24px 60px rgba(8, 32, 64, 0.28);
+    --shadow-logo: 0 10px 24px rgba(13, 59, 115, 0.18);
+
+    --gradient-fill: linear-gradient(90deg, #0D3B73 0%, #2F80ED 100%);
+}
+
+/* ---- Global reset ---- */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html,
+body {
+    height: 100%;
+}
+
+body {
+    font-family: "Poppins", system-ui, -apple-system, sans-serif;
+    color: var(--color-primary);
+    /* Full-screen abstract blue background image (BCP branding) */
+    background: url("../images/backgrounds/splash-bg.jpg") center center / cover no-repeat fixed;
+    overflow: hidden;
+    /* Fade-in for the whole page */
+    animation: pageFadeIn 0.9s ease-out both;
+}
+
+/* ---- Subtle dark-blue overlay for text contrast (keeps image visible) ---- */
+body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    background: linear-gradient(
+        160deg,
+        rgba(13, 59, 115, 0.45) 0%,
+        rgba(13, 59, 115, 0.55) 50%,
+        rgba(13, 59, 115, 0.62) 100%
+    );
+}
+
+/* ============================================================
+   Centered splash stage
+   ============================================================ */
+.splash {
+    position: relative;
+    z-index: 1;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+}
+
+/* ---- White glassmorphism card ---- */
+.splash__card {
+    position: relative;
+    background: rgba(255, 255, 255, 0.92);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border: 1px solid rgba(255, 255, 255, 0.6);
+    border-radius: var(--radius-card);
+    box-shadow: var(--shadow-card);
+    padding: 48px 56px;
+    max-width: 600px;
+    width: 100%;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 22px;
+
+    /* Slide-up entrance for the whole card */
+    animation: cardSlideUp 0.9s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* ============================================================
+   Institution logos (School + BSIT)
+   ============================================================ */
+.splash__institutions {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 22px;
+    animation: fadeIn 0.8s ease-out 0.15s both;
+}
+
+.splash__logo {
+    object-fit: contain;
+    border-radius: 50%;
+    background-color: var(--color-light);
+    box-shadow: var(--shadow-logo);
+}
+
+.splash__logo--school,
+.splash__logo--bsit {
+    width: 64px;
+    height: 64px;
+    /* Zoom-in entrance */
+    animation: zoomIn 0.8s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.splash__logo--school { animation-delay: 0.2s; }
+.splash__logo--bsit { animation-delay: 0.35s; }
+
+/* ============================================================
+   System logo inside a glass card
+   ============================================================ */
+.splash__system-card {
+    width: 132px;
+    height: 132px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-card);
+    background: rgba(255, 255, 255, 0.75);
+    border: 1px solid rgba(47, 128, 237, 0.25);
+    box-shadow: 0 14px 34px rgba(13, 59, 115, 0.18);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    /* Gentle floating motion */
+    animation: floatY 4s ease-in-out infinite, zoomIn 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.45s both;
+    transition: transform 0.4s ease, box-shadow 0.4s ease;
+}
+
+/* Smooth hover animation on the system logo card */
+.splash__system-card:hover {
+    transform: translateY(-6px) scale(1.04);
+    box-shadow: 0 22px 48px rgba(13, 59, 115, 0.28);
+}
+
+.splash__logo--system {
+    width: 96px;
+    height: 96px;
+    background: transparent;
+    box-shadow: none;
+}
+
+/* ============================================================
+   Title (prominent, two lines)
+   ============================================================ */
+.splash__title {
+    font-weight: 800;
+    line-height: 1.15;
+    color: var(--color-primary);
+    letter-spacing: 0.4px;
+    animation: slideUp 0.9s ease-out 0.6s both;
+}
+
+.splash__title-line1 {
+    display: block;
+    font-size: 1.9rem;
+    text-transform: uppercase;
+}
+
+.splash__title-line2 {
+    display: block;
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--color-secondary);
+}
+
+/* ============================================================
+   Slogan (italic, smaller)
+   ============================================================ */
+.splash__slogan {
+    font-size: 0.95rem;
+    font-style: italic;
+    font-weight: 400;
+    letter-spacing: 0.4px;
+    color: var(--color-text-muted);
+    animation: slideUp 0.9s ease-out 0.75s both;
+}
+
+/* ============================================================
+   Modern progress bar
+   ============================================================ */
+.splash__progress {
+    width: 100%;
+    height: 12px;
+    background: rgba(13, 59, 115, 0.10);
+    border-radius: var(--radius-pill);
+    overflow: hidden;
+    box-shadow: inset 0 1px 3px rgba(13, 59, 115, 0.12);
+    animation: fadeIn 0.8s ease-out 0.85s both;
+}
+
+.splash__progress-fill {
+    width: 0%;
+    height: 100%;
+    border-radius: var(--radius-pill);
+    background: var(--gradient-fill);
+    background-size: 200% 100%;
+    /* Smooth animated shimmer + width transition */
+    transition: width 0.25s linear;
+    animation: shimmer 2s linear infinite;
+}
+
+/* ============================================================
+   Loading text + percentage
+   ============================================================ */
+.splash__status {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    font-size: 0.9rem;
+    animation: fadeIn 0.8s ease-out 0.95s both;
+}
+
+.splash__loading-text {
+    font-weight: 500;
+    color: var(--color-primary);
+}
+
+.splash__percent {
+    font-weight: 700;
+    color: var(--color-secondary);
+    font-variant-numeric: tabular-nums;
+    min-width: 48px;
+    text-align: right;
+}
+
+/* ============================================================
+   Meta information (degree / section / group)
+   ============================================================ */
+.splash__meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 8px 18px;
+    font-size: 0.82rem;
+    color: var(--color-text-muted);
+    padding-top: 14px;
+    border-top: 1px solid rgba(13, 59, 115, 0.10);
+    width: 100%;
+    animation: fadeIn 0.8s ease-out 1.05s both;
+}
+
+.splash__meta-item {
+    font-weight: 500;
+}
+
+.splash__meta-item:not(:last-child)::after {
+    content: "•";
+    margin-left: 18px;
+    color: #C7D2E0;
+}
+
+/* ============================================================
+   Keyframe animations
+   ============================================================ */
+@keyframes pageFadeIn {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}
+
+@keyframes zoomIn {
+    from { opacity: 0; transform: scale(0.6); }
+    to   { opacity: 1; transform: scale(1); }
+}
+
+@keyframes slideUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes cardSlideUp {
+    from { opacity: 0; transform: translateY(40px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Gentle floating for the system logo card */
+@keyframes floatY {
+    0%   { transform: translateY(0); }
+    50%  { transform: translateY(-10px); }
+    100% { transform: translateY(0); }
+}
+
+/* Moving gradient sheen on the progress fill */
+@keyframes shimmer {
+    0%   { background-position: 0% 0; }
+    100% { background-position: 200% 0; }
+}
+
+/* Respect users who prefer reduced motion */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation: none !important;
+        transition: none !important;
+    }
+}

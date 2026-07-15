@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Ashure Heaben Resort Management System</title>
+
+    <!-- ============================================================
+         Poppins font (Google Fonts) — multiple weights
+         ============================================================ -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,500&display=swap"
+        rel="stylesheet"
+    />
+
+    <!-- Splash screen styles -->
+    <link rel="stylesheet" href="assets/css/splash.css" />
+</head>
+
+<body>
+    <!-- ============================================================
+         SPLASH SCREEN (Screen 1)
+         A premium, app-like intro over a themed gradient backdrop.
+         ============================================================ -->
+
+    <!-- Centered splash stage -->
+    <main class="splash" role="main" aria-label="Loading screen">
+
+        <!-- White glassmorphism card holding all content -->
+        <section class="splash__card">
+
+            <!-- ---- Top institution logos (School + BSIT) ---- -->
+            <header class="splash__institutions">
+                <img
+                    class="splash__logo splash__logo--school"
+                    src="assets/images/school-logo.png"
+                    alt="Bestlink College of the Philippines Logo"
+                />
+                <img
+                    class="splash__logo splash__logo--bsit"
+                    src="assets/images/bsit-logo.png"
+                    alt="BSIT Logo"
+                />
+            </header>
+
+            <!-- ---- System logo inside a glass card ---- -->
+            <div class="splash__system-card">
+                <img
+                    class="splash__logo splash__logo--system"
+                    src="assets/images/system-logo.png"
+                    alt="Ashure Heaben Resort Management System Logo"
+                />
+            </div>
+
+            <!-- ---- Project title (prominent, two lines) ---- -->
+            <h1 class="splash__title">
+                <span class="splash__title-line1">ASHURE HEABEN HOTEL</span>
+                <span class="splash__title-line2">Reservation System</span>
+            </h1>
+
+            <!-- ---- Slogan (italic, smaller) ---- -->
+            <p class="splash__slogan">Relax. Unwind. Belong.</p>
+
+            <!-- ---- Modern animated progress bar ---- -->
+            <div class="splash__progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+                <div class="splash__progress-fill" id="progressFill"></div>
+            </div>
+
+            <!-- ---- Loading text + percentage ---- -->
+            <div class="splash__status">
+                <span class="splash__loading-text" id="loadingText">Initializing...</span>
+                <span class="splash__percent" id="percentText">0%</span>
+            </div>
+
+            <!-- ---- Project / group meta information ---- -->
+            <footer class="splash__meta">
+                <span class="splash__meta-item">Bachelor of Science in Information Technology</span>
+                <span class="splash__meta-item">Section 21002</span>
+                <span class="splash__meta-item">Group 5</span>
+            </footer>
+
+        </section>
+    </main>
+
+    <!-- Splash screen behavior (loading simulation) -->
+    <script src="assets/js/splash.js"></script>
+</body>
+</html>
