@@ -60,6 +60,39 @@
     animation: cardSlideUp 0.9s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
+/* ---- System logo inside a white glassmorphism container (consistent with Splash Screen) ---- */
+.login__system-card {
+    width: 160px;
+    height: 96px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-card);
+    background: rgba(255, 255, 255, 0.75);
+    border: 1px solid rgba(47, 128, 237, 0.25);
+    box-shadow: 0 14px 34px rgba(13, 59, 115, 0.18);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    animation: floatY 4s ease-in-out infinite, zoomIn 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.45s both;
+    transition: transform 0.4s ease, box-shadow 0.4s ease;
+}
+
+.login__system-card:hover {
+    transform: translateY(-6px) scale(1.04);
+    box-shadow: 0 22px 48px rgba(13, 59, 115, 0.28);
+}
+
+.login__logo--system {
+    width: 100%;
+    height: auto;
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    border-radius: 0;
+    background-color: transparent;
+    box-shadow: none;
+}
+
 /* ---- School logo ---- */
 .login__logo {
     width: 100px;
