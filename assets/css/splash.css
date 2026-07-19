@@ -140,16 +140,17 @@ body::before {
 }
 
 /* ============================================================
-   System logo inside a glass card
+   System logo inside a capsule glass card
    ============================================================ */
 .splash__system-card {
-    width: 132px;
-    height: 80px;
-    display: flex;
+    display: inline-flex;
+    width: fit-content;
+    height: fit-content;
     align-items: center;
     justify-content: center;
-    border-radius: var(--radius-card);
-    background: rgba(255, 255, 255, 0.75);
+    padding: 16px;
+    border-radius: 20px;
+    background: rgba(255, 255, 255, 0.9);
     border: 1px solid rgba(47, 128, 237, 0.25);
     box-shadow: 0 14px 34px rgba(13, 59, 115, 0.18);
     backdrop-filter: blur(10px);
@@ -166,13 +167,14 @@ body::before {
 }
 
 .splash__logo--system {
-    width: 150%;
+    width: auto;
     height: auto;
     max-width: auto;
     max-height: auto;
     object-fit: contain;
-    border-radius: 10;
-    box-shadow: 0 4px 12px rgba(13, 59, 115, 0.25);
+    border-radius: 0;
+    background-color: transparent;
+    box-shadow: none;
 }
 
 /* ============================================================

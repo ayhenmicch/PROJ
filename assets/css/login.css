@@ -39,37 +39,18 @@
 }
 
 /* ---- White glassmorphism card ---- */
-.login__card {
-    position: relative;
-    z-index: 1;
-    background: rgba(255, 255, 255, 0.92);
-    backdrop-filter: blur(14px);
-    -webkit-backdrop-filter: blur(14px);
-    border: 1px solid rgba(255, 255, 255, 0.6);
-    border-radius: var(--radius-card);
-    box-shadow: var(--shadow-card);
-    padding: 48px 56px;
-    max-width: 420px;
-    width: 100%;
-    text-align: center;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 20px;
 
-    animation: cardSlideUp 0.9s cubic-bezier(0.22, 1, 0.36, 1) both;
-}
 
-/* ---- System logo inside a white glassmorphism container (consistent with Splash Screen) ---- */
+/* ---- System logo inside a capsule glass card (consistent with Splash Screen) ---- */
 .login__system-card {
     display: inline-flex;
     width: fit-content;
     height: fit-content;
     align-items: center;
     justify-content: center;
-    padding: 10px;
-    border-radius: var(--radius-card);
-    background: rgba(255, 255, 255, 0.75);
+    padding: 16px;
+    border-radius: 20px;
+    background: rgba(255, 255, 255, 0.9);
     border: 1px solid rgba(47, 128, 237, 0.25);
     box-shadow: 0 14px 34px rgba(13, 59, 115, 0.18);
     backdrop-filter: blur(10px);
