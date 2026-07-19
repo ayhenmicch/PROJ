@@ -38,8 +38,6 @@ body {
 body {
     font-family: "Poppins", system-ui, -apple-system, sans-serif;
     color: var(--color-primary);
-    /* Full-screen abstract blue background image (BCP branding) */
-    background: url("../images/backgrounds/splash-bg.jpg") center center / cover no-repeat fixed;
     overflow: hidden;
     /* Fade-in for the whole page */
     animation: pageFadeIn 0.9s ease-out both;
@@ -71,6 +69,23 @@ body::before {
     align-items: center;
     justify-content: center;
     padding: 24px;
+
+    /* Full-screen Splash Screen background image (BCP branding) */
+    background-image: url("../images/backgrounds/splash-bg.jpg");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+}
+
+/* ---- Semi-transparent dark-blue overlay above the image (keeps it visible) ---- */
+.splash::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    background: rgba(13, 59, 115, 0.55);
 }
 
 /* ---- White glassmorphism card ---- */
