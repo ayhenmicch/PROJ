@@ -86,19 +86,14 @@
 
     /**
      * Called once the simulated loading reaches 100%.
-     * Logs where the future redirect to the Login page will be wired in.
+     * Hides the splash screen and reveals the Login page.
      */
     function onLoadingComplete() {
-        /*
-         * ============================================================
-         * FUTURE REDIRECT TO LOGIN PAGE WILL BE ADDED HERE
-         * ------------------------------------------------------------
-         * Example (when the Login screen is created):
-         *     setTimeout(function () {
-         *         window.location.href = "login.html";
-         *     }, 600);
-         * ============================================================
-         */
-        console.log("Splash loading complete. Redirect to Login page will be added here.");
+        setTimeout(function () {
+            var splash = document.querySelector(".splash");
+            var loginPage = document.getElementById("loginPage");
+            if (splash) splash.style.display = "none";
+            if (loginPage) loginPage.classList.add("login--visible");
+        }, 600);
     }
 })();

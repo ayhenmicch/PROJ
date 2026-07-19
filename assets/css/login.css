@@ -1,0 +1,272 @@
+/* ============================================================
+   Ashure Heaben Resort Management System
+   Login Page Styles (Screen 2) — Glassmorphism / Modern UI
+   Theme: Bestlink College of the Philippines (BCP)
+   Colors: #0D3B73 / #2F80ED / #F8FAFC
+   Font: Poppins (300–800, italic)
+   ============================================================ */
+
+/* ---- Login page container (hidden until splash completes) ---- */
+.login {
+    display: none;
+    position: relative;
+    z-index: 1;
+    min-height: 100vh;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    background: url("../images/backgrounds/splash-bg.jpg") center center / cover no-repeat fixed;
+    overflow: hidden;
+}
+
+.login--visible {
+    display: flex;
+}
+
+/* ---- Dark-blue overlay for text contrast ---- */
+.login::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    background: linear-gradient(
+        160deg,
+        rgba(13, 59, 115, 0.45) 0%,
+        rgba(13, 59, 115, 0.55) 50%,
+        rgba(13, 59, 115, 0.62) 100%
+    );
+}
+
+/* ---- White glassmorphism card ---- */
+.login__card {
+    position: relative;
+    z-index: 1;
+    background: rgba(255, 255, 255, 0.92);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border: 1px solid rgba(255, 255, 255, 0.6);
+    border-radius: var(--radius-card);
+    box-shadow: var(--shadow-card);
+    padding: 48px 56px;
+    max-width: 420px;
+    width: 100%;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+
+    animation: cardSlideUp 0.9s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* ---- School logo ---- */
+.login__logo {
+    width: 100px;
+    height: 100px;
+    object-fit: contain;
+    border-radius: 50%;
+    background-color: var(--color-light);
+    box-shadow: var(--shadow-logo);
+    animation: zoomIn 0.8s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* ---- Title ---- */
+.login__title {
+    font-weight: 800;
+    line-height: 1.2;
+    color: var(--color-primary);
+    letter-spacing: 0.4px;
+    font-size: 1.4rem;
+    animation: slideUp 0.9s ease-out 0.2s both;
+}
+
+/* ---- Form ---- */
+.login__form {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    animation: slideUp 0.9s ease-out 0.4s both;
+}
+
+/* ---- Input wrapper with icon ---- */
+.login__field {
+    width: 100%;
+}
+
+.login__input-wrap {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.login__icon {
+    position: absolute;
+    left: 16px;
+    width: 20px;
+    height: 20px;
+    color: var(--color-text-muted);
+    pointer-events: none;
+    z-index: 1;
+}
+
+.login__input {
+    width: 100%;
+    padding: 14px 16px 14px 48px;
+    border: 2px solid rgba(13, 59, 115, 0.15);
+    border-radius: var(--radius-pill);
+    font-family: "Poppins", system-ui, -apple-system, sans-serif;
+    font-size: 0.95rem;
+    color: var(--color-primary);
+    background: rgba(255, 255, 255, 0.7);
+    outline: none;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.login__input::placeholder {
+    color: var(--color-text-muted);
+    opacity: 0.7;
+}
+
+.login__input:focus {
+    border-color: var(--color-secondary);
+    box-shadow: 0 0 0 4px rgba(47, 128, 237, 0.15);
+}
+
+/* ---- Validation message ---- */
+.login__message {
+    width: 100%;
+    min-height: 24px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: #E74C3C;
+    text-align: left;
+    opacity: 0;
+    transform: translateY(-8px);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.login__message--visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.login__message--success {
+    color: #10B981;
+}
+
+/* ---- Buttons ---- */
+.login__btn {
+    width: 100%;
+    padding: 14px 24px;
+    border-radius: var(--radius-pill);
+    font-family: "Poppins", system-ui, -apple-system, sans-serif;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.3s ease, background 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+}
+
+.login__btn--primary {
+    background: var(--gradient-fill);
+    color: var(--color-white);
+    border: none;
+    box-shadow: 0 8px 24px rgba(13, 59, 115, 0.25);
+}
+
+.login__btn--primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 32px rgba(13, 59, 115, 0.35);
+}
+
+.login__btn--primary:active {
+    transform: translateY(0) scale(0.98);
+    box-shadow: 0 6px 16px rgba(13, 59, 115, 0.25);
+}
+
+.login__btn--primary:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.login__btn--exit {
+    background: var(--color-white);
+    color: var(--color-primary);
+    border: 2px solid var(--color-primary);
+}
+
+.login__btn--exit:hover {
+    background: #FEE2E2;
+    border-color: #DC2626;
+    color: #DC2626;
+}
+
+/* ============================================================
+   Responsive
+   ============================================================ */
+
+/* Laptop */
+@media (max-width: 1024px) {
+    .login__card {
+        padding: 40px 44px;
+        gap: 18px;
+    }
+}
+
+/* Tablet */
+@media (max-width: 768px) {
+    .login__card {
+        padding: 36px 28px;
+        gap: 16px;
+    }
+    .login__title {
+        font-size: 1.2rem;
+    }
+}
+
+/* Mobile */
+@media (max-width: 480px) {
+    .login__card {
+        padding: 28px 20px;
+        gap: 14px;
+        border-radius: 20px;
+    }
+    .login__logo {
+        width: 80px;
+        height: 80px;
+    }
+    .login__title {
+        font-size: 1.1rem;
+    }
+    .login__input {
+        padding: 12px 14px 12px 42px;
+        font-size: 0.9rem;
+    }
+    .login__icon {
+        left: 14px;
+        width: 18px;
+        height: 18px;
+    }
+    .login__btn {
+        padding: 12px 20px;
+        font-size: 0.95rem;
+    }
+}
+
+/* Respect users who prefer reduced motion */
+@media (prefers-reduced-motion: reduce) {
+    .login__card,
+    .login__logo,
+    .login__title,
+    .login__form {
+        animation: none !important;
+    }
+    .login__message {
+        transition: none !important;
+    }
+    .login__btn {
+        transition: none !important;
+    }
+}

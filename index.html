@@ -17,6 +17,8 @@
 
     <!-- Splash screen styles -->
     <link rel="stylesheet" href="assets/css/splash.css" />
+    <!-- Login page styles -->
+    <link rel="stylesheet" href="assets/css/login.css" />
 </head>
 
 <body>
@@ -79,7 +81,66 @@
         </section>
     </main>
 
+    <!-- ============================================================
+         LOGIN PAGE (Screen 2)
+         Initially hidden; shown after splash loading completes.
+         ============================================================ -->
+    <main class="login" id="loginPage" role="main" aria-label="Login page">
+        <div class="login__card">
+            <img
+                class="login__logo"
+                src="assets/images/school-logo.png"
+                alt="Bestlink College of the Philippines Logo"
+            />
+
+            <h1 class="login__title">
+                Hotel Reservation<br />Management System
+            </h1>
+
+            <form class="login__form" id="loginForm" novalidate>
+                <div class="login__field">
+                    <div class="login__input-wrap">
+                        <svg class="login__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                            <circle cx="12" cy="7" r="4" />
+                        </svg>
+                        <input
+                            type="text"
+                            id="username"
+                            class="login__input"
+                            placeholder="Username"
+                            autocomplete="username"
+                        />
+                    </div>
+                </div>
+
+                <div class="login__field">
+                    <div class="login__input-wrap">
+                        <svg class="login__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                            <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                        </svg>
+                        <input
+                            type="password"
+                            id="password"
+                            class="login__input"
+                            placeholder="Password"
+                            autocomplete="current-password"
+                        />
+                    </div>
+                </div>
+
+                <div class="login__message" id="loginMessage" aria-live="polite"></div>
+
+                <button type="submit" class="login__btn login__btn--primary">Login</button>
+                <button type="button" class="login__btn login__btn--exit" id="exitBtn">Exit</button>
+            </form>
+        </div>
+    </main>
+
     <!-- Splash screen behavior (loading simulation) -->
     <script src="assets/js/splash.js"></script>
+    <!-- Login page behavior -->
+    <script src="assets/js/login.js"></script>
 </body>
 </html>
