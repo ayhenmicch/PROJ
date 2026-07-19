@@ -14,6 +14,15 @@
     var loginMessage = document.getElementById("loginMessage");
     var exitBtn = document.getElementById("exitBtn");
     var primaryBtn = document.querySelector(".login__btn--primary");
+    var loginPage = document.getElementById("loginPage");
+    var appShell = document.getElementById("appShell");
+
+    /**
+     * Default credentials (demonstration only).
+     * Stored as constants inside JavaScript — no database, no backend.
+     */
+    var DEFAULT_USERNAME = "admin";
+    var DEFAULT_PASSWORD = "admin123";
 
     /**
      * Show a validation or status message with animation.
@@ -48,18 +57,36 @@
     }
 
     /**
-     * Simulate a successful login after short delay.
+     * Handle an incorrect login attempt.
      */
-    function simulateLogin() {
-        showMessage("Login successful! Redirecting...", true);
+    function onAuthFailed() {
+        showMessage("Invalid username or password.", false);
+        passwordInput.value = "";
+        usernameInput.focus();
+        passwordInput.focus();
+    }
+
+    /**
+     * Handle a successful login attempt.
+     */
+    function onAuthSuccess() {
+        showMessage("Login Successful", true);
 
         usernameInput.disabled = true;
         passwordInput.disabled = true;
         primaryBtn.disabled = true;
 
         setTimeout(function () {
-            console.log("Login simulation complete. Dashboard redirect would happen here.");
-        }, 1500);
+            navigateToDashboard();
+        }, 1000);
+    }
+
+    /**
+     * Reveal the Dashboard (app shell) and hide the login page.
+     */
+    function navigateToDashboard() {
+        if (loginPage) loginPage.classList.remove("login--visible");
+        if (appShell) appShell.classList.add("app--visible");
     }
 
     // ---- Form submit handler ----
@@ -71,8 +98,21 @@
             var isUsernameValid = validateField(usernameInput, "Please enter your username.");
             var isPasswordValid = validateField(passwordInput, "Please enter your password.");
 
-            if (isUsernameValid && isPasswordValid) {
-                simulateLogin();
+            if (!isUsernameValid || !isPasswordValid) {
+                return;
+            }
+
+            var enteredUsername = usernameInput.value.trim();
+            var enteredPassword = passwordInput.value;
+
+            var credentialsMatch =
+                enteredUsername === DEFAULT_USERNAME &&
+                enteredPassword === DEFAULT_PASSWORD;
+
+            if (credentialsMatch) {
+                onAuthSuccess();
+            } else {
+                onAuthFailed();
             }
         });
     }
