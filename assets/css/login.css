@@ -96,12 +96,11 @@
 
 /* ---- School logo ---- */
 .login__logo {
-    width: 100px;
-    height: 100px;
+    width: auto;
+    height: auto;
     object-fit: contain;
-    border-radius: 50%;
+    border-radius: 10px;
     background-color: var(--color-light);
-    box-shadow: var(--shadow-logo);
     animation: zoomIn 0.8s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
