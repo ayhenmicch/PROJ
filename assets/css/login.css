@@ -58,6 +58,7 @@
     gap: 20px;
 
     animation: cardSlideUp 0.9s cubic-bezier(0.22, 1, 0.36, 1) both;
+    transition: background-color .35s ease, border-color .35s ease, box-shadow .35s ease;
 }
 
 /* ---- System logo inside a white glassmorphism container (consistent with Splash Screen) ---- */
@@ -302,4 +303,84 @@
     .login__btn {
         transition: none !important;
     }
+}
+
+/* ============================================================
+   Dark Mode
+   ============================================================ */
+body.dark-mode .login::before {
+    background: linear-gradient(
+        160deg,
+        rgba(0, 0, 0, 0.55) 0%,
+        rgba(0, 0, 0, 0.65) 50%,
+        rgba(0, 0, 0, 0.72) 100%
+    );
+}
+
+body.dark-mode .login__card {
+    background: #1E293B;
+    border-color: rgba(255, 255, 255, 0.08);
+    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.4);
+}
+
+body.dark-mode .login__system-card {
+    background: rgba(30, 41, 59, 0.9);
+    border-color: rgba(59, 130, 246, 0.25);
+    box-shadow: 0 14px 34px rgba(0, 0, 0, 0.35);
+}
+
+body.dark-mode .login__system-card:hover {
+    box-shadow: 0 22px 48px rgba(0, 0, 0, 0.45);
+}
+
+body.dark-mode .login__title {
+    color: #F8FAFC;
+}
+
+body.dark-mode .login__input {
+    background: rgba(30, 41, 59, 0.8);
+    border-color: #334155;
+    color: #F8FAFC;
+}
+
+body.dark-mode .login__input::placeholder {
+    color: #64748B;
+}
+
+body.dark-mode .login__input:focus {
+    border-color: #60A5FA;
+    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.2);
+}
+
+body.dark-mode .login__icon {
+    color: #94A3B8;
+}
+
+body.dark-mode .login__message {
+    color: #F87171;
+}
+
+body.dark-mode .login__message--success {
+    color: #34D399;
+}
+
+body.dark-mode .login__btn--primary {
+    background: linear-gradient(90deg, #1D4ED8 0%, #2563EB 100%);
+    box-shadow: 0 8px 24px rgba(37, 99, 235, 0.35);
+}
+
+body.dark-mode .login__btn--primary:hover {
+    box-shadow: 0 12px 32px rgba(37, 99, 235, 0.45);
+}
+
+body.dark-mode .login__btn--exit {
+    background: transparent;
+    color: #60A5FA;
+    border-color: #60A5FA;
+}
+
+body.dark-mode .login__btn--exit:hover {
+    background: rgba(59, 130, 246, 0.1);
+    border-color: #60A5FA;
+    color: #93C5FD;
 }
