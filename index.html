@@ -151,17 +151,10 @@
         <!-- Sidebar -->
         <aside class="sidebar" id="sidebar">
             <div class="sidebar__brand">
-                <div class="sidebar__logo-badge">
-                    <img
-                        class="sidebar__logo"
-                        src="assets/images/system-logo.png"
-                        alt="Ashure Heaben Hotel Reservation System Logo"
-                    />
-                </div>
-                <span class="sidebar__brand-text">
-                    Ashure Heaben Hotel
+                <div class="sidebar__brand-text">
+                    <span class="sidebar__brand-name">Ashure Heaben Hotel</span>
                     <span class="sidebar__brand-subtitle">Reservation System</span>
-                </span>
+                </div>
             </div>
 
             <nav class="sidebar__nav" aria-label="Main navigation">
@@ -218,7 +211,13 @@
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7 3 9 3 9h6s3-2 3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
                     </button>
                     <div class="topbar__profile">
-                        <div class="topbar__avatar" aria-label="Admin" role="img">
+                        <img
+                            class="topbar__avatar"
+                            src="assets/images/admin-avatar.png"
+                            alt="Admin avatar"
+                            onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+                        />
+                        <div class="topbar__avatar-fallback" aria-hidden="true">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
                         </div>
                         <span class="topbar__profile-name">Admin</span>
@@ -228,7 +227,166 @@
 
             <!-- Dynamic content area -->
             <main class="content" id="contentArea" role="main" aria-label="Main content">
-                <!-- Rendered by JavaScript -->
+                <section class="dashboard">
+                    <!-- Welcome Section -->
+                    <div class="dashboard__welcome">
+                        <h1>Welcome back, Admin!</h1>
+                        <p>Manage your hotel reservation system efficiently.</p>
+                    </div>
+
+                    <!-- Statistics Cards -->
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-card__icon stat-card__icon--primary">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                            </div>
+                            <div class="stat-card__info">
+                                <span class="stat-card__value">1,248</span>
+                                <span class="stat-card__label">Total Reservations</span>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-card__icon stat-card__icon--secondary">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7v11a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V7"/><path d="M21 7H3"/><path d="M9 7V3h6v4"/></svg>
+                            </div>
+                            <div class="stat-card__info">
+                                <span class="stat-card__value">86</span>
+                                <span class="stat-card__label">Available Rooms</span>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-card__icon stat-card__icon--success">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                            </div>
+                            <div class="stat-card__info">
+                                <span class="stat-card__value">142</span>
+                                <span class="stat-card__label">Checked-in Guests</span>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-card__icon stat-card__icon--warning">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                            </div>
+                            <div class="stat-card__info">
+                                <span class="stat-card__value">38</span>
+                                <span class="stat-card__label">Checked-out Today</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Quick Statistics Panels -->
+                    <div class="dashboard-panels">
+                        <div class="card dashboard-panel">
+                            <div class="dashboard-panel__title">Hotel Occupancy</div>
+                            <div class="dashboard-panel__body">
+                                <div class="circular-progress">
+                                    <svg viewBox="0 0 120 120">
+                                        <circle class="circular-progress__track" cx="60" cy="60" r="50"/>
+                                        <circle class="circular-progress__fill" cx="60" cy="60" r="50"/>
+                                    </svg>
+                                    <div class="circular-progress__text">82%</div>
+                                </div>
+                                <div class="occupancy-details">
+                                    <div class="occupancy-details__item">
+                                        <span class="occupancy-details__dot" style="background: var(--color-secondary);"></span>
+                                        <span>Occupied: 164 rooms</span>
+                                    </div>
+                                    <div class="occupancy-details__item">
+                                        <span class="occupancy-details__dot" style="background: var(--color-success);"></span>
+                                        <span>Available: 86 rooms</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card dashboard-panel">
+                            <div class="dashboard-panel__title">Reservation Status</div>
+                            <div class="dashboard-panel__body">
+                                <div class="progress-group">
+                                    <div class="progress-item">
+                                        <div class="progress-item__header">
+                                            <span class="progress-item__label">Confirmed</span>
+                                            <span class="progress-item__value">78</span>
+                                        </div>
+                                        <div class="progress-bar">
+                                            <div class="progress-bar__fill" style="width: 78%;"></div>
+                                        </div>
+                                    </div>
+                                    <div class="progress-item">
+                                        <div class="progress-item__header">
+                                            <span class="progress-item__label">Pending</span>
+                                            <span class="progress-item__value">15</span>
+                                        </div>
+                                        <div class="progress-bar">
+                                            <div class="progress-bar__fill" style="width: 15%; background: var(--color-warning);"></div>
+                                        </div>
+                                    </div>
+                                    <div class="progress-item">
+                                        <div class="progress-item__header">
+                                            <span class="progress-item__label">Cancelled</span>
+                                            <span class="progress-item__value">5</span>
+                                        </div>
+                                        <div class="progress-bar">
+                                            <div class="progress-bar__fill" style="width: 5%; background: var(--color-danger);"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Recent Reservations -->
+                    <div class="dashboard-table">
+                        <div class="card">
+                            <div class="card__header">
+                                <h3 class="card__title">Recent Reservations</h3>
+                            </div>
+                            <div class="table-wrap">
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th>Guest Name</th>
+                                            <th>Room</th>
+                                            <th>Check-in</th>
+                                            <th>Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>John Anderson</td>
+                                            <td>101</td>
+                                            <td>Jul 21, 2026</td>
+                                            <td><span class="badge badge--info">Checked-in</span></td>
+                                        </tr>
+                                        <tr>
+                                            <td>Sarah Williams</td>
+                                            <td>204</td>
+                                            <td>Jul 22, 2026</td>
+                                            <td><span class="badge badge--success">Confirmed</span></td>
+                                        </tr>
+                                        <tr>
+                                            <td>Michael Chen</td>
+                                            <td>305</td>
+                                            <td>Jul 22, 2026</td>
+                                            <td><span class="badge badge--warning">Pending</span></td>
+                                        </tr>
+                                        <tr>
+                                            <td>Emily Rodriguez</td>
+                                            <td>112</td>
+                                            <td>Jul 23, 2026</td>
+                                            <td><span class="badge badge--success">Confirmed</span></td>
+                                        </tr>
+                                        <tr>
+                                            <td>David Thompson</td>
+                                            <td>401</td>
+                                            <td>Jul 21, 2026</td>
+                                            <td><span class="badge badge--info">Checked-in</span></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </section>
             </main>
         </div>
     </div>
@@ -254,5 +412,7 @@
     <script src="assets/js/splash.js"></script>
     <!-- Login page behavior -->
     <script src="assets/js/login.js"></script>
+    <!-- Sidebar toggle behavior -->
+    <script src="assets/js/sidebar.js"></script>
 </body>
 </html>
