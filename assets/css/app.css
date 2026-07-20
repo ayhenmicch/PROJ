@@ -95,24 +95,23 @@ body {
 }
 
 .sidebar__brand-logo {
-    width: 46px;
-    height: 46px;
+    width: 60px;
+    height: 40px;
     object-fit: contain;
     border-radius: 10px;
     background: var(--color-light);
-    box-shadow: var(--shadow-logo);
     opacity: 0;
     visibility: hidden;
-    transform: scale(0.8);
+    transform: translateX(-50%) translateY(-50%) scale(0.8);
     transition: opacity 0.25s ease 0.2s, transform 0.25s ease 0.2s, visibility 0s;
     position: absolute;
     left: 50%;
-    transform: translateX(-50%) scale(0.8);
+    top: 50%;
 }
 
 .sidebar.collapsed .sidebar__brand-logo {
     opacity: 1;
-    transform: translateX(-50%) scale(1);
+    transform: translateX(-50%) translateY(-50%) scale(1);
     visibility: visible;
 }
 
@@ -1463,6 +1462,10 @@ body {
 @media (max-width: 1024px) {
     :root {
         --sidebar-width: 220px;
+    }
+    .sidebar__brand-logo {
+        width: 52px;
+        height: 52px;
     }
     .content {
         padding: 20px;
