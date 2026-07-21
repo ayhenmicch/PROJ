@@ -13,6 +13,7 @@
     var PAGE_TITLES = {
         dashboard: "Dashboard",
         reservations: "Reservation Management",
+        guests: "Guest Management",
         recordList: "Record List",
         addRecord: "Add Record",
         searchRecord: "Search Record",

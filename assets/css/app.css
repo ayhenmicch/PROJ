@@ -1113,6 +1113,29 @@ body {
 }
 
 /* ============================================================
+   Guests
+   ============================================================ */
+.guests {
+    animation: fadeIn 0.4s ease-out both;
+}
+
+.guests__table-card {
+    animation: slideUp 0.5s ease-out 0.1s both;
+}
+
+.guests__count {
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--color-text-muted);
+}
+
+.guests__empty {
+    text-align: center;
+    padding: 48px 24px;
+    color: var(--color-text-muted);
+}
+
+/* ============================================================
    Record List
    ============================================================ */
 .page-header {
