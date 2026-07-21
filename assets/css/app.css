@@ -46,7 +46,7 @@ html, body {
 body {
     font-family: "Poppins", system-ui, -apple-system, sans-serif;
     color: var(--color-primary);
-    background: var(--color-light);
+    background: linear-gradient(135deg, #F8FAFC 0%, #EAF3FF 100%);
     overflow-x: hidden;
 }
 
@@ -622,7 +622,7 @@ body {
 }
 
 .table tbody tr:hover {
-    background: rgba(47, 128, 237, 0.04);
+    background: #F5F8FF;
 }
 
 .table tbody tr:last-child {
@@ -711,7 +711,7 @@ body {
 }
 
 .stat-card:hover {
-    transform: translateY(-4px);
+    transform: translateY(-5px);
     box-shadow: var(--shadow-hover);
 }
 
