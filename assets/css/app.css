@@ -1102,8 +1102,8 @@ body {
 
 .toolbar {
     display: flex;
-    align-items: center;
-    gap: 12px;
+    align-items: flex-start;
+    gap: 20px;
     flex-wrap: wrap;
     margin-bottom: 20px;
     animation: fadeIn 0.4s ease-out 0.1s both;
@@ -1111,8 +1111,8 @@ body {
 
 .toolbar__search {
     position: relative;
-    flex: 1;
-    min-width: 240px;
+    flex: 0 0 58%;
+    min-width: 280px;
 }
 
 .toolbar__search input {
@@ -1132,8 +1132,9 @@ body {
 
 .toolbar__sort {
     display: flex;
-    align-items: center;
-    gap: 8px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
 }
 
 .toolbar__sort label {
@@ -1143,7 +1144,8 @@ body {
     white-space: nowrap;
 }
 
-.toolbar__sort select {
+.toolbar__sort select,
+.toolbar__sort input[type="date"] {
     padding: 10px 14px;
     border: 2px solid rgba(13, 59, 115, 0.12);
     border-radius: var(--radius-input);
@@ -1154,9 +1156,11 @@ body {
     outline: none;
     cursor: pointer;
     transition: border-color 0.3s ease;
+    height: 44px;
 }
 
-.toolbar__sort select:focus {
+.toolbar__sort select:focus,
+.toolbar__sort input[type="date"]:focus {
     border-color: var(--color-secondary);
 }
 
