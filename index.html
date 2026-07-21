@@ -527,8 +527,47 @@
                         </button>
                     </div>
 
+                    <div class="guests__summary stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-card__icon stat-card__icon--primary">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                            </div>
+                            <div class="stat-card__info">
+                                <span class="stat-card__value" id="totalGuestsCount">0</span>
+                                <span class="stat-card__label">Total Guests</span>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-card__icon stat-card__icon--warning">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                            </div>
+                            <div class="stat-card__info">
+                                <span class="stat-card__value" id="vipGuestsCount">0</span>
+                                <span class="stat-card__label">VIP Guests</span>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-card__icon stat-card__icon--success">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                            </div>
+                            <div class="stat-card__info">
+                                <span class="stat-card__value" id="returningGuestsCount">0</span>
+                                <span class="stat-card__label">Returning Guests</span>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-card__icon" style="background: rgba(160, 174, 192, 0.10); color: #6B7280;">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                            </div>
+                            <div class="stat-card__info">
+                                <span class="stat-card__value" id="inactiveGuestsCount">0</span>
+                                <span class="stat-card__label">Inactive Guests</span>
+                            </div>
+                        </div>
+                    </div>
+
                     <div class="toolbar">
-                        <div class="toolbar__search">
+                        <div class="toolbar__search toolbar__search--wide">
                             <svg class="toolbar__search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                 <circle cx="11" cy="11" r="8"/>
                                 <line x1="21" y1="21" x2="16.65" y2="16.65"/>
@@ -536,17 +575,24 @@
                             <input type="text" class="input" id="guestSearch" placeholder="Search guests..." />
                         </div>
 
-                        <div class="toolbar__sort">
-                            <label for="guestStatusFilter">Status</label>
-                            <select id="guestStatusFilter" class="input">
-                                <option value="">All Statuses</option>
-                                <option value="active">Active</option>
-                                <option value="vip">VIP</option>
-                                <option value="inactive">Inactive</option>
+                        <div class="toolbar__sort toolbar__sort--equal">
+                            <label for="guestNationalityFilter">Nationality</label>
+                            <select id="guestNationalityFilter" class="input">
+                                <option value="">All Nationalities</option>
+                                <option value="american">American</option>
+                                <option value="spanish">Spanish</option>
+                                <option value="chinese">Chinese</option>
+                                <option value="british">British</option>
+                                <option value="japanese">Japanese</option>
+                                <option value="italian">Italian</option>
+                                <option value="irish">Irish</option>
+                                <option value="indian">Indian</option>
+                                <option value="brazilian">Brazilian</option>
+                                <option value="french">French</option>
                             </select>
                         </div>
 
-                        <div class="toolbar__sort">
+                        <div class="toolbar__sort toolbar__sort--equal">
                             <label for="guestMembershipFilter">Membership</label>
                             <select id="guestMembershipFilter" class="input">
                                 <option value="">All Memberships</option>
@@ -554,6 +600,16 @@
                                 <option value="silver">Silver</option>
                                 <option value="bronze">Bronze</option>
                                 <option value="none">None</option>
+                            </select>
+                        </div>
+
+                        <div class="toolbar__sort toolbar__sort--equal">
+                            <label for="guestStatusFilter">Status</label>
+                            <select id="guestStatusFilter" class="input">
+                                <option value="">All Statuses</option>
+                                <option value="active">Active</option>
+                                <option value="vip">VIP</option>
+                                <option value="inactive">Inactive</option>
                             </select>
                         </div>
 
@@ -739,6 +795,91 @@
             <div class="modal__footer">
                 <button type="button" class="btn btn--primary" id="btnEditFromView">Edit</button>
                 <button type="button" class="btn btn--secondary" id="btnCloseViewModal">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Guest Modal -->
+    <div class="modal" id="addGuestModal" aria-hidden="true">
+        <div class="modal__backdrop" id="addGuestModalBackdrop"></div>
+        <div class="modal__dialog modal__dialog--lg" role="dialog" aria-modal="true" aria-labelledby="addGuestModalTitle">
+            <div class="modal__header">
+                <h3 class="modal__title" id="addGuestModalTitle">Add Guest</h3>
+                <button type="button" class="modal__close" id="closeAddGuestModalX" aria-label="Close">&times;</button>
+            </div>
+            <div class="modal__body">
+                <form id="addGuestForm" novalidate>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label class="form-label" for="guestFirstName">First Name</label>
+                            <input type="text" id="guestFirstName" class="input" placeholder="John" />
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="guestLastName">Last Name</label>
+                            <input type="text" id="guestLastName" class="input" placeholder="Doe" />
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="guestEmail">Email</label>
+                            <input type="email" id="guestEmail" class="input" placeholder="john@example.com" />
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="guestPhone">Phone</label>
+                            <input type="tel" id="guestPhone" class="input" placeholder="+63 912 345 6789" />
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="guestNationality">Nationality</label>
+                            <select id="guestNationality" class="input">
+                                <option value="">Select nationality</option>
+                                <option value="american">American</option>
+                                <option value="spanish">Spanish</option>
+                                <option value="chinese">Chinese</option>
+                                <option value="british">British</option>
+                                <option value="japanese">Japanese</option>
+                                <option value="italian">Italian</option>
+                                <option value="irish">Irish</option>
+                                <option value="indian">Indian</option>
+                                <option value="brazilian">Brazilian</option>
+                                <option value="french">French</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="guestBirthday">Birthday</label>
+                            <input type="date" id="guestBirthday" class="input" />
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="guestGender">Gender</label>
+                            <select id="guestGender" class="input">
+                                <option value="">Select gender</option>
+                                <option value="male">Male</option>
+                                <option value="female">Female</option>
+                                <option value="other">Other</option>
+                                <option value="prefer-not-to-say">Prefer not to say</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="guestMembership">Membership</label>
+                            <select id="guestMembership" class="input">
+                                <option value="">Select membership</option>
+                                <option value="gold">Gold</option>
+                                <option value="silver">Silver</option>
+                                <option value="bronze">Bronze</option>
+                                <option value="none">None</option>
+                            </select>
+                        </div>
+                        <div class="form-group form-group--full">
+                            <label class="form-label" for="guestAddress">Address</label>
+                            <input type="text" id="guestAddress" class="input" placeholder="Street, City, Country" />
+                        </div>
+                        <div class="form-group form-group--full">
+                            <label class="form-label" for="guestNotes">Notes</label>
+                            <textarea id="guestNotes" class="textarea" placeholder="Any additional notes..."></textarea>
+                        </div>
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn--primary">Save Guest</button>
+                        <button type="button" class="btn btn--secondary" id="closeAddGuestModal">Cancel</button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>

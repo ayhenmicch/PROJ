@@ -29,6 +29,21 @@
     var guestsPagination = document.getElementById("guestsPagination");
     var guestCount = document.getElementById("guestCount");
     var guestsPage = document.getElementById("guestsPage");
+    var guestSearch = document.getElementById("guestSearch");
+    var guestStatusFilter = document.getElementById("guestStatusFilter");
+    var guestMembershipFilter = document.getElementById("guestMembershipFilter");
+    var guestNationalityFilter = document.getElementById("guestNationalityFilter");
+    var totalGuestsCount = document.getElementById("totalGuestsCount");
+    var vipGuestsCount = document.getElementById("vipGuestsCount");
+    var returningGuestsCount = document.getElementById("returningGuestsCount");
+    var inactiveGuestsCount = document.getElementById("inactiveGuestsCount");
+
+    var addGuestModal = document.getElementById("addGuestModal");
+    var addGuestModalBackdrop = document.getElementById("addGuestModalBackdrop");
+    var btnAddGuest = document.getElementById("btnAddGuest");
+    var closeAddGuestModalX = document.getElementById("closeAddGuestModalX");
+    var closeAddGuestModal = document.getElementById("closeAddGuestModal");
+    var addGuestForm = document.getElementById("addGuestForm");
 
     // ---- Utility: Escape HTML ----
     function escapeHtml(text) {
@@ -37,12 +52,43 @@
         return div.innerHTML;
     }
 
+    // ---- Utility: Get initials from name ----
+    function getInitials(name) {
+        var parts = name.split(" ");
+        if (parts.length >= 2) {
+            return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+        }
+        return name.substring(0, 2).toUpperCase();
+    }
+
+    // ---- Utility: Get avatar background color by index ----
+    function getAvatarColor(index) {
+        var colors = [
+            "#E3F2FD",
+            "#E8F5E9",
+            "#F3E5F5",
+            "#FFF3E0",
+            "#E0F2F1",
+            "#FCE4EC",
+            "#E8EAF6",
+            "#E0F7FA",
+            "#F1F8E9",
+            "#FFF8E1"
+        ];
+        return colors[index % colors.length];
+    }
+
+    // ---- Utility: Get visits text ----
+    function getVisitsText(count) {
+        return count + " Visit" + (count !== 1 ? "s" : "");
+    }
+
     // ---- Utility: Badge class mapping ----
     function getStatusBadgeClass(status) {
         switch (status) {
             case "active": return "badge--success";
-            case "vip": return "badge--warning";
-            case "inactive": return "badge--danger";
+            case "vip": return "badge--vip";
+            case "inactive": return "badge--inactive";
             default: return "badge--info";
         }
     }
@@ -52,13 +98,44 @@
         return str.charAt(0).toUpperCase() + str.slice(1);
     }
 
+    // ---- Update summary stats ----
+    function updateStats() {
+        var total = guests.length;
+        var vip = guests.filter(function (g) { return g.status === "vip"; }).length;
+        var returning = guests.filter(function (g) { return g.visits > 1; }).length;
+        var inactive = guests.filter(function (g) { return g.status === "inactive"; }).length;
+
+        totalGuestsCount.textContent = total;
+        vipGuestsCount.textContent = vip;
+        returningGuestsCount.textContent = returning;
+        inactiveGuestsCount.textContent = inactive;
+    }
+
     // ---- Render table ----
     function renderTable() {
+        var searchTerm = guestSearch ? guestSearch.value.trim().toLowerCase() : "";
+        var statusVal = guestStatusFilter ? guestStatusFilter.value : "";
+        var membershipVal = guestMembershipFilter ? guestMembershipFilter.value : "";
+        var nationalityVal = guestNationalityFilter ? guestNationalityFilter.value : "";
+
+        var filtered = guests.filter(function (g) {
+            var matchesSearch = !searchTerm ||
+                g.name.toLowerCase().indexOf(searchTerm) !== -1 ||
+                g.email.toLowerCase().indexOf(searchTerm) !== -1 ||
+                g.phone.toLowerCase().indexOf(searchTerm) !== -1;
+
+            var matchesStatus = !statusVal || g.status === statusVal;
+            var matchesMembership = !membershipVal || g.membership === membershipVal;
+            var matchesNationality = !nationalityVal || g.nationality.toLowerCase() === nationalityVal;
+
+            return matchesSearch && matchesStatus && matchesMembership && matchesNationality;
+        });
+
         var start = (currentPage - 1) * ITEMS_PER_PAGE;
         var end = start + ITEMS_PER_PAGE;
-        var pageItems = guests.slice(start, end);
+        var pageItems = filtered.slice(start, end);
 
-        guestCount.textContent = guests.length + " guest" + (guests.length !== 1 ? "s" : "");
+        guestCount.textContent = filtered.length + " guest" + (filtered.length !== 1 ? "s" : "");
 
         if (pageItems.length === 0) {
             guestsTableBody.innerHTML = "";
@@ -69,13 +146,25 @@
 
         guestsEmpty.style.display = "none";
 
-        guestsTableBody.innerHTML = pageItems.map(function (g) {
+        guestsTableBody.innerHTML = pageItems.map(function (g, idx) {
+            var initials = getInitials(g.name);
+            var avatarColor = getAvatarColor(idx);
+            var visitsText = getVisitsText(g.visits);
+
             return "<tr>" +
-                "<td>" + escapeHtml(g.name) + "</td>" +
+                "<td>" +
+                    "<div class=\"guest-cell\">" +
+                        "<div class=\"guest-avatar\" style=\"background: " + avatarColor + ";\">" + escapeHtml(initials) + "</div>" +
+                        "<div class=\"guest-info\">" +
+                            "<span class=\"guest-name\">" + escapeHtml(g.name) + "</span>" +
+                            "<span class=\"guest-email\">" + escapeHtml(g.email) + "</span>" +
+                        "</div>" +
+                    "</div>" +
+                "</td>" +
                 "<td>" + escapeHtml(g.email) + "</td>" +
                 "<td>" + escapeHtml(g.phone) + "</td>" +
                 "<td>" + escapeHtml(g.nationality) + "</td>" +
-                "<td>" + g.visits + "</td>" +
+                "<td><span class=\"visits-text\">" + visitsText + "</span></td>" +
                 "<td><span class=\"badge " + getStatusBadgeClass(g.status) + "\">" + escapeHtml(capitalize(g.status)) + "</span></td>" +
                 "<td><div class=\"actions-cell\">" +
                 "<button class=\"action-btn action-btn--view\" aria-label=\"View\">" +
@@ -94,7 +183,25 @@
 
     // ---- Render pagination (UI only) ----
     function renderPagination() {
-        var totalPages = Math.ceil(guests.length / ITEMS_PER_PAGE);
+        var searchTerm = guestSearch ? guestSearch.value.trim().toLowerCase() : "";
+        var statusVal = guestStatusFilter ? guestStatusFilter.value : "";
+        var membershipVal = guestMembershipFilter ? guestMembershipFilter.value : "";
+        var nationalityVal = guestNationalityFilter ? guestNationalityFilter.value : "";
+
+        var filtered = guests.filter(function (g) {
+            var matchesSearch = !searchTerm ||
+                g.name.toLowerCase().indexOf(searchTerm) !== -1 ||
+                g.email.toLowerCase().indexOf(searchTerm) !== -1 ||
+                g.phone.toLowerCase().indexOf(searchTerm) !== -1;
+
+            var matchesStatus = !statusVal || g.status === statusVal;
+            var matchesMembership = !membershipVal || g.membership === membershipVal;
+            var matchesNationality = !nationalityVal || g.nationality.toLowerCase() === nationalityVal;
+
+            return matchesSearch && matchesStatus && matchesMembership && matchesNationality;
+        });
+
+        var totalPages = Math.ceil(filtered.length / ITEMS_PER_PAGE);
         if (totalPages <= 1) {
             guestsPagination.innerHTML = "";
             guestsPagination.style.display = "none";
@@ -120,8 +227,77 @@
         if (guestsPage) {
             guestsPage.style.display = "none";
         }
+        updateStats();
         renderTable();
         renderPagination();
+    }
+
+    if (guestSearch) {
+        guestSearch.addEventListener("input", function () {
+            renderTable();
+            renderPagination();
+        });
+    }
+
+    if (guestStatusFilter) {
+        guestStatusFilter.addEventListener("change", function () {
+            renderTable();
+            renderPagination();
+        });
+    }
+
+    if (guestMembershipFilter) {
+        guestMembershipFilter.addEventListener("change", function () {
+            renderTable();
+            renderPagination();
+        });
+    }
+
+    if (guestNationalityFilter) {
+        guestNationalityFilter.addEventListener("change", function () {
+            renderTable();
+            renderPagination();
+        });
+    }
+
+    // ---- Add Guest Modal ----
+    function openAddGuestModal() {
+        if (addGuestModal) {
+            addGuestModal.classList.add("modal--visible");
+            addGuestModal.setAttribute("aria-hidden", "false");
+        }
+    }
+
+    function closeAddGuestModal() {
+        if (addGuestModal) {
+            addGuestModal.classList.remove("modal--visible");
+            addGuestModal.setAttribute("aria-hidden", "true");
+        }
+        if (addGuestForm) {
+            addGuestForm.reset();
+        }
+    }
+
+    if (btnAddGuest) {
+        btnAddGuest.addEventListener("click", openAddGuestModal);
+    }
+
+    if (closeAddGuestModalX) {
+        closeAddGuestModalX.addEventListener("click", closeAddGuestModal);
+    }
+
+    if (closeAddGuestModal) {
+        closeAddGuestModal.addEventListener("click", closeAddGuestModal);
+    }
+
+    if (addGuestModalBackdrop) {
+        addGuestModalBackdrop.addEventListener("click", closeAddGuestModal);
+    }
+
+    if (addGuestForm) {
+        addGuestForm.addEventListener("submit", function (e) {
+            e.preventDefault();
+        });
     }
 
     if (document.readyState === "loading") {
