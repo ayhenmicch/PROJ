@@ -172,6 +172,11 @@
                     <span>Dashboard</span>
                     <span class="sidebar__tooltip" aria-hidden="true">Dashboard</span>
                 </a>
+                <a href="#" class="sidebar__link" data-page="reservations">
+                    <svg class="sidebar__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                    <span>Reservations</span>
+                    <span class="sidebar__tooltip" aria-hidden="true">Reservations</span>
+                </a>
                 <a href="#" class="sidebar__link" data-page="recordList">
                     <svg class="sidebar__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
                     <span>Record List</span>
@@ -409,6 +414,84 @@
                         </div>
                     </div>
                 </section>
+
+                <section class="reservations" id="reservationsPage">
+                    <div class="page-header">
+                        <div>
+                            <h1 class="page-header__title">Reservation Management</h1>
+                            <p class="page-header__subtitle">Manage all hotel reservations efficiently.</p>
+                        </div>
+                        <button class="btn btn--primary" id="btnNewReservation">New Reservation</button>
+                    </div>
+
+                    <div class="toolbar">
+                        <div class="toolbar__search">
+                            <svg class="toolbar__search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="11" cy="11" r="8"/>
+                                <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                            </svg>
+                            <input type="text" class="input" id="reservationSearch" placeholder="Search reservations..." />
+                        </div>
+
+                        <div class="toolbar__sort">
+                            <label for="statusFilter">Status</label>
+                            <select id="statusFilter" class="input">
+                                <option value="">All Statuses</option>
+                                <option value="confirmed">Confirmed</option>
+                                <option value="pending">Pending</option>
+                                <option value="checked-in">Checked-in</option>
+                                <option value="checked-out">Checked-out</option>
+                                <option value="cancelled">Cancelled</option>
+                            </select>
+                        </div>
+
+                        <div class="toolbar__sort">
+                            <label for="roomTypeFilter">Room Type</label>
+                            <select id="roomTypeFilter" class="input">
+                                <option value="">All Types</option>
+                                <option value="standard">Standard</option>
+                                <option value="deluxe">Deluxe</option>
+                                <option value="suite">Suite</option>
+                                <option value="family">Family</option>
+                            </select>
+                        </div>
+
+                        <div class="toolbar__sort">
+                            <label for="dateFilter">Date</label>
+                            <input type="date" id="dateFilter" class="input" />
+                        </div>
+
+                        <button class="btn btn--secondary" id="btnExport">Export</button>
+                    </div>
+
+                    <div class="reservations__table-card card">
+                        <div class="card__header">
+                            <h3 class="card__title">All Reservations</h3>
+                            <span class="reservations__count" id="reservationCount">0 reservations</span>
+                        </div>
+                        <div class="table-wrap">
+                            <table class="table" id="reservationsTable">
+                                <thead>
+                                    <tr>
+                                        <th>Guest Name</th>
+                                        <th>Room</th>
+                                        <th>Room Type</th>
+                                        <th>Check-in</th>
+                                        <th>Check-out</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="reservationsTableBody">
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="reservations__empty" id="reservationsEmpty" style="display: none;">
+                            <p>No reservations found matching your criteria.</p>
+                        </div>
+                        <div class="pagination" id="reservationsPagination"></div>
+                    </div>
+                </section>
             </main>
         </div>
     </div>
@@ -430,6 +513,73 @@
         </div>
     </div>
 
+    <!-- Reservation Modal -->
+    <div class="modal" id="reservationModal" aria-hidden="true">
+        <div class="modal__backdrop" id="reservationModalBackdrop"></div>
+        <div class="modal__dialog modal__dialog--lg" role="dialog" aria-modal="true" aria-labelledby="reservationModalTitle">
+            <div class="modal__header">
+                <h3 class="modal__title" id="reservationModalTitle">New Reservation</h3>
+            </div>
+            <div class="modal__body">
+                <form id="reservationForm" novalidate>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label class="form-label" for="resGuestName">Guest Name</label>
+                            <input type="text" id="resGuestName" class="input" placeholder="Full name" required />
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="resEmail">Email</label>
+                            <input type="email" id="resEmail" class="input" placeholder="guest@example.com" />
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="resPhone">Phone</label>
+                            <input type="tel" id="resPhone" class="input" placeholder="+63 912 345 6789" />
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="resRoomType">Room Type</label>
+                            <select id="resRoomType" class="input">
+                                <option value="standard">Standard</option>
+                                <option value="deluxe">Deluxe</option>
+                                <option value="suite">Suite</option>
+                                <option value="family">Family</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="resRoomNumber">Room Number</label>
+                            <input type="text" id="resRoomNumber" class="input" placeholder="e.g. 101" />
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="resGuests">Guests</label>
+                            <input type="number" id="resGuests" class="input" min="1" value="1" />
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="resCheckIn">Check-in</label>
+                            <input type="date" id="resCheckIn" class="input" required />
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="resCheckOut">Check-out</label>
+                            <input type="date" id="resCheckOut" class="input" required />
+                        </div>
+                        <div class="form-group form-group--full">
+                            <label class="form-label" for="resStatus">Status</label>
+                            <select id="resStatus" class="input">
+                                <option value="confirmed">Confirmed</option>
+                                <option value="pending">Pending</option>
+                                <option value="checked-in">Checked-in</option>
+                                <option value="checked-out">Checked-out</option>
+                                <option value="cancelled">Cancelled</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn--primary">Save Reservation</button>
+                        <button type="button" class="btn btn--secondary" id="closeReservationModal">Cancel</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
     <!-- Splash screen behavior (loading simulation) -->
     <script src="assets/js/splash.js"></script>
     <!-- Login page behavior -->
@@ -438,5 +588,7 @@
     <script src="assets/js/sidebar.js"></script>
     <!-- Dashboard animations -->
     <script src="assets/js/dashboard.js"></script>
+    <!-- Reservation Management -->
+    <script src="assets/js/reservations.js"></script>
 </body>
 </html>

@@ -1046,6 +1046,34 @@ body {
 }
 
 /* ============================================================
+   Reservations
+   ============================================================ */
+.reservations {
+    animation: fadeIn 0.4s ease-out both;
+}
+
+.reservations__table-card {
+    animation: slideUp 0.5s ease-out 0.1s both;
+}
+
+.reservations__count {
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--color-text-muted);
+}
+
+.reservations__empty {
+    text-align: center;
+    padding: 48px 24px;
+    color: var(--color-text-muted);
+    font-size: 0.95rem;
+}
+
+.reservations__empty p {
+    margin: 0;
+}
+
+/* ============================================================
    Record List
    ============================================================ */
 .page-header {
@@ -1062,6 +1090,14 @@ body {
     font-size: 1.4rem;
     font-weight: 800;
     color: var(--color-primary);
+}
+
+.page-header__subtitle {
+    font-size: 0.95rem;
+    color: var(--color-text-muted);
+    margin-top: 6px;
+    font-weight: 400;
+    opacity: 0.85;
 }
 
 .toolbar {
@@ -1464,6 +1500,10 @@ body {
     display: flex;
     gap: 12px;
     justify-content: center;
+}
+
+.modal__dialog--lg {
+    max-width: 720px;
 }
 
 /* ============================================================
