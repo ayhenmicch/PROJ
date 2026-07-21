@@ -17,9 +17,9 @@
     var greetingEl = document.getElementById("dashboardGreeting");
 
     // ---- Configuration ----
-    var CIRCLE_CIRCUMFERENCE = 314; // 2 * PI * 50
+    var CIRCLE_CIRCUMFERENCE = 365; // 2 * PI * 58
     var CIRCLE_TARGET_PERCENT = 82;
-    var CIRCLE_TARGET_OFFSET = 57; // circumference - (percent/100 * circumference)
+    var CIRCLE_TARGET_OFFSET = 66; // circumference - (percent/100 * circumference)
     var COUNT_UP_DURATION = 1500; // ms
     var PROGRESS_DURATION = 800; // ms
 
