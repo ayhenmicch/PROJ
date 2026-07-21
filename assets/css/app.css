@@ -46,8 +46,7 @@ html, body {
 body {
     font-family: "Poppins", system-ui, -apple-system, sans-serif;
     color: var(--color-primary);
-    background: linear-gradient(135deg, #F8FAFC 0%, #EEF4FF 100%);
-    background-attachment: fixed;
+    background: var(--color-light);
     overflow-x: hidden;
 }
 
@@ -97,7 +96,7 @@ body {
 
 .sidebar__brand-logo {
     width: 60px;
-    height: 60px;
+    height: 40px;
     object-fit: contain;
     border-radius: 10px;
     background: var(--color-light);
@@ -145,21 +144,21 @@ body {
     padding: 16px 12px;
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 4px;
     overflow-y: auto;
 }
 
 .sidebar__link {
     display: flex;
     align-items: center;
-    gap: 14px;
-    padding: 14px 18px;
+    gap: 12px;
+    padding: 12px 16px;
     border-radius: var(--radius-input);
     color: var(--color-text-muted);
     text-decoration: none;
     font-weight: 500;
     font-size: 0.95rem;
-    transition: background 0.25s ease, color 0.25s ease, transform 0.2s ease;
+    transition: background 0.25s ease, color 0.25s ease;
     position: relative;
     overflow: hidden;
 }
@@ -185,8 +184,8 @@ body {
 }
 
 .sidebar__icon {
-    width: 22px;
-    height: 22px;
+    width: 20px;
+    height: 20px;
     flex-shrink: 0;
 }
 
@@ -243,7 +242,7 @@ body {
 
 .sidebar.collapsed .sidebar__link {
     justify-content: center;
-    padding: 14px;
+    padding: 12px;
     gap: 0;
 }
 
@@ -619,11 +618,11 @@ body {
 
 .table tbody tr {
     border-bottom: 1px solid rgba(13, 59, 115, 0.06);
-    transition: background 0.3s ease, transform 0.2s ease;
+    transition: background 0.2s ease;
 }
 
 .table tbody tr:hover {
-    background: #F5F8FF;
+    background: rgba(47, 128, 237, 0.04);
 }
 
 .table tbody tr:last-child {
@@ -712,8 +711,8 @@ body {
 }
 
 .stat-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 16px 40px rgba(13, 59, 115, 0.18);
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-hover);
 }
 
 .stat-card__icon {
@@ -820,8 +819,8 @@ body {
     stroke-width: 8;
     stroke-linecap: round;
     stroke-dasharray: 314;
-    stroke-dashoffset: 314;
-    transition: stroke-dashoffset 1.2s cubic-bezier(0.22, 1, 0.36, 1);
+    stroke-dashoffset: 57;
+    transition: stroke-dashoffset 1s ease;
 }
 
 .circular-progress__text {
@@ -1601,52 +1600,3 @@ body {
 }
 
 /* Respect users who prefer reduced motion */
-
-@keyframes pulseBadge {
-    0%, 100% { opacity: 1; transform: scale(1); }
-    50% { opacity: 0.7; transform: scale(1.15); }
-}
-
-/* ============================================================
-   Dashboard Animations
-   ============================================================ */
-.dashboard__welcome {
-    margin-bottom: 28px;
-    animation: slideUp 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
-}
-
-.stats-grid .stat-card {
-    opacity: 0;
-    animation: cardSlideUp 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
-}
-
-.stats-grid .stat-card:nth-child(1) { animation-delay: 0.1s; }
-.stats-grid .stat-card:nth-child(2) { animation-delay: 0.2s; }
-.stats-grid .stat-card:nth-child(3) { animation-delay: 0.3s; }
-.stats-grid .stat-card:nth-child(4) { animation-delay: 0.4s; }
-
-.dashboard-panels {
-    opacity: 0;
-    animation: slideUp 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0.3s both;
-}
-
-.dashboard-table {
-    opacity: 0;
-    animation: slideUp 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0.4s both;
-}
-
-/* Dashboard panel cards */
-.dashboard-panel {
-    background: rgba(255, 255, 255, 0.95);
-    border: 1px solid rgba(255, 255, 255, 0.8);
-}
-
-.dashboard-table .card {
-    background: rgba(255, 255, 255, 0.95);
-    border: 1px solid rgba(255, 255, 255, 0.8);
-}
-
-/* Table card hover enhancement */
-.dashboard-table .card:hover {
-    transform: translateY(-3px);
-}
