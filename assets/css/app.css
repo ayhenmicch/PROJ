@@ -40,7 +40,6 @@
 }
 
 html, body {
-    height: 100%;
 }
 
 body {
@@ -56,7 +55,6 @@ body {
    ============================================================ */
 .app {
     display: none;
-    min-height: 100vh;
 }
 
 .app--visible {
@@ -283,7 +281,6 @@ body {
 .app__main {
     flex: 1;
     margin-left: var(--sidebar-width);
-    min-height: 100vh;
     display: flex;
     flex-direction: column;
     transition: margin-left 0.35s cubic-bezier(0.22, 1, 0.36, 1);
@@ -462,9 +459,7 @@ body {
    Content Area
    ============================================================ */
 .content {
-    flex: 1;
     padding: 28px;
-    overflow-y: auto;
     max-width: 1600px;
     margin: 0 auto;
     width: 100%;
