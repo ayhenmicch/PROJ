@@ -225,6 +225,7 @@
                     </div>
                     <button class="topbar__icon-btn" aria-label="Notifications">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7 3 9 3 9h6s3-2 3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+                        <span class="topbar__badge" aria-hidden="true"></span>
                     </button>
                     <div class="topbar__profile">
                         <img
@@ -246,6 +247,7 @@
                 <section class="dashboard">
                     <!-- Welcome Section -->
                     <div class="dashboard__welcome">
+                        <p class="dashboard__greeting" id="dashboardGreeting">Good Afternoon,</p>
                         <h1>Welcome back, Admin!</h1>
                         <p>Manage your hotel reservation system efficiently.</p>
                     </div>
@@ -430,5 +432,7 @@
     <script src="assets/js/login.js"></script>
     <!-- Sidebar toggle behavior -->
     <script src="assets/js/sidebar.js"></script>
+    <!-- Dashboard animations -->
+    <script src="assets/js/dashboard.js"></script>
 </body>
 </html>
