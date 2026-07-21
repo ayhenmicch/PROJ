@@ -40,6 +40,7 @@
 }
 
 html, body {
+    min-height: 100vh;
 }
 
 body {
@@ -48,6 +49,7 @@ body {
     background: linear-gradient(135deg, #FFFFFF 0%, #F7FAFC 55%, #EEF4FF 100%);
     background-attachment: fixed;
     overflow-x: hidden;
+    overflow-y: auto;
 }
 
 /* ============================================================
@@ -55,6 +57,7 @@ body {
    ============================================================ */
 .app {
     display: none;
+    min-height: 100vh;
 }
 
 .app--visible {
@@ -281,6 +284,7 @@ body {
 .app__main {
     flex: 1;
     margin-left: var(--sidebar-width);
+    min-height: 100vh;
     display: flex;
     flex-direction: column;
     transition: margin-left 0.35s cubic-bezier(0.22, 1, 0.36, 1);
