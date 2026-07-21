@@ -495,7 +495,7 @@ body {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-bottom: 20px;
+    margin-bottom: 24px;
 }
 
 .card__title {
@@ -517,8 +517,14 @@ body {
     font-weight: 600;
     cursor: pointer;
     border: none;
-    transition: background 0.25s ease, transform 0.2s ease, box-shadow 0.25s ease;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     text-decoration: none;
+}
+
+.btn svg {
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
 }
 
 .btn--primary {
@@ -607,6 +613,7 @@ body {
     text-transform: uppercase;
     letter-spacing: 0.4px;
     white-space: nowrap;
+    line-height: 1;
     transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
@@ -661,7 +668,7 @@ body {
 }
 
 .table th, .table td {
-    padding: 18px 22px;
+    padding: 20px 28px;
     text-align: left;
     font-size: 0.88rem;
 }
@@ -674,7 +681,7 @@ body {
     text-transform: uppercase;
     letter-spacing: 0.5px;
     color: var(--color-text-muted);
-    background: rgba(13, 59, 115, 0.025);
+    background: #F8FAFC;
     border-bottom: 1px solid rgba(13, 59, 115, 0.08);
     white-space: nowrap;
     z-index: 1;
@@ -699,7 +706,7 @@ body {
     align-items: center;
     justify-content: center;
     gap: 6px;
-    margin-top: 20px;
+    margin-top: 24px;
 }
 
 .pagination__btn {
@@ -1066,11 +1073,43 @@ body {
     text-align: center;
     padding: 48px 24px;
     color: var(--color-text-muted);
-    font-size: 0.95rem;
 }
 
-.reservations__empty p {
+.empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+}
+
+.empty-state__icon {
+    width: 64px;
+    height: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 8px;
+    color: var(--color-text-muted);
+    opacity: 0.6;
+}
+
+.empty-state__icon svg {
+    width: 100%;
+    height: 100%;
+}
+
+.empty-state__title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--color-primary);
     margin: 0;
+}
+
+.empty-state__subtitle {
+    font-size: 0.9rem;
+    color: var(--color-text-muted);
+    margin: 0;
+    max-width: 320px;
 }
 
 /* ============================================================
@@ -1082,7 +1121,7 @@ body {
     justify-content: space-between;
     flex-wrap: wrap;
     gap: 12px;
-    margin-bottom: 24px;
+    margin-bottom: 28px;
     animation: fadeIn 0.4s ease-out both;
 }
 
@@ -1105,7 +1144,7 @@ body {
     align-items: flex-start;
     gap: 20px;
     flex-wrap: wrap;
-    margin-bottom: 20px;
+    margin-bottom: 24px;
     animation: fadeIn 0.4s ease-out 0.1s both;
 }
 
@@ -1170,20 +1209,49 @@ body {
 }
 
 .action-btn {
-    width: 32px;
-    height: 32px;
+    width: 36px;
+    height: 36px;
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: 8px;
+    border-radius: 10px;
     border: none;
     cursor: pointer;
-    transition: background 0.2s ease, color 0.2s ease, transform 0.2s ease;
+    transition: background 0.25s ease, color 0.25s ease, transform 0.2s ease;
+    position: relative;
 }
 
 .action-btn svg {
     width: 16px;
     height: 16px;
+}
+
+.action-btn::after {
+    content: attr(aria-label);
+    position: absolute;
+    bottom: calc(100% + 8px);
+    left: 50%;
+    transform: translateX(-50%) translateY(4px);
+    background: #1F2937;
+    color: #FFFFFF;
+    padding: 5px 10px;
+    border-radius: 6px;
+    font-size: 0.78rem;
+    font-weight: 500;
+    white-space: nowrap;
+    pointer-events: none;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.2s ease, transform 0.2s ease, visibility 0s;
+    z-index: 200;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
+    font-family: "Poppins", system-ui, -apple-system, sans-serif;
+}
+
+.action-btn:hover::after {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(-50%) translateY(0);
 }
 
 .action-btn--view {
@@ -1228,7 +1296,7 @@ body {
 .form-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 16px;
+    gap: 24px;
 }
 
 .form-group {
@@ -1254,8 +1322,8 @@ body {
 
 .form-actions {
     display: flex;
-    gap: 12px;
-    margin-top: 24px;
+    gap: 16px;
+    margin-top: 28px;
 }
 
 /* ============================================================
@@ -1467,8 +1535,8 @@ body {
     position: absolute;
     inset: 0;
     background: rgba(13, 59, 115, 0.45);
-    backdrop-filter: blur(6px);
-    -webkit-backdrop-filter: blur(6px);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
     animation: fadeIn 0.25s ease-out both;
 }
 
@@ -1508,6 +1576,30 @@ body {
 
 .modal__dialog--lg {
     max-width: 720px;
+}
+
+.modal__close {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    width: 36px;
+    height: 36px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-pill);
+    border: none;
+    background: transparent;
+    color: var(--color-text-muted);
+    font-size: 1.5rem;
+    line-height: 1;
+    cursor: pointer;
+    transition: background 0.2s ease, color 0.2s ease;
+}
+
+.modal__close:hover {
+    background: var(--color-light);
+    color: var(--color-primary);
 }
 
 /* ============================================================
@@ -1604,6 +1696,20 @@ body {
     }
 }
 
+@media (min-width: 1600px) {
+    .content {
+        padding: 32px;
+    }
+
+    .card {
+        padding: 28px;
+    }
+
+    .table th, .table td {
+        padding: 22px 32px;
+    }
+}
+
 /* Laptop */
 @media (max-width: 1366px) {
     .content {
@@ -1629,6 +1735,41 @@ body {
 
     .card {
         padding: 22px;
+    }
+}
+
+@media (max-width: 1280px) {
+    .content {
+        padding: 18px;
+    }
+
+    .card {
+        padding: 18px;
+    }
+
+    .table {
+        min-width: 540px;
+    }
+
+    .table th, .table td {
+        padding: 14px 18px;
+        font-size: 0.85rem;
+    }
+
+    .page-header {
+        margin-bottom: 24px;
+    }
+
+    .toolbar {
+        margin-bottom: 20px;
+    }
+
+    .card__header {
+        margin-bottom: 20px;
+    }
+
+    .pagination {
+        margin-top: 20px;
     }
 }
 
@@ -1897,7 +2038,7 @@ body {
     }
 
     .table th, .table td {
-        padding: 10px 12px;
+        padding: 10px 16px;
         font-size: 0.8rem;
     }
 
@@ -1966,7 +2107,7 @@ body {
     }
 
     .table th, .table td {
-        padding: 8px 10px;
+        padding: 8px 14px;
         font-size: 0.75rem;
     }
 

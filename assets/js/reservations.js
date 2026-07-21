@@ -39,6 +39,7 @@
     // ---- State ----
     var currentPage = 1;
     var editingId = null;
+    var viewingId = null;
     var filteredReservations = reservations.slice();
 
     // ---- DOM references ----
@@ -64,6 +65,7 @@
     var reservationModalTitle = document.getElementById("reservationModalTitle");
     var reservationForm = document.getElementById("reservationForm");
     var closeReservationModal = document.getElementById("closeReservationModal");
+    var closeReservationModalX = document.getElementById("closeReservationModalX");
 
     var resGuestName = document.getElementById("resGuestName");
     var resEmail = document.getElementById("resEmail");
@@ -74,6 +76,21 @@
     var resCheckIn = document.getElementById("resCheckIn");
     var resCheckOut = document.getElementById("resCheckOut");
     var resStatus = document.getElementById("resStatus");
+
+    var viewReservationModal = document.getElementById("viewReservationModal");
+    var viewReservationModalBackdrop = document.getElementById("viewReservationModalBackdrop");
+    var viewReservationModalTitle = document.getElementById("viewReservationModalTitle");
+    var btnEditFromView = document.getElementById("btnEditFromView");
+    var btnCloseViewModal = document.getElementById("btnCloseViewModal");
+    var viewGuestName = document.getElementById("viewGuestName");
+    var viewEmail = document.getElementById("viewEmail");
+    var viewPhone = document.getElementById("viewPhone");
+    var viewRoomNumber = document.getElementById("viewRoomNumber");
+    var viewRoomType = document.getElementById("viewRoomType");
+    var viewGuests = document.getElementById("viewGuests");
+    var viewCheckIn = document.getElementById("viewCheckIn");
+    var viewCheckOut = document.getElementById("viewCheckOut");
+    var viewStatus = document.getElementById("viewStatus");
 
     // ---- Utility: Format date ----
     function formatDate(dateStr) {
@@ -137,6 +154,7 @@
         if (pageItems.length === 0) {
             reservationsTableBody.innerHTML = "";
             reservationsEmpty.style.display = "block";
+            reservationsPagination.style.display = "none";
             return;
         }
 
@@ -177,8 +195,11 @@
         var totalPages = Math.ceil(filteredReservations.length / ITEMS_PER_PAGE);
         if (totalPages <= 1) {
             reservationsPagination.innerHTML = "";
+            reservationsPagination.style.display = "none";
             return;
         }
+
+        reservationsPagination.style.display = "flex";
 
         var html = "";
 
@@ -306,20 +327,31 @@
         applyFilters();
     }
 
-    // ---- View reservation (simple alert for demo) ----
+    // ---- View reservation (read-only modal) ----
     function viewReservation(id) {
+        viewingId = id;
         var r = reservations.find(function (item) { return item.id === id; });
         if (!r) return;
-        alert(
-            "Guest: " + r.guestName + "\n" +
-            "Email: " + r.email + "\n" +
-            "Phone: " + r.phone + "\n" +
-            "Room: " + r.roomNumber + " (" + capitalize(r.roomType) + ")\n" +
-            "Check-in: " + formatDate(r.checkIn) + "\n" +
-            "Check-out: " + formatDate(r.checkOut) + "\n" +
-            "Guests: " + r.guests + "\n" +
-            "Status: " + capitalize(r.status)
-        );
+
+        viewReservationModalTitle.textContent = "Reservation Details — " + r.guestName;
+        viewGuestName.value = r.guestName;
+        viewEmail.value = r.email;
+        viewPhone.value = r.phone;
+        viewRoomNumber.value = r.roomNumber;
+        viewRoomType.value = capitalize(r.roomType);
+        viewGuests.value = r.guests;
+        viewCheckIn.value = r.checkIn;
+        viewCheckOut.value = r.checkOut;
+        viewStatus.value = capitalize(r.status);
+        viewReservationModal.classList.add("modal--visible");
+        viewReservationModal.setAttribute("aria-hidden", "false");
+    }
+
+    // ---- Close view reservation modal ----
+    function closeViewModal() {
+        viewReservationModal.classList.remove("modal--visible");
+        viewReservationModal.setAttribute("aria-hidden", "true");
+        viewingId = null;
     }
 
     // ---- Export reservations (demo: CSV download) ----
@@ -401,7 +433,14 @@
     if (btnExport) btnExport.addEventListener("click", exportReservations);
     if (reservationForm) reservationForm.addEventListener("submit", saveReservation);
     if (closeReservationModal) closeReservationModal.addEventListener("click", closeModal);
+    if (closeReservationModalX) closeReservationModalX.addEventListener("click", closeModal);
     if (reservationModalBackdrop) reservationModalBackdrop.addEventListener("click", closeModal);
+    if (viewReservationModalBackdrop) viewReservationModalBackdrop.addEventListener("click", closeViewModal);
+    if (btnEditFromView) btnEditFromView.addEventListener("click", function () {
+        closeViewModal();
+        if (viewingId) openEditModal(viewingId);
+    });
+    if (btnCloseViewModal) btnCloseViewModal.addEventListener("click", closeViewModal);
 
     // ---- Table action listeners (delegation) ----
     if (reservationsTableBody) {
@@ -434,8 +473,12 @@
 
     // ---- Keyboard shortcut to close modal ----
     document.addEventListener("keydown", function (e) {
-        if (e.key === "Escape" && reservationModal.classList.contains("modal--visible")) {
-            closeModal();
+        if (e.key === "Escape") {
+            if (viewReservationModal.classList.contains("modal--visible")) {
+                closeViewModal();
+            } else if (reservationModal.classList.contains("modal--visible")) {
+                closeModal();
+            }
         }
     });
 
