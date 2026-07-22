@@ -18,7 +18,7 @@
         recordList: "Record List",
         addRecord: "Add Record",
         searchRecord: "Search Record",
-        reports: "Reports",
+        reports: "Reports & Analytics",
         about: "About"
     };
 
