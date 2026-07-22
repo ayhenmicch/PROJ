@@ -939,6 +939,18 @@
                                 </tbody>
                             </table>
                         </div>
+                        <div class="rooms__empty" id="roomsEmpty" style="display: none;">
+                            <div class="empty-state">
+                                <div class="empty-state__icon">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M3 7v11a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V7"/><path d="M21 7H3"/><path d="M9 7V3h6v4"/>
+                                    </svg>
+                                </div>
+                                <h3 class="empty-state__title">No rooms found.</h3>
+                                <p class="empty-state__subtitle">Try adjusting your search or filters.</p>
+                                <button class="btn btn--secondary" id="btnResetRoomFilters">Reset Filters</button>
+                            </div>
+                        </div>
                         <div class="pagination">
                             <button class="pagination__btn" disabled>&laquo;</button>
                             <button class="pagination__btn pagination__btn--active">1</button>

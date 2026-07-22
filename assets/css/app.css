@@ -1399,24 +1399,74 @@ body {
 
 .rooms .table th,
 .rooms .table td {
-    padding: 24px 30px;
-    transition: background 0.2s ease;
+    padding: 26px 30px;
+    transition: background 0.25s ease;
+    vertical-align: middle;
 }
 
 .rooms .table tbody tr {
-    min-height: 72px;
+    min-height: 76px;
     cursor: pointer;
-    transition: background 0.2s ease;
+    transition: background 0.25s ease, box-shadow 0.25s ease;
     border-bottom: 1px solid rgba(13, 59, 115, 0.06);
 }
 
 .rooms .table tbody tr:hover {
     background: #F5F8FF;
+    box-shadow: inset 3px 0 0 var(--color-secondary);
+}
+
+.rooms .table .actions-cell {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.rooms .table td:nth-child(6) {
+    text-align: center;
+}
+
+.rooms__empty {
+    text-align: center;
+    padding: 48px 24px;
+    color: var(--color-text-muted);
 }
 
 .rooms .stat-card {
     transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1),
                 box-shadow 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.rooms .stat-card__icon {
+    width: 56px;
+    height: 56px;
+    border-radius: 16px;
+}
+
+.rooms .stat-card__icon svg {
+    width: 26px;
+    height: 26px;
+}
+
+.rooms .stat-card__value {
+    font-size: 2rem;
+    line-height: 1.1;
+    letter-spacing: -0.03em;
+}
+
+.rooms .stat-card__info {
+    gap: 6px;
+}
+
+.rooms .stats-grid {
+    grid-template-columns: repeat(4, 1fr);
+    align-items: stretch;
+}
+
+.rooms .stat-card {
+    padding: 24px;
+    gap: 14px;
 }
 
 /* ============================================================
@@ -1448,8 +1498,8 @@ body {
 
 .toolbar {
     display: flex;
-    align-items: flex-start;
-    gap: 20px;
+    align-items: flex-end;
+    gap: 24px;
     flex-wrap: wrap;
     margin-bottom: 24px;
     animation: fadeIn 0.4s ease-out 0.1s both;
@@ -1463,6 +1513,7 @@ body {
 
 .toolbar__search input {
     padding-left: 42px;
+    height: 44px;
 }
 
 .toolbar__search-icon {
@@ -1481,6 +1532,7 @@ body {
     flex-direction: column;
     align-items: flex-start;
     gap: 6px;
+    justify-content: flex-end;
 }
 
 .toolbar__sort label {
@@ -1492,7 +1544,7 @@ body {
 
 .toolbar__sort select,
 .toolbar__sort input[type="date"] {
-    padding: 10px 14px;
+    padding: 12px 16px;
     border: 2px solid rgba(13, 59, 115, 0.12);
     border-radius: var(--radius-input);
     font-family: "Poppins", system-ui, -apple-system, sans-serif;
@@ -1508,6 +1560,14 @@ body {
 .toolbar__sort select:focus,
 .toolbar__sort input[type="date"]:focus {
     border-color: var(--color-secondary);
+}
+
+.toolbar .btn--secondary {
+    margin-left: auto;
+}
+
+.toolbar .btn {
+    min-height: 44px;
 }
 
 .actions-cell {
