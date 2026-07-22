@@ -716,6 +716,236 @@
                             </div>
                         </div>
                     </div>
+
+                    <div class="toolbar">
+                        <div class="toolbar__search">
+                            <svg class="toolbar__search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="11" cy="11" r="8"/>
+                                <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                            </svg>
+                            <input type="text" class="input" id="roomSearch" placeholder="Search rooms..." />
+                        </div>
+
+                        <div class="toolbar__sort">
+                            <label for="roomTypeFilter">Room Type</label>
+                            <select id="roomTypeFilter" class="input">
+                                <option value="">All Types</option>
+                                <option value="standard">Standard</option>
+                                <option value="deluxe">Deluxe</option>
+                                <option value="suite">Suite</option>
+                                <option value="family">Family</option>
+                            </select>
+                        </div>
+
+                        <div class="toolbar__sort">
+                            <label for="floorFilter">Floor</label>
+                            <select id="floorFilter" class="input">
+                                <option value="">All Floors</option>
+                                <option value="1">Floor 1</option>
+                                <option value="2">Floor 2</option>
+                                <option value="3">Floor 3</option>
+                                <option value="4">Floor 4</option>
+                                <option value="5">Floor 5</option>
+                            </select>
+                        </div>
+
+                        <div class="toolbar__sort">
+                            <label for="roomStatusFilter">Status</label>
+                            <select id="roomStatusFilter" class="input">
+                                <option value="">All Statuses</option>
+                                <option value="available">Available</option>
+                                <option value="occupied">Occupied</option>
+                                <option value="maintenance">Maintenance</option>
+                            </select>
+                        </div>
+
+                        <button class="btn btn--secondary" id="btnRoomExport">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                            Export
+                        </button>
+                    </div>
+
+                    <div class="rooms__table-card card">
+                        <div class="card__header">
+                            <h3 class="card__title">All Rooms</h3>
+                            <span class="rooms__count" id="roomCount">8 rooms</span>
+                        </div>
+                        <div class="table-wrap">
+                            <table class="table" id="roomsTable">
+                                <thead>
+                                    <tr>
+                                        <th>Room No.</th>
+                                        <th>Room Type</th>
+                                        <th>Floor</th>
+                                        <th>Capacity</th>
+                                        <th>Price/Night</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="roomsTableBody">
+                                    <tr>
+                                        <td>101</td>
+                                        <td>Standard</td>
+                                        <td>1</td>
+                                        <td>2</td>
+                                        <td>₱1,200</td>
+                                        <td><span class="badge badge--success">Available</span></td>
+                                        <td><div class="actions-cell">
+                                            <button class="action-btn action-btn--view" aria-label="View">
+                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                                            </button>
+                                            <button class="action-btn action-btn--edit" aria-label="Edit">
+                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                                            </button>
+                                            <button class="action-btn action-btn--delete" aria-label="Delete">
+                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                                            </button>
+                                        </div></td>
+                                    </tr>
+                                    <tr>
+                                        <td>102</td>
+                                        <td>Standard</td>
+                                        <td>1</td>
+                                        <td>2</td>
+                                        <td>₱1,200</td>
+                                        <td><span class="badge badge--info">Occupied</span></td>
+                                        <td><div class="actions-cell">
+                                            <button class="action-btn action-btn--view" aria-label="View">
+                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                                            </button>
+                                            <button class="action-btn action-btn--edit" aria-label="Edit">
+                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                                            </button>
+                                            <button class="action-btn action-btn--delete" aria-label="Delete">
+                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                                            </button>
+                                        </div></td>
+                                    </tr>
+                                    <tr>
+                                        <td>201</td>
+                                        <td>Deluxe</td>
+                                        <td>2</td>
+                                        <td>3</td>
+                                        <td>₱2,500</td>
+                                        <td><span class="badge badge--success">Available</span></td>
+                                        <td><div class="actions-cell">
+                                            <button class="action-btn action-btn--view" aria-label="View">
+                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                                            </button>
+                                            <button class="action-btn action-btn--edit" aria-label="Edit">
+                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                                            </button>
+                                            <button class="action-btn action-btn--delete" aria-label="Delete">
+                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                                            </button>
+                                        </div></td>
+                                    </tr>
+                                    <tr>
+                                        <td>202</td>
+                                        <td>Deluxe</td>
+                                        <td>2</td>
+                                        <td>3</td>
+                                        <td>₱2,500</td>
+                                        <td><span class="badge badge--warning">Reserved</span></td>
+                                        <td><div class="actions-cell">
+                                            <button class="action-btn action-btn--view" aria-label="View">
+                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                                            </button>
+                                            <button class="action-btn action-btn--edit" aria-label="Edit">
+                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                                            </button>
+                                            <button class="action-btn action-btn--delete" aria-label="Delete">
+                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                                            </button>
+                                        </div></td>
+                                    </tr>
+                                    <tr>
+                                        <td>301</td>
+                                        <td>Suite</td>
+                                        <td>3</td>
+                                        <td>4</td>
+                                        <td>₱4,800</td>
+                                        <td><span class="badge badge--success">Available</span></td>
+                                        <td><div class="actions-cell">
+                                            <button class="action-btn action-btn--view" aria-label="View">
+                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                                            </button>
+                                            <button class="action-btn action-btn--edit" aria-label="Edit">
+                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                                            </button>
+                                            <button class="action-btn action-btn--delete" aria-label="Delete">
+                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                                            </button>
+                                        </div></td>
+                                    </tr>
+                                    <tr>
+                                        <td>302</td>
+                                        <td>Suite</td>
+                                        <td>3</td>
+                                        <td>4</td>
+                                        <td>₱4,800</td>
+                                        <td><span class="badge badge--danger">Maintenance</span></td>
+                                        <td><div class="actions-cell">
+                                            <button class="action-btn action-btn--view" aria-label="View">
+                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                                            </button>
+                                            <button class="action-btn action-btn--edit" aria-label="Edit">
+                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                                            </button>
+                                            <button class="action-btn action-btn--delete" aria-label="Delete">
+                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                                            </button>
+                                        </div></td>
+                                    </tr>
+                                    <tr>
+                                        <td>401</td>
+                                        <td>Family</td>
+                                        <td>4</td>
+                                        <td>5</td>
+                                        <td>₱3,500</td>
+                                        <td><span class="badge badge--warning">Reserved</span></td>
+                                        <td><div class="actions-cell">
+                                            <button class="action-btn action-btn--view" aria-label="View">
+                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                                            </button>
+                                            <button class="action-btn action-btn--edit" aria-label="Edit">
+                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                                            </button>
+                                            <button class="action-btn action-btn--delete" aria-label="Delete">
+                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                                            </button>
+                                        </div></td>
+                                    </tr>
+                                    <tr>
+                                        <td>402</td>
+                                        <td>Family</td>
+                                        <td>4</td>
+                                        <td>6</td>
+                                        <td>₱4,200</td>
+                                        <td><span class="badge badge--info">Occupied</span></td>
+                                        <td><div class="actions-cell">
+                                            <button class="action-btn action-btn--view" aria-label="View">
+                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                                            </button>
+                                            <button class="action-btn action-btn--edit" aria-label="Edit">
+                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                                            </button>
+                                            <button class="action-btn action-btn--delete" aria-label="Delete">
+                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                                            </button>
+                                        </div></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="pagination">
+                            <button class="pagination__btn" disabled>&laquo;</button>
+                            <button class="pagination__btn pagination__btn--active">1</button>
+                            <button class="pagination__btn">2</button>
+                            <button class="pagination__btn">&raquo;</button>
+                        </div>
+                    </div>
                 </section>
             </main>
         </div>

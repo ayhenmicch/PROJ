@@ -1380,6 +1380,45 @@ body {
     margin-bottom: 24px;
 }
 
+.rooms__table-card .card {
+    transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+                box-shadow 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.rooms__table-card .card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 16px 40px rgba(13, 59, 115, 0.14);
+}
+
+.rooms__count {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--color-secondary);
+    letter-spacing: 0.02em;
+}
+
+.rooms .table th,
+.rooms .table td {
+    padding: 24px 30px;
+    transition: background 0.2s ease;
+}
+
+.rooms .table tbody tr {
+    min-height: 72px;
+    cursor: pointer;
+    transition: background 0.2s ease;
+    border-bottom: 1px solid rgba(13, 59, 115, 0.06);
+}
+
+.rooms .table tbody tr:hover {
+    background: #F5F8FF;
+}
+
+.rooms .stat-card {
+    transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+                box-shadow 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
 /* ============================================================
    Record List
    ============================================================ */
@@ -2150,6 +2189,25 @@ body {
     .pagination {
         margin-top: 20px;
     }
+
+    .rooms .page-header {
+        margin-bottom: 20px;
+    }
+
+    .rooms .toolbar {
+        flex-wrap: wrap;
+    }
+
+    .rooms .toolbar__search {
+        flex: 0 0 58%;
+        min-width: 240px;
+    }
+
+    .rooms .toolbar__sort {
+        flex: 1;
+        min-width: 130px;
+        width: auto;
+    }
 }
 
 @media (max-width: 1024px) {
@@ -2229,6 +2287,39 @@ body {
     }
 
     .guests .toolbar__sort--equal {
+        flex: 1 1 calc(50% - 6px);
+        min-width: 130px;
+    }
+
+    .rooms .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+    }
+
+    .rooms .stat-card {
+        padding: 16px;
+    }
+
+    .rooms .stat-card__icon {
+        width: 40px;
+        height: 40px;
+    }
+
+    .rooms .stat-card__value {
+        font-size: 1.25rem;
+    }
+
+    .rooms .toolbar {
+        flex-wrap: wrap;
+        gap: 12px;
+    }
+
+    .rooms .toolbar__search {
+        flex: 0 0 100%;
+        min-width: 100%;
+    }
+
+    .rooms .toolbar__sort {
         flex: 1 1 calc(50% - 6px);
         min-width: 130px;
     }
@@ -2394,6 +2485,39 @@ body {
         flex: 1 1 calc(50% - 5px);
         min-width: 120px;
     }
+
+    .rooms .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+    }
+
+    .rooms .stat-card {
+        padding: 16px;
+    }
+
+    .rooms .stat-card__icon {
+        width: 38px;
+        height: 38px;
+    }
+
+    .rooms .stat-card__value {
+        font-size: 1.2rem;
+    }
+
+    .rooms .toolbar {
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .rooms .toolbar__search {
+        flex: 0 0 100%;
+        min-width: 100%;
+    }
+
+    .rooms .toolbar__sort {
+        flex: 1 1 calc(50% - 5px);
+        min-width: 120px;
+    }
 }
 
 /* Mobile */
@@ -2502,6 +2626,21 @@ body {
     }
 
     .guests .toolbar__sort--equal {
+        flex: 1 1 100%;
+        min-width: 100%;
+    }
+
+    .rooms .stats-grid {
+        grid-template-columns: 1fr;
+        gap: 10px;
+    }
+
+    .rooms .toolbar__search {
+        flex: 1 1 100%;
+        min-width: 100%;
+    }
+
+    .rooms .toolbar__sort {
         flex: 1 1 100%;
         min-width: 100%;
     }
