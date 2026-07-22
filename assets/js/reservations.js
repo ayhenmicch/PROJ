@@ -14,6 +14,7 @@
         dashboard: "Dashboard",
         reservations: "Reservation Management",
         guests: "Guest Management",
+        rooms: "Room Management",
         recordList: "Record List",
         addRecord: "Add Record",
         searchRecord: "Search Record",
