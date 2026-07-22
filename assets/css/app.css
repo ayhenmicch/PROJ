@@ -536,6 +536,7 @@ body {
 .btn--primary:hover {
     transform: translateY(-2px);
     box-shadow: 0 10px 28px rgba(13, 59, 115, 0.35);
+    filter: brightness(1.1);
 }
 
 .btn--primary:active {
@@ -550,6 +551,8 @@ body {
 
 .btn--secondary:hover {
     background: var(--color-light);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(13, 59, 115, 0.18);
 }
 
 .btn--danger {
@@ -632,7 +635,7 @@ body {
     align-items: center;
     justify-content: center;
     padding: 6px 16px;
-    border-radius: var(--radius-pill);
+    border-radius: 12px;
     font-size: 0.72rem;
     font-weight: 600;
     text-transform: uppercase;
@@ -640,6 +643,7 @@ body {
     white-space: nowrap;
     line-height: 1;
     transition: transform 0.2s ease, box-shadow 0.2s ease;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
 }
 
 .badge--success {
@@ -1412,7 +1416,7 @@ body {
 }
 
 .rooms .table tbody tr:hover {
-    background: #F5F8FF;
+    background: #F8FBFF;
     box-shadow: inset 3px 0 0 var(--color-secondary);
 }
 
@@ -1469,6 +1473,11 @@ body {
     gap: 14px;
 }
 
+.rooms .stat-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 28px rgba(13, 59, 115, 0.12);
+}
+
 /* ============================================================
    Record List
    ============================================================ */
@@ -1514,6 +1523,12 @@ body {
 .toolbar__search input {
     padding-left: 42px;
     height: 44px;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.toolbar__search input:focus {
+    border-color: var(--color-secondary);
+    box-shadow: 0 0 0 4px rgba(47, 128, 237, 0.12);
 }
 
 .toolbar__search-icon {
@@ -1560,6 +1575,7 @@ body {
 .toolbar__sort select:focus,
 .toolbar__sort input[type="date"]:focus {
     border-color: var(--color-secondary);
+    box-shadow: 0 0 0 4px rgba(47, 128, 237, 0.12);
 }
 
 .toolbar .btn--secondary {
@@ -1629,6 +1645,7 @@ body {
 .action-btn--view:hover {
     background: var(--color-secondary);
     color: var(--color-white);
+    transform: scale(1.05);
 }
 
 .action-btn--edit {
@@ -1639,6 +1656,7 @@ body {
 .action-btn--edit:hover {
     background: var(--color-warning);
     color: var(--color-primary);
+    transform: scale(1.05);
 }
 
 .action-btn--delete {
@@ -1649,6 +1667,7 @@ body {
 .action-btn--delete:hover {
     background: var(--color-danger);
     color: var(--color-white);
+    transform: scale(1.05);
 }
 
 /* ============================================================
