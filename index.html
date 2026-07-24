@@ -182,6 +182,11 @@
                     <span>Guests</span>
                     <span class="sidebar__tooltip" aria-hidden="true">Guests</span>
                 </a>
+                <a href="#" class="sidebar__link" data-page="rooms">
+                    <svg class="sidebar__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                    <span>Rooms</span>
+                    <span class="sidebar__tooltip" aria-hidden="true">Rooms</span>
+                </a>
                 <a href="#" class="sidebar__link" data-page="reports">
                     <svg class="sidebar__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
                     <span>Reports</span>
@@ -976,6 +981,299 @@
                         <p class="about-footer__subtext">
                             Bachelor of Science in Information Technology &mdash; Section 21002 &mdash; Group 5
                         </p>
+                    </div>
+                </section>
+                <section class="rooms" id="roomsPage" style="display: none;">
+                    <div class="page-header">
+                        <div>
+                            <h1 class="page-header__title">Room Management</h1>
+                            <p class="page-header__subtitle">Manage hotel rooms and availability.</p>
+                        </div>
+                        <button class="btn btn--primary" id="btnAddRoom">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                            Add Room
+                        </button>
+                    </div>
+
+                    <div class="rooms__summary stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-card__icon stat-card__icon--primary">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+                            </div>
+                            <div class="stat-card__info">
+                                <span class="stat-card__value">120</span>
+                                <span class="stat-card__label">Total Rooms</span>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-card__icon stat-card__icon--success">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                            </div>
+                            <div class="stat-card__info">
+                                <span class="stat-card__value">45</span>
+                                <span class="stat-card__label">Available Rooms</span>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-card__icon stat-card__icon--warning">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                            </div>
+                            <div class="stat-card__info">
+                                <span class="stat-card__value">68</span>
+                                <span class="stat-card__label">Occupied Rooms</span>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-card__icon" style="background: rgba(160, 174, 192, 0.10); color: #6B7280;">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+                            </div>
+                            <div class="stat-card__info">
+                                <span class="stat-card__value">7</span>
+                                <span class="stat-card__label">Maintenance</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="toolbar">
+                        <div class="toolbar__search">
+                            <svg class="toolbar__search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="11" cy="11" r="8"/>
+                                <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                            </svg>
+                            <input type="text" class="input" id="roomSearch" placeholder="Search rooms..." />
+                        </div>
+
+                        <div class="toolbar__sort">
+                            <label for="roomTypeFilter">Room Type</label>
+                            <select id="roomTypeFilter" class="input">
+                                <option value="">All Types</option>
+                                <option value="standard">Standard</option>
+                                <option value="deluxe">Deluxe</option>
+                                <option value="suite">Suite</option>
+                                <option value="family">Family</option>
+                            </select>
+                        </div>
+
+                        <div class="toolbar__sort">
+                            <label for="floorFilter">Floor</label>
+                            <select id="floorFilter" class="input">
+                                <option value="">All Floors</option>
+                                <option value="1">Floor 1</option>
+                                <option value="2">Floor 2</option>
+                                <option value="3">Floor 3</option>
+                                <option value="4">Floor 4</option>
+                                <option value="5">Floor 5</option>
+                            </select>
+                        </div>
+
+                        <div class="toolbar__sort">
+                            <label for="roomStatusFilter">Status</label>
+                            <select id="roomStatusFilter" class="input">
+                                <option value="">All Statuses</option>
+                                <option value="available">Available</option>
+                                <option value="occupied">Occupied</option>
+                                <option value="maintenance">Maintenance</option>
+                            </select>
+                        </div>
+
+                        <button class="btn btn--secondary" id="btnRoomExport">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                            Export
+                        </button>
+                    </div>
+
+                    <div class="rooms__table-card card">
+                        <div class="card__header">
+                            <h3 class="card__title">All Rooms</h3>
+                            <span class="rooms__count" id="roomCount">8 rooms</span>
+                        </div>
+                        <div class="table-wrap">
+                            <table class="table" id="roomsTable">
+                                <thead>
+                                    <tr>
+                                        <th>Room No.</th>
+                                        <th>Room Type</th>
+                                        <th>Floor</th>
+                                        <th>Capacity</th>
+                                        <th>Price/Night</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="roomsTableBody">
+                                    <tr>
+                                        <td>101</td>
+                                        <td>Standard</td>
+                                        <td>1</td>
+                                        <td>2</td>
+                                        <td>&#8369;1,200</td>
+                                        <td><span class="badge badge--success">Available</span></td>
+                                        <td><div class="actions-cell">
+                                            <button class="action-btn action-btn--view" aria-label="View">
+                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                                            </button>
+                                            <button class="action-btn action-btn--edit" aria-label="Edit">
+                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                                            </button>
+                                            <button class="action-btn action-btn--delete" aria-label="Delete">
+                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                                            </button>
+                                        </div></td>
+                                    </tr>
+                                    <tr>
+                                        <td>102</td>
+                                        <td>Standard</td>
+                                        <td>1</td>
+                                        <td>2</td>
+                                        <td>&#8369;1,200</td>
+                                        <td><span class="badge badge--info">Occupied</span></td>
+                                        <td><div class="actions-cell">
+                                            <button class="action-btn action-btn--view" aria-label="View">
+                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                                            </button>
+                                            <button class="action-btn action-btn--edit" aria-label="Edit">
+                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                                            </button>
+                                            <button class="action-btn action-btn--delete" aria-label="Delete">
+                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                                            </button>
+                                        </div></td>
+                                    </tr>
+                                    <tr>
+                                        <td>201</td>
+                                        <td>Deluxe</td>
+                                        <td>2</td>
+                                        <td>3</td>
+                                        <td>&#8369;2,500</td>
+                                        <td><span class="badge badge--success">Available</span></td>
+                                        <td><div class="actions-cell">
+                                            <button class="action-btn action-btn--view" aria-label="View">
+                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                                            </button>
+                                            <button class="action-btn action-btn--edit" aria-label="Edit">
+                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                                            </button>
+                                            <button class="action-btn action-btn--delete" aria-label="Delete">
+                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                                            </button>
+                                        </div></td>
+                                    </tr>
+                                    <tr>
+                                        <td>202</td>
+                                        <td>Deluxe</td>
+                                        <td>2</td>
+                                        <td>3</td>
+                                        <td>&#8369;2,500</td>
+                                        <td><span class="badge badge--warning">Reserved</span></td>
+                                        <td><div class="actions-cell">
+                                            <button class="action-btn action-btn--view" aria-label="View">
+                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                                            </button>
+                                            <button class="action-btn action-btn--edit" aria-label="Edit">
+                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                                            </button>
+                                            <button class="action-btn action-btn--delete" aria-label="Delete">
+                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                                            </button>
+                                        </div></td>
+                                    </tr>
+                                    <tr>
+                                        <td>301</td>
+                                        <td>Suite</td>
+                                        <td>3</td>
+                                        <td>4</td>
+                                        <td>&#8369;4,800</td>
+                                        <td><span class="badge badge--success">Available</span></td>
+                                        <td><div class="actions-cell">
+                                            <button class="action-btn action-btn--view" aria-label="View">
+                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                                            </button>
+                                            <button class="action-btn action-btn--edit" aria-label="Edit">
+                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                                            </button>
+                                            <button class="action-btn action-btn--delete" aria-label="Delete">
+                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                                            </button>
+                                        </div></td>
+                                    </tr>
+                                    <tr>
+                                        <td>302</td>
+                                        <td>Suite</td>
+                                        <td>3</td>
+                                        <td>4</td>
+                                        <td>&#8369;4,800</td>
+                                        <td><span class="badge badge--danger">Maintenance</span></td>
+                                        <td><div class="actions-cell">
+                                            <button class="action-btn action-btn--view" aria-label="View">
+                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                                            </button>
+                                            <button class="action-btn action-btn--edit" aria-label="Edit">
+                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                                            </button>
+                                            <button class="action-btn action-btn--delete" aria-label="Delete">
+                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                                            </button>
+                                        </div></td>
+                                    </tr>
+                                    <tr>
+                                        <td>401</td>
+                                        <td>Family</td>
+                                        <td>4</td>
+                                        <td>5</td>
+                                        <td>&#8369;3,500</td>
+                                        <td><span class="badge badge--warning">Reserved</span></td>
+                                        <td><div class="actions-cell">
+                                            <button class="action-btn action-btn--view" aria-label="View">
+                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                                            </button>
+                                            <button class="action-btn action-btn--edit" aria-label="Edit">
+                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                                            </button>
+                                            <button class="action-btn action-btn--delete" aria-label="Delete">
+                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                                            </button>
+                                        </div></td>
+                                    </tr>
+                                    <tr>
+                                        <td>402</td>
+                                        <td>Family</td>
+                                        <td>4</td>
+                                        <td>6</td>
+                                        <td>&#8369;4,200</td>
+                                        <td><span class="badge badge--info">Occupied</span></td>
+                                        <td><div class="actions-cell">
+                                            <button class="action-btn action-btn--view" aria-label="View">
+                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                                            </button>
+                                            <button class="action-btn action-btn--edit" aria-label="Edit">
+                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                                            </button>
+                                            <button class="action-btn action-btn--delete" aria-label="Delete">
+                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                                            </button>
+                                        </div></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="rooms__empty" id="roomsEmpty" style="display: none;">
+                            <div class="empty-state">
+                                <div class="empty-state__icon">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M3 7v11a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V7"/><path d="M21 7H3"/><path d="M9 7V3h6v4"/>
+                                    </svg>
+                                </div>
+                                <h3 class="empty-state__title">No rooms found.</h3>
+                                <p class="empty-state__subtitle">Try adjusting your search or filters.</p>
+                                <button class="btn btn--secondary" id="btnResetRoomFilters">Reset Filters</button>
+                            </div>
+                        </div>
+                        <div class="pagination">
+                            <button class="pagination__btn" disabled>&laquo;</button>
+                            <button class="pagination__btn pagination__btn--active">1</button>
+                            <button class="pagination__btn">2</button>
+                            <button class="pagination__btn">&raquo;</button>
+                        </div>
                     </div>
                 </section>
             </main>

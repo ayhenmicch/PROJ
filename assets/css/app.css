@@ -1706,6 +1706,16 @@ body {
     color: var(--color-text-muted);
 }
 
+.form-group--error .input {
+    border-color: var(--color-danger);
+}
+
+.form-group__error {
+    font-size: 0.75rem;
+    color: var(--color-danger);
+    margin-top: 2px;
+}
+
 .form-actions {
     display: flex;
     gap: 16px;

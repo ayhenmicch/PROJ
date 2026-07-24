@@ -22,21 +22,36 @@
         about: "About"
     };
 
-// ---- Sample reservation data ----
-var reservations = [
-    { id: 1, guestName: "Mark Angelo Ty", email: "mark@example.com", phone: "+63 912 345 6789", roomNumber: "101", roomType: "standard", checkIn: "2026-07-21", checkOut: "2026-07-23", status: "checked-in", guests: 2 },
-    { id: 2, guestName: "Mary Grace Piattos", email: "mary@example.com", phone: "+63 923 456 7890", roomNumber: "204", roomType: "deluxe", checkIn: "2026-07-22", checkOut: "2026-07-25", status: "confirmed", guests: 1 },
-    { id: 3, guestName: "Lebron James", email: "lebron@example.com", phone: "+63 934 567 8901", roomNumber: "305", roomType: "suite", checkIn: "2026-07-22", checkOut: "2026-07-24", status: "pending", guests: 3 },
-    { id: 4, guestName: "Nanny McPhee", email: "nanny@example.com", phone: "+63 945 678 9012", roomNumber: "112", roomType: "standard", checkIn: "2026-07-23", checkOut: "2026-07-26", status: "confirmed", guests: 2 },
-    { id: 5, guestName: "Rene Baterbonia", email: "rene@example.com", phone: "+63 956 789 0123", roomNumber: "401", roomType: "family", checkIn: "2026-07-21", checkOut: "2026-07-22", status: "checked-out", guests: 4 },
-    { id: 6, guestName: "Sofia Reyes", email: "sofia@example.com", phone: "+63 967 890 1234", roomNumber: "108", roomType: "standard", checkIn: "2026-07-24", checkOut: "2026-07-26", status: "confirmed", guests: 1 },
-    { id: 7, guestName: "Carlos Mendoza", email: "carlos@example.com", phone: "+63 978 901 2345", roomNumber: "215", roomType: "deluxe", checkIn: "2026-07-25", checkOut: "2026-07-28", status: "pending", guests: 2 },
-    { id: 8, guestName: "Aisha Patel", email: "aisha@example.com", phone: "+63 989 012 3456", roomNumber: "302", roomType: "suite", checkIn: "2026-07-23", checkOut: "2026-07-25", status: "cancelled", guests: 2 },
-    { id: 9, guestName: "John Dela Cruz", email: "john@example.com", phone: "+63 990 123 4567", roomNumber: "110", roomType: "standard", checkIn: "2026-07-26", checkOut: "2026-07-28", status: "confirmed", guests: 1 },
-    { id: 10, guestName: "Maria Santos", email: "maria@example.com", phone: "+63 901 234 5678", roomNumber: "208", roomType: "deluxe", checkIn: "2026-07-27", checkOut: "2026-07-30", status: "pending", guests: 2 },
-    { id: 11, guestName: "David Kim", email: "david@example.com", phone: "+63 912 345 6780", roomNumber: "310", roomType: "suite", checkIn: "2026-07-28", checkOut: "2026-07-31", status: "confirmed", guests: 3 },
-    { id: 12, guestName: "Elena Garcia", email: "elena@example.com", phone: "+63 923 456 7891", roomNumber: "405", roomType: "family", checkIn: "2026-07-29", checkOut: "2026-08-01", status: "checked-in", guests: 5 }
-];
+// ---- Storage key ----
+var STORAGE_KEY = "ashure_reservations";
+
+// ---- Load reservations from localStorage or initialize with sample data ----
+var reservations = (function () {
+    var stored = localStorage.getItem(STORAGE_KEY);
+    if (stored) {
+        try {
+            return JSON.parse(stored);
+        } catch (e) {
+            // Corrupted data — fall through to initialize
+        }
+    }
+    var sample = [
+        { id: 1, guestName: "Mark Angelo Ty", email: "mark@example.com", phone: "+63 912 345 6789", roomNumber: "101", roomType: "standard", checkIn: "2026-07-21", checkOut: "2026-07-23", status: "checked-in", guests: 2 },
+        { id: 2, guestName: "Mary Grace Piattos", email: "mary@example.com", phone: "+63 923 456 7890", roomNumber: "204", roomType: "deluxe", checkIn: "2026-07-22", checkOut: "2026-07-25", status: "confirmed", guests: 1 },
+        { id: 3, guestName: "Lebron James", email: "lebron@example.com", phone: "+63 934 567 8901", roomNumber: "305", roomType: "suite", checkIn: "2026-07-22", checkOut: "2026-07-24", status: "pending", guests: 3 },
+        { id: 4, guestName: "Nanny McPhee", email: "nanny@example.com", phone: "+63 945 678 9012", roomNumber: "112", roomType: "standard", checkIn: "2026-07-23", checkOut: "2026-07-26", status: "confirmed", guests: 2 },
+        { id: 5, guestName: "Rene Baterbonia", email: "rene@example.com", phone: "+63 956 789 0123", roomNumber: "401", roomType: "family", checkIn: "2026-07-21", checkOut: "2026-07-22", status: "checked-out", guests: 4 },
+        { id: 6, guestName: "Sofia Reyes", email: "sofia@example.com", phone: "+63 967 890 1234", roomNumber: "108", roomType: "standard", checkIn: "2026-07-24", checkOut: "2026-07-26", status: "confirmed", guests: 1 },
+        { id: 7, guestName: "Carlos Mendoza", email: "carlos@example.com", phone: "+63 978 901 2345", roomNumber: "215", roomType: "deluxe", checkIn: "2026-07-25", checkOut: "2026-07-28", status: "pending", guests: 2 },
+        { id: 8, guestName: "Aisha Patel", email: "aisha@example.com", phone: "+63 989 012 3456", roomNumber: "302", roomType: "suite", checkIn: "2026-07-23", checkOut: "2026-07-25", status: "cancelled", guests: 2 },
+        { id: 9, guestName: "John Dela Cruz", email: "john@example.com", phone: "+63 990 123 4567", roomNumber: "110", roomType: "standard", checkIn: "2026-07-26", checkOut: "2026-07-28", status: "confirmed", guests: 1 },
+        { id: 10, guestName: "Maria Santos", email: "maria@example.com", phone: "+63 901 234 5678", roomNumber: "208", roomType: "deluxe", checkIn: "2026-07-27", checkOut: "2026-07-30", status: "pending", guests: 2 },
+        { id: 11, guestName: "David Kim", email: "david@example.com", phone: "+63 912 345 6780", roomNumber: "310", roomType: "suite", checkIn: "2026-07-28", checkOut: "2026-07-31", status: "confirmed", guests: 3 },
+        { id: 12, guestName: "Elena Garcia", email: "elena@example.com", phone: "+63 923 456 7891", roomNumber: "405", roomType: "family", checkIn: "2026-07-29", checkOut: "2026-08-01", status: "checked-in", guests: 5 }
+    ];
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(sample));
+    return sample;
+})();
 
 // Expose data for statistics computation
 window.ASHURE_APP = window.ASHURE_APP || {};
@@ -121,6 +136,55 @@ window.ASHURE_APP.reservations = reservations;
     // ---- Utility: Capitalize first letter ----
     function capitalize(str) {
         return str.charAt(0).toUpperCase() + str.slice(1);
+    }
+
+    // ---- Validate a single form field, show inline error ----
+    function showFieldError(fieldEl, message) {
+        if (!fieldEl) return;
+        var formGroup = fieldEl.closest('.form-group');
+        if (!formGroup) return;
+
+        formGroup.classList.add('form-group--error');
+
+        var existing = formGroup.querySelector('.form-group__error');
+        if (existing) existing.remove();
+
+        var errorEl = document.createElement('span');
+        errorEl.className = 'form-group__error';
+        errorEl.textContent = message;
+        formGroup.appendChild(errorEl);
+    }
+
+    // ---- Clear all inline validation errors ----
+    function clearValidation() {
+        var errorEls = document.querySelectorAll('.form-group--error');
+        for (var i = 0; i < errorEls.length; i++) {
+            errorEls[i].classList.remove('form-group--error');
+        }
+        var msgEls = document.querySelectorAll('.form-group__error');
+        for (var j = 0; j < msgEls.length; j++) {
+            msgEls[j].remove();
+        }
+    }
+
+    // ---- Bind input listeners to clear validation on user input ----
+    function bindValidationClear() {
+        var validatable = [resGuestName, resRoomNumber, resCheckIn, resCheckOut];
+        for (var i = 0; i < validatable.length; i++) {
+            if (validatable[i]) {
+                validatable[i].addEventListener('input', clearValidation);
+                validatable[i].addEventListener('change', clearValidation);
+            }
+        }
+    }
+
+    // ---- Persist reservations to localStorage ----
+    function saveToLocalStorage() {
+        try {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(reservations));
+        } catch (e) {
+            // Storage unavailable or quota exceeded — continue silently
+        }
     }
 
     // ---- Filter reservations ----
@@ -283,8 +347,26 @@ window.ASHURE_APP.reservations = reservations;
         var checkOut = resCheckOut.value;
         var status = resStatus.value;
 
-        if (!guestName || !roomNumber || !checkIn || !checkOut) {
-            alert("Please fill in all required fields.");
+        var hasError = false;
+        clearValidation();
+
+        if (!guestName) {
+            showFieldError(resGuestName, "Guest name is required.");
+            hasError = true;
+        }
+        if (!roomNumber) {
+            showFieldError(resRoomNumber, "Room number is required.");
+            hasError = true;
+        }
+        if (!checkIn) {
+            showFieldError(resCheckIn, "Check-in date is required.");
+            hasError = true;
+        }
+        if (!checkOut) {
+            showFieldError(resCheckOut, "Check-out date is required.");
+            hasError = true;
+        }
+        if (hasError) {
             return;
         }
 
@@ -322,6 +404,7 @@ window.ASHURE_APP.reservations = reservations;
 
         closeModal();
         applyFilters();
+        saveToLocalStorage();
         document.dispatchEvent(new CustomEvent("ashure:data-changed"));
     }
 
@@ -332,6 +415,7 @@ window.ASHURE_APP.reservations = reservations;
         }
         reservations = reservations.filter(function (r) { return r.id !== id; });
         applyFilters();
+        saveToLocalStorage();
         document.dispatchEvent(new CustomEvent("ashure:data-changed"));
     }
 
@@ -498,6 +582,16 @@ window.ASHURE_APP.reservations = reservations;
         if (reservationsSection) {
             reservationsSection.style.display = "none";
         }
+    }
+
+    function initReservations() {
+        applyFilters();
+        // Hide reservations section initially; dashboard is visible by default
+        var reservationsSection = document.getElementById("reservationsPage");
+        if (reservationsSection) {
+            reservationsSection.style.display = "none";
+        }
+        bindValidationClear();
     }
 
     if (document.readyState === "loading") {
