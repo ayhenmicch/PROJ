@@ -21,6 +21,10 @@
         { id: 10, name: "Sophie Dubois", email: "sophie.dubois@email.com", phone: "+33 555-0110", nationality: "French", visits: 7, status: "active", membership: "gold" }
     ];
 
+    // Expose data for statistics computation
+    window.ASHURE_APP = window.ASHURE_APP || {};
+    window.ASHURE_APP.guests = guests;
+
     var ITEMS_PER_PAGE = 8;
     var currentPage = 1;
 

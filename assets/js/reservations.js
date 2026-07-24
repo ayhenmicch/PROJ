@@ -22,21 +22,25 @@
         about: "About"
     };
 
-    // ---- Sample reservation data ----
-    var reservations = [
-        { id: 1, guestName: "Mark Angelo Ty", email: "mark@example.com", phone: "+63 912 345 6789", roomNumber: "101", roomType: "standard", checkIn: "2026-07-21", checkOut: "2026-07-23", status: "checked-in", guests: 2 },
-        { id: 2, guestName: "Mary Grace Piattos", email: "mary@example.com", phone: "+63 923 456 7890", roomNumber: "204", roomType: "deluxe", checkIn: "2026-07-22", checkOut: "2026-07-25", status: "confirmed", guests: 1 },
-        { id: 3, guestName: "Lebron James", email: "lebron@example.com", phone: "+63 934 567 8901", roomNumber: "305", roomType: "suite", checkIn: "2026-07-22", checkOut: "2026-07-24", status: "pending", guests: 3 },
-        { id: 4, guestName: "Nanny McPhee", email: "nanny@example.com", phone: "+63 945 678 9012", roomNumber: "112", roomType: "standard", checkIn: "2026-07-23", checkOut: "2026-07-26", status: "confirmed", guests: 2 },
-        { id: 5, guestName: "Rene Baterbonia", email: "rene@example.com", phone: "+63 956 789 0123", roomNumber: "401", roomType: "family", checkIn: "2026-07-21", checkOut: "2026-07-22", status: "checked-out", guests: 4 },
-        { id: 6, guestName: "Sofia Reyes", email: "sofia@example.com", phone: "+63 967 890 1234", roomNumber: "108", roomType: "standard", checkIn: "2026-07-24", checkOut: "2026-07-26", status: "confirmed", guests: 1 },
-        { id: 7, guestName: "Carlos Mendoza", email: "carlos@example.com", phone: "+63 978 901 2345", roomNumber: "215", roomType: "deluxe", checkIn: "2026-07-25", checkOut: "2026-07-28", status: "pending", guests: 2 },
-        { id: 8, guestName: "Aisha Patel", email: "aisha@example.com", phone: "+63 989 012 3456", roomNumber: "302", roomType: "suite", checkIn: "2026-07-23", checkOut: "2026-07-25", status: "cancelled", guests: 2 },
-        { id: 9, guestName: "John Dela Cruz", email: "john@example.com", phone: "+63 990 123 4567", roomNumber: "110", roomType: "standard", checkIn: "2026-07-26", checkOut: "2026-07-28", status: "confirmed", guests: 1 },
-        { id: 10, guestName: "Maria Santos", email: "maria@example.com", phone: "+63 901 234 5678", roomNumber: "208", roomType: "deluxe", checkIn: "2026-07-27", checkOut: "2026-07-30", status: "pending", guests: 2 },
-        { id: 11, guestName: "David Kim", email: "david@example.com", phone: "+63 912 345 6780", roomNumber: "310", roomType: "suite", checkIn: "2026-07-28", checkOut: "2026-07-31", status: "confirmed", guests: 3 },
-        { id: 12, guestName: "Elena Garcia", email: "elena@example.com", phone: "+63 923 456 7891", roomNumber: "405", roomType: "family", checkIn: "2026-07-29", checkOut: "2026-08-01", status: "checked-in", guests: 5 }
-    ];
+// ---- Sample reservation data ----
+var reservations = [
+    { id: 1, guestName: "Mark Angelo Ty", email: "mark@example.com", phone: "+63 912 345 6789", roomNumber: "101", roomType: "standard", checkIn: "2026-07-21", checkOut: "2026-07-23", status: "checked-in", guests: 2 },
+    { id: 2, guestName: "Mary Grace Piattos", email: "mary@example.com", phone: "+63 923 456 7890", roomNumber: "204", roomType: "deluxe", checkIn: "2026-07-22", checkOut: "2026-07-25", status: "confirmed", guests: 1 },
+    { id: 3, guestName: "Lebron James", email: "lebron@example.com", phone: "+63 934 567 8901", roomNumber: "305", roomType: "suite", checkIn: "2026-07-22", checkOut: "2026-07-24", status: "pending", guests: 3 },
+    { id: 4, guestName: "Nanny McPhee", email: "nanny@example.com", phone: "+63 945 678 9012", roomNumber: "112", roomType: "standard", checkIn: "2026-07-23", checkOut: "2026-07-26", status: "confirmed", guests: 2 },
+    { id: 5, guestName: "Rene Baterbonia", email: "rene@example.com", phone: "+63 956 789 0123", roomNumber: "401", roomType: "family", checkIn: "2026-07-21", checkOut: "2026-07-22", status: "checked-out", guests: 4 },
+    { id: 6, guestName: "Sofia Reyes", email: "sofia@example.com", phone: "+63 967 890 1234", roomNumber: "108", roomType: "standard", checkIn: "2026-07-24", checkOut: "2026-07-26", status: "confirmed", guests: 1 },
+    { id: 7, guestName: "Carlos Mendoza", email: "carlos@example.com", phone: "+63 978 901 2345", roomNumber: "215", roomType: "deluxe", checkIn: "2026-07-25", checkOut: "2026-07-28", status: "pending", guests: 2 },
+    { id: 8, guestName: "Aisha Patel", email: "aisha@example.com", phone: "+63 989 012 3456", roomNumber: "302", roomType: "suite", checkIn: "2026-07-23", checkOut: "2026-07-25", status: "cancelled", guests: 2 },
+    { id: 9, guestName: "John Dela Cruz", email: "john@example.com", phone: "+63 990 123 4567", roomNumber: "110", roomType: "standard", checkIn: "2026-07-26", checkOut: "2026-07-28", status: "confirmed", guests: 1 },
+    { id: 10, guestName: "Maria Santos", email: "maria@example.com", phone: "+63 901 234 5678", roomNumber: "208", roomType: "deluxe", checkIn: "2026-07-27", checkOut: "2026-07-30", status: "pending", guests: 2 },
+    { id: 11, guestName: "David Kim", email: "david@example.com", phone: "+63 912 345 6780", roomNumber: "310", roomType: "suite", checkIn: "2026-07-28", checkOut: "2026-07-31", status: "confirmed", guests: 3 },
+    { id: 12, guestName: "Elena Garcia", email: "elena@example.com", phone: "+63 923 456 7891", roomNumber: "405", roomType: "family", checkIn: "2026-07-29", checkOut: "2026-08-01", status: "checked-in", guests: 5 }
+];
+
+// Expose data for statistics computation
+window.ASHURE_APP = window.ASHURE_APP || {};
+window.ASHURE_APP.reservations = reservations;
 
     // ---- State ----
     var currentPage = 1;
@@ -318,6 +322,7 @@
 
         closeModal();
         applyFilters();
+        document.dispatchEvent(new CustomEvent("ashure:data-changed"));
     }
 
     // ---- Delete reservation ----
@@ -327,6 +332,7 @@
         }
         reservations = reservations.filter(function (r) { return r.id !== id; });
         applyFilters();
+        document.dispatchEvent(new CustomEvent("ashure:data-changed"));
     }
 
     // ---- View reservation (read-only modal) ----
