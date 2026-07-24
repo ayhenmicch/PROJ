@@ -1,11 +1,14 @@
 /* ============================================================
    Ashure Heaben Resort Management System
    Login Page Behavior (Screen 2)
-   Validates inputs, simulates login, and handles exit.
+   Validates inputs, authenticates against stored credentials,
+   saves session to localStorage, and handles redirect.
    ============================================================ */
 
 (function () {
     "use strict";
+
+    var STORAGE_KEY = "ashure_heaben_auth";
 
     // ---- DOM references ----
     var loginForm = document.getElementById("loginForm");
@@ -16,6 +19,27 @@
     var primaryBtn = document.querySelector(".login__btn--primary");
     var loginPage = document.getElementById("loginPage");
     var appShell = document.getElementById("appShell");
+
+    // ---- Check if already logged in (standalone login.html) ----
+    function isLoggedIn() {
+        try {
+            var data = JSON.parse(localStorage.getItem(STORAGE_KEY));
+            return data && data.loggedIn === true;
+        } catch (e) {
+            return false;
+        }
+    }
+
+    // ---- Redirect to index.html if already authenticated ----
+    if (isLoggedIn() && !appShell) {
+        window.location.href = "index.html";
+        return;
+    }
+
+    // Show login page when loaded standalone (e.g., after logout)
+    if (!appShell && loginPage) {
+        loginPage.classList.add("login--visible");
+    }
 
     /**
      * Default credentials (demonstration only).
@@ -72,12 +96,27 @@
     function onAuthSuccess() {
         showMessage("Login Successful", true);
 
+        // Save session to localStorage
+        try {
+            localStorage.setItem(
+                STORAGE_KEY,
+                JSON.stringify({ loggedIn: true, username: DEFAULT_USERNAME })
+            );
+        } catch (e) {
+            // localStorage unavailable — continue silently
+        }
+
         usernameInput.disabled = true;
         passwordInput.disabled = true;
         primaryBtn.disabled = true;
 
         setTimeout(function () {
-            navigateToDashboard();
+            // If running as standalone login.html, redirect to index.html
+            if (!appShell) {
+                window.location.href = "index.html";
+            } else {
+                navigateToDashboard();
+            }
         }, 1000);
     }
 

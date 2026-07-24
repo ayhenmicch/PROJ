@@ -8,6 +8,28 @@
 (function () {
     "use strict";
 
+    var STORAGE_KEY = "ashure_heaben_auth";
+
+    // ---- Skip splash if already authenticated (e.g., returning after login) ----
+    function isLoggedIn() {
+        try {
+            var data = JSON.parse(localStorage.getItem(STORAGE_KEY));
+            return data && data.loggedIn === true;
+        } catch (e) {
+            return false;
+        }
+    }
+
+    if (isLoggedIn()) {
+        var splash = document.querySelector(".splash");
+        var appShell = document.getElementById("appShell");
+        var loginPage = document.getElementById("loginPage");
+        if (splash) splash.style.display = "none";
+        if (appShell) appShell.classList.add("app--visible");
+        if (loginPage) loginPage.classList.remove("login--visible");
+        return;
+    }
+
     // ---- DOM references ----
     const progressFill = document.getElementById("progressFill");
     const progressBar = document.querySelector(".splash__progress");

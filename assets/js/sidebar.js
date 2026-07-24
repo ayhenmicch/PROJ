@@ -104,4 +104,18 @@
     window.addEventListener("resize", handleResize);
 
     restoreState();
+
+    // ---- Logout handler ----
+    var logoutLink = document.getElementById("sidebarLogout");
+    if (logoutLink) {
+        logoutLink.addEventListener("click", function (e) {
+            e.preventDefault();
+            try {
+                localStorage.removeItem("ashure_heaben_auth");
+            } catch (err) {
+                // localStorage unavailable — continue
+            }
+            window.location.href = "login.html";
+        });
+    }
 })();
