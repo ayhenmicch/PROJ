@@ -91,7 +91,7 @@
     var addGuestModalBackdrop = document.getElementById("addGuestModalBackdrop");
     var btnAddGuest = document.getElementById("btnAddGuest");
     var closeAddGuestModalX = document.getElementById("closeAddGuestModalX");
-    var closeAddGuestModal = document.getElementById("closeAddGuestModal");
+    var closeAddGuestModalBtn = document.getElementById("closeAddGuestModal");
     var addGuestForm = document.getElementById("addGuestForm");
 
     // ---- View Guest Modal ----
@@ -445,8 +445,8 @@
         closeAddGuestModalX.addEventListener("click", closeAddGuestModal);
     }
 
-    if (closeAddGuestModal) {
-        closeAddGuestModal.addEventListener("click", closeAddGuestModal);
+    if (closeAddGuestModalBtn) {
+        closeAddGuestModalBtn.addEventListener("click", closeAddGuestModal);
     }
 
     if (addGuestModalBackdrop) {
