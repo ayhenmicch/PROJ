@@ -1504,6 +1504,154 @@
         </div>
     </div>
 
+    <!-- View Guest Modal -->
+    <div class="modal" id="viewGuestModal" aria-hidden="true">
+        <div class="modal__backdrop" id="viewGuestModalBackdrop"></div>
+        <div class="modal__dialog modal__dialog--lg" role="dialog" aria-modal="true" aria-labelledby="viewGuestModalTitle">
+            <div class="modal__header">
+                <h3 class="modal__title" id="viewGuestModalTitle">Guest Details</h3>
+                <button type="button" class="modal__close" id="closeViewGuestModalX" aria-label="Close">&times;</button>
+            </div>
+            <div class="modal__body">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label class="form-label">Name</label>
+                        <input type="text" id="viewGuestName" class="input" disabled />
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Email</label>
+                        <input type="email" id="viewGuestEmail" class="input" disabled />
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Phone</label>
+                        <input type="tel" id="viewGuestPhone" class="input" disabled />
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Nationality</label>
+                        <input type="text" id="viewGuestNationality" class="input" disabled />
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Membership</label>
+                        <input type="text" id="viewGuestMembership" class="input" disabled />
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Status</label>
+                        <input type="text" id="viewGuestStatus" class="input" disabled />
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Visits</label>
+                        <input type="number" id="viewGuestVisits" class="input" disabled />
+                    </div>
+                    <div class="form-group form-group--full">
+                        <label class="form-label">Birthday</label>
+                        <input type="date" id="viewGuestBirthday" class="input" disabled />
+                    </div>
+                    <div class="form-group form-group--full">
+                        <label class="form-label">Gender</label>
+                        <input type="text" id="viewGuestGender" class="input" disabled />
+                    </div>
+                    <div class="form-group form-group--full">
+                        <label class="form-label">Address</label>
+                        <input type="text" id="viewGuestAddress" class="input" disabled />
+                    </div>
+                    <div class="form-group form-group--full">
+                        <label class="form-label">Notes</label>
+                        <textarea id="viewGuestNotes" class="textarea" disabled></textarea>
+                    </div>
+                </div>
+            </div>
+            <div class="modal__footer">
+                <button type="button" class="btn btn--primary" id="btnEditFromViewGuest">Edit</button>
+                <button type="button" class="btn btn--secondary" id="btnCloseViewGuestModal">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Guest Modal -->
+    <div class="modal" id="editGuestModal" aria-hidden="true">
+        <div class="modal__backdrop" id="editGuestModalBackdrop"></div>
+        <div class="modal__dialog modal__dialog--lg" role="dialog" aria-modal="true" aria-labelledby="editGuestModalTitle">
+            <div class="modal__header">
+                <h3 class="modal__title" id="editGuestModalTitle">Edit Guest</h3>
+                <button type="button" class="modal__close" id="closeEditGuestModalX" aria-label="Close">&times;</button>
+            </div>
+            <div class="modal__body">
+                <form id="editGuestForm" novalidate>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label class="form-label" for="editGuestFirstName">First Name</label>
+                            <input type="text" id="editGuestFirstName" class="input" placeholder="John" />
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="editGuestLastName">Last Name</label>
+                            <input type="text" id="editGuestLastName" class="input" placeholder="Doe" />
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="editGuestEmail">Email</label>
+                            <input type="email" id="editGuestEmail" class="input" placeholder="john@example.com" />
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="editGuestPhone">Phone</label>
+                            <input type="tel" id="editGuestPhone" class="input" placeholder="+63 912 345 6789" />
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="editGuestNationality">Nationality</label>
+                            <select id="editGuestNationality" class="input">
+                                <option value="">Select nationality</option>
+                                <option value="american">American</option>
+                                <option value="spanish">Spanish</option>
+                                <option value="chinese">Chinese</option>
+                                <option value="british">British</option>
+                                <option value="japanese">Japanese</option>
+                                <option value="italian">Italian</option>
+                                <option value="irish">Irish</option>
+                                <option value="indian">Indian</option>
+                                <option value="brazilian">Brazilian</option>
+                                <option value="french">French</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="editGuestBirthday">Birthday</label>
+                            <input type="date" id="editGuestBirthday" class="input" />
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="editGuestGender">Gender</label>
+                            <select id="editGuestGender" class="input">
+                                <option value="">Select gender</option>
+                                <option value="male">Male</option>
+                                <option value="female">Female</option>
+                                <option value="other">Other</option>
+                                <option value="prefer-not-to-say">Prefer not to say</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="editGuestMembership">Membership</label>
+                            <select id="editGuestMembership" class="input">
+                                <option value="">Select membership</option>
+                                <option value="gold">Gold</option>
+                                <option value="silver">Silver</option>
+                                <option value="bronze">Bronze</option>
+                                <option value="none">None</option>
+                            </select>
+                        </div>
+                        <div class="form-group form-group--full">
+                            <label class="form-label" for="editGuestAddress">Address</label>
+                            <input type="text" id="editGuestAddress" class="input" placeholder="Street, City, Country" />
+                        </div>
+                        <div class="form-group form-group--full">
+                            <label class="form-label" for="editGuestNotes">Notes</label>
+                            <textarea id="editGuestNotes" class="textarea" placeholder="Any additional notes..."></textarea>
+                        </div>
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn--primary">Save Changes</button>
+                        <button type="button" class="btn btn--secondary" id="closeEditGuestModal">Cancel</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
     <!-- Splash screen behavior (loading simulation) -->
     <script src="assets/js/splash.js"></script>
     <!-- Login page behavior -->
