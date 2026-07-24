@@ -370,6 +370,43 @@ window.ASHURE_APP.reservations = reservations;
             return;
         }
 
+        // Check-in cannot be earlier than today
+        var today = new Date();
+        today.setHours(0, 0, 0, 0);
+        var checkInDate = new Date(checkIn + "T00:00:00");
+        if (checkInDate < today) {
+            showFieldError(resCheckIn, "Check-in date cannot be in the past.");
+            hasError = true;
+        }
+
+        // Check-out must be later than check-in
+        var checkOutDate = new Date(checkOut + "T00:00:00");
+        if (checkOutDate <= checkInDate) {
+            showFieldError(resCheckOut, "Check-out date must be after check-in.");
+            hasError = true;
+        }
+
+        if (hasError) {
+            return;
+        }
+
+        // Check for overlapping reservations in the same room
+        var hasOverlap = reservations.some(function (r) {
+            if (r.id === editingId) return false;
+            if (r.roomNumber !== roomNumber) return false;
+            var existingCheckIn = new Date(r.checkIn + "T00:00:00");
+            var existingCheckOut = new Date(r.checkOut + "T00:00:00");
+            return checkInDate < existingCheckOut && checkOutDate > existingCheckIn;
+        });
+        if (hasOverlap) {
+            showFieldError(resRoomNumber, "This room is already booked for the selected dates.");
+            hasError = true;
+        }
+
+        if (hasError) {
+            return;
+        }
+
         if (editingId) {
             var index = reservations.findIndex(function (item) { return item.id === editingId; });
             if (index !== -1) {
