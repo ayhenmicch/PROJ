@@ -34,6 +34,11 @@
         return Math.round(num) + "%";
     }
 
+    // ---- Utility: Ease-out cubic ----
+    function easeOutCubic(t) {
+        return 1 - Math.pow(1 - t, 3);
+    }
+
     // ---- Update statistics cards from data ----
     function updateStatistics() {
         var reservations = (window.ASHURE_APP && window.ASHURE_APP.reservations) || [];
