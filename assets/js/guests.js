@@ -116,7 +116,7 @@
     var editGuestModal = document.getElementById("editGuestModal");
     var editGuestModalBackdrop = document.getElementById("editGuestModalBackdrop");
     var closeEditGuestModalX = document.getElementById("closeEditGuestModalX");
-    var closeEditGuestModal = document.getElementById("closeEditGuestModal");
+    var closeEditGuestModalBtn = document.getElementById("closeEditGuestModal");
     var editGuestForm = document.getElementById("editGuestForm");
     var editGuestFirstName = document.getElementById("editGuestFirstName");
     var editGuestLastName = document.getElementById("editGuestLastName");
@@ -487,8 +487,8 @@
         closeEditGuestModalX.addEventListener("click", closeEditGuestModal);
     }
 
-    if (closeEditGuestModal) {
-        closeEditGuestModal.addEventListener("click", closeEditGuestModal);
+    if (closeEditGuestModalBtn) {
+        closeEditGuestModalBtn.addEventListener("click", closeEditGuestModal);
     }
 
     if (editGuestModalBackdrop) {
