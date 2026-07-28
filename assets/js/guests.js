@@ -100,17 +100,18 @@
     var closeViewGuestModalX = document.getElementById("closeViewGuestModalX");
     var btnCloseViewGuestModal = document.getElementById("btnCloseViewGuestModal");
     var btnEditFromViewGuest = document.getElementById("btnEditFromViewGuest");
-    var viewGuestFullName = document.getElementById("viewGuestFullName");
+    var viewGuestFirstName = document.getElementById("viewGuestFirstName");
+    var viewGuestLastName = document.getElementById("viewGuestLastName");
     var viewGuestEmail = document.getElementById("viewGuestEmail");
     var viewGuestPhone = document.getElementById("viewGuestPhone");
     var viewGuestNationality = document.getElementById("viewGuestNationality");
-    var viewGuestMembership = document.getElementById("viewGuestMembership");
-    var viewGuestStatus = document.getElementById("viewGuestStatus");
-    var viewGuestVisits = document.getElementById("viewGuestVisits");
     var viewGuestBirthday = document.getElementById("viewGuestBirthday");
     var viewGuestGender = document.getElementById("viewGuestGender");
+    var viewGuestMembership = document.getElementById("viewGuestMembership");
     var viewGuestAddress = document.getElementById("viewGuestAddress");
     var viewGuestNotes = document.getElementById("viewGuestNotes");
+    var viewGuestStatusBadge = document.getElementById("viewGuestStatusBadge");
+    var viewGuestVisitsBadge = document.getElementById("viewGuestVisitsBadge");
 
     // ---- Edit Guest Modal ----
     var editGuestModal = document.getElementById("editGuestModal");
@@ -201,14 +202,11 @@
         var vipCount = guests.filter(function (g) { return g.status === "vip"; }).length;
         var returningCount = guests.filter(function (g) { return g.visits > 1; }).length;
         var inactiveCount = guests.filter(function (g) { return g.status === "inactive"; }).length;
-        console.log("[StatsDebug] BEFORE total=" + total + " vip=" + vipCount + " returning=" + returningCount + " inactive=" + inactiveCount);
-        console.log("[StatsDebug] totalEl=" + (totalGuestsCount ? 'found' : 'null') + " vipEl=" + (vipGuestsCount ? 'found' : 'null') + " returningEl=" + (returningGuestsCount ? 'found' : 'null') + " inactiveEl=" + (inactiveGuestsCount ? 'found' : 'null'));
 
         totalGuestsCount.textContent = total;
         vipGuestsCount.textContent = vipCount;
         returningGuestsCount.textContent = returningCount;
         inactiveGuestsCount.textContent = inactiveCount;
-        console.log("[StatsDebug] AFTER total=" + totalGuestsCount.textContent + " vip=" + vipGuestsCount.textContent + " returning=" + returningGuestsCount.textContent + " inactive=" + inactiveGuestsCount.textContent);
     }
 
     // ---- Render table ----
@@ -331,7 +329,6 @@
         renderTable();
         renderPagination();
         bindValidationClear();
-        console.log("[StatsDebug] initGuests done, checking elements: total=" + (totalGuestsCount ? totalGuestsCount.textContent : 'null') + " vip=" + (vipGuestsCount ? vipGuestsCount.textContent : 'null') + " returning=" + (returningGuestsCount ? returningGuestsCount.textContent : 'null') + " inactive=" + (inactiveGuestsCount ? inactiveGuestsCount.textContent : 'null'));
     }
 
     if (guestSearch) {
@@ -387,17 +384,21 @@
 
         viewingGuestId = id;
 
-        viewGuestFullName.value = g.name || "";
+        viewGuestFirstName.value = g.name ? g.name.split(" ")[0] : "";
+        viewGuestLastName.value = g.name ? g.name.split(" ").slice(1).join(" ") : "";
         viewGuestEmail.value = g.email || "";
         viewGuestPhone.value = g.phone || "";
         viewGuestNationality.value = g.nationality || "";
-        viewGuestMembership.value = capitalize(g.membership) || "";
-        viewGuestStatus.value = capitalize(g.status) || "";
-        viewGuestVisits.value = g.visits || 0;
         viewGuestBirthday.value = g.birthday || "";
         viewGuestGender.value = capitalize(g.gender) || "";
+        viewGuestMembership.value = capitalize(g.membership) || "";
         viewGuestAddress.value = g.address || "";
         viewGuestNotes.value = g.notes || "";
+
+        viewGuestStatusBadge.className = "badge " + getStatusBadgeClass(g.status || "");
+        viewGuestStatusBadge.textContent = capitalize(g.status) || "";
+        viewGuestVisitsBadge.className = "badge badge--info";
+        viewGuestVisitsBadge.textContent = (g.visits || 0) + " Visits";
 
         viewGuestModal.classList.add("modal--visible");
         viewGuestModal.setAttribute("aria-hidden", "false");

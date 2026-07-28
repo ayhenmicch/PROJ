@@ -10,7 +10,7 @@
 
     // ---- DOM references ----
     var appShell = document.getElementById("appShell");
-    var statValues = document.querySelectorAll(".stat-card__value");
+    var statValues = document.querySelectorAll(".dashboard .stat-card__value");
     var circularFill = document.querySelector(".circular-progress__fill");
     var circularText = document.querySelector(".circular-progress__text");
     var progressFills = document.querySelectorAll(".progress-bar__fill");
