@@ -431,6 +431,12 @@
 
         var hasError = false;
 
+        if (roomNumber !== r.roomNumber && isRoomReferenced(r.roomNumber)) {
+            window.ASHURE_UTILS.showFieldError(editRoomNumber,
+                "This room number cannot be changed because existing reservations reference it.");
+            hasError = true;
+        }
+
         if (!roomNumber) {
             window.ASHURE_UTILS.showFieldError(editRoomNumber, "Room number is required.");
             hasError = true;
@@ -485,12 +491,24 @@
     }
 
     // ---- Delete Room ----
+    function isRoomReferenced(roomNumber) {
+        var reservations = (window.ASHURE_APP && window.ASHURE_APP.reservations) || [];
+        return reservations.some(function (reservation) {
+            return reservation.roomNumber.toLowerCase() === roomNumber.toLowerCase();
+        });
+    }
+
     function deleteRoom(id) {
         window.ASHURE_UTILS.confirm("Are you sure you want to delete this room?").then(function (confirmed) {
             if (!confirmed) return;
 
             var index = rooms.findIndex(function (r) { return r.id === id; });
             if (index === -1) return;
+
+            if (isRoomReferenced(rooms[index].roomNumber)) {
+                window.alert("This room cannot be deleted because existing reservations reference it.");
+                return;
+            }
 
             rooms.splice(index, 1);
 

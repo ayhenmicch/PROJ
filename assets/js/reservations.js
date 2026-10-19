@@ -326,6 +326,37 @@ window.ASHURE_APP.reservations = reservations;
             return;
         }
 
+        var existingReservation = editingId ? reservations.find(function (r) {
+            return r.id === editingId;
+        }) : null;
+        var bookingChanged = !existingReservation ||
+            existingReservation.roomNumber !== roomNumber ||
+            existingReservation.guests !== guests ||
+            existingReservation.checkIn !== checkIn ||
+            existingReservation.checkOut !== checkOut ||
+            (existingReservation.status === "cancelled" && status !== "cancelled");
+
+        if (bookingChanged) {
+            var rooms = (window.ASHURE_APP && window.ASHURE_APP.rooms) || [];
+            var room = rooms.find(function (r) { return r.roomNumber === roomNumber; });
+            if (!room) {
+                window.ASHURE_UTILS.showFieldError(resRoomNumber, "Select an existing room from Room Management.");
+                return;
+            }
+            if (!Number.isSafeInteger(room.capacity) || room.capacity <= 0) {
+                window.ASHURE_UTILS.showFieldError(resRoomNumber, "This room has no valid capacity. Update it in Room Management.");
+                return;
+            }
+            if (guests > room.capacity) {
+                window.ASHURE_UTILS.showFieldError(resGuests, "Guest count exceeds this room's capacity of " + room.capacity + ".");
+                return;
+            }
+            if (["available", "occupied", "reserved"].indexOf(room.status) === -1) {
+                window.ASHURE_UTILS.showFieldError(resRoomNumber, "This room is unavailable for booking.");
+                return;
+            }
+        }
+
         // New reservations cannot check in earlier than today.
         var today = new Date();
         today.setHours(0, 0, 0, 0);
