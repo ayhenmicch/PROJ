@@ -9,6 +9,16 @@
 
     window.ASHURE_UTILS = window.ASHURE_UTILS || {};
 
+    // CSV output only: a leading apostrophe makes formula-like text safer for
+    // spreadsheet imports. Some importers display it; CSV has no universal type metadata.
+    window.ASHURE_UTILS.csvField = function (value) {
+        var text = value === null || value === undefined ? "" : String(value);
+        if (typeof value !== "number" && /^[\s\u0000-\u001f\u007f-\u009f\u200b-\u200f\u202a-\u202e\u2060-\u206f]*[=+\-@]/.test(text)) {
+            text = "'" + text;
+        }
+        return '"' + text.replace(/"/g, '""') + '"';
+    };
+
     // Keep unreadable stored records untouched, including on later saves.
     var blockedStorageKeys = {};
     var unsavedStorageKeys = {};

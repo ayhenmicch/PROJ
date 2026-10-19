@@ -17,6 +17,79 @@
         };
     }
 
+    function calendarDay(value) {
+        if (typeof value !== "string" || !/^\d{4}-\d{2}-\d{2}$/.test(value)) return null;
+        var year = Number(value.slice(0, 4)), month = Number(value.slice(5, 7)), day = Number(value.slice(8));
+        var leap = year % 4 === 0 && (year % 100 !== 0 || year % 400 === 0);
+        var days = [31, leap ? 29 : 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+        if (year < 1 || month < 1 || month > 12 || day < 1 || day > days[month - 1]) return null;
+        var date = new Date(0);
+        date.setUTCFullYear(year, month - 1, day);
+        return date.getTime() / 86400000;
+    }
+
+    function normalizedReportStatus(status) {
+        return typeof status === "string" ? status.trim().toLowerCase() : "";
+    }
+
+    function isFinanciallyEligible(record) {
+        return ["confirmed", "checked-in", "checked-out"].indexOf(normalizedReportStatus(record && record.status)) !== -1;
+    }
+
+    function snapshotCents(rate) {
+        if (typeof rate !== "number" || !Number.isFinite(rate) || rate <= 0) return null;
+        var cents = rate * 100, rounded = Math.round(cents);
+        var tolerance = Math.min(0.000001, Number.EPSILON * Math.max(1, Math.abs(cents)) * 4);
+        return Number.isSafeInteger(rounded) && rounded > 0 && Math.abs(cents - rounded) <= tolerance ? rounded : null;
+    }
+
+    function inspectReportRecord(record) {
+        record = record || {};
+        var start = calendarDay(record.checkIn), end = calendarDay(record.checkOut);
+        var nights = start !== null && end !== null && end > start ? end - start : null;
+        var rooms = reportDataState().rooms ? window.ASHURE_APP.rooms : [];
+        var room = typeof record.roomNumber === "string" && record.roomNumber.trim()
+            ? rooms.find(function (r) { return r && r.roomNumber === record.roomNumber; }) : null;
+        var financialEligible = isFinanciallyEligible(record);
+        var rateCents = snapshotCents(record.bookedRoomRate);
+        var amountCents = financialEligible && nights !== null && rateCents !== null &&
+            Number.isSafeInteger(rateCents * nights) ? rateCents * nights : null;
+        var normalizedStatus = normalizedReportStatus(record.status);
+        return { nights: nights, amount: amountCents === null ? null : amountCents / 100,
+            amountCents: amountCents, financialEligible: financialEligible,
+            missingSnapshot: !Object.prototype.hasOwnProperty.call(record, "bookedRoomRate"),
+            invalidSnapshot: rateCents === null, missingRoom: !room,
+            excludedLegacyStatus: !financialEligible && ["pending", "cancelled"].indexOf(normalizedStatus) === -1 };
+    }
+
+    function reportQualityMessage() {
+        if (!reportDataState().reservations) return "";
+        var records = getFilteredReservations(), affected = 0, dates = 0, financialDates = 0, missingRates = 0, invalidRates = 0, amounts = 0, missingRooms = 0, statuses = 0, knownCents = 0;
+        records.forEach(function (record) {
+            var info = inspectReportRecord(record);
+            var invalidAmount = info.financialEligible && (info.amountCents === null || !Number.isSafeInteger(knownCents + info.amountCents));
+            if (info.financialEligible && !invalidAmount) knownCents += info.amountCents;
+            if (info.nights === null) dates++;
+            if (info.financialEligible && info.nights === null) financialDates++;
+            if (info.financialEligible && info.missingSnapshot) missingRates++;
+            else if (info.financialEligible && info.invalidSnapshot) invalidRates++;
+            else if (info.nights !== null && invalidAmount) amounts++;
+            var missingRoom = reportDataState().rooms && info.missingRoom;
+            if (missingRoom) missingRooms++;
+            if (info.excludedLegacyStatus) statuses++;
+            if (info.nights === null || invalidAmount || missingRoom || info.excludedLegacyStatus) affected++;
+        });
+        if (!affected) return "";
+        return "Data quality: " + affected + " reservation record(s) need review. " +
+            (dates ? dates + " invalid stay(s) excluded from duration/monthly calculations. Unassignable check-in dates remain in the record count for review. " : "") +
+            (financialDates ? financialDates + " eligible booking(s) with invalid stays; booking value estimates are incomplete. " : "") +
+            (missingRates ? missingRates + " eligible booking(s) missing saved booking rates: Unknown amounts; estimates are incomplete. " : "") +
+            (invalidRates ? invalidRates + " eligible booking(s) with invalid saved booking rates: Unknown amounts; estimates are incomplete. " : "") +
+            (amounts ? amounts + " unsafe booking amount(s); estimates are incomplete. " : "") +
+            (missingRooms ? missingRooms + " missing current room reference(s); valid saved rates remain usable. " : "") +
+            (statuses ? statuses + " legacy completed or unknown status(es) excluded from financial values; retained in nonfinancial metrics. " : "");
+    }
+
     function updateDataWarning(state) {
         var warning = reportsPage.querySelector("#reportDataWarning");
         if (!warning) {
@@ -33,7 +106,7 @@
             window.ASHURE_UTILS.isStoredRecordsUnsaved("ashure_rooms");
         warning.textContent = (missing.length ? "Unavailable " + missing.join(" and ") +
             " data: affected values are unknown and PDF export is blocked. " : "") +
-            (unsaved ? "Reports reflect unsaved in-memory changes; saved records may differ after refresh." : "");
+            (unsaved ? "Reports reflect unsaved in-memory changes; saved records may differ after refresh. " : "") + reportQualityMessage();
         warning.hidden = !warning.textContent;
     }
 
@@ -79,58 +152,57 @@
 
         // Total Revenue
         var totalRevenue = 0;
+        var totalCents = 0;
+        var knownAmounts = 0, incompleteRevenue = false;
         for (var r = 0; r < filteredReservations.length; r++) {
-            var res = filteredReservations[r];
-            var checkIn = new Date(res.checkIn + "T00:00:00");
-            var checkOut = new Date(res.checkOut + "T00:00:00");
-            var nights = (checkOut - checkIn) / (1000 * 60 * 60 * 24);
-            if (nights > 0) {
-                var room = rooms.find(function (rm) { return rm.roomNumber === res.roomNumber; });
-                var price = room ? room.price : 0;
-                totalRevenue += nights * price;
-            }
+            var info = inspectReportRecord(filteredReservations[r]);
+            if (!info.financialEligible) continue;
+            if (info.amountCents === null || !Number.isSafeInteger(totalCents + info.amountCents)) incompleteRevenue = true;
+            else { totalCents += info.amountCents; knownAmounts++; }
         }
-        if (valueEls["Total Revenue"]) {
-            valueEls["Total Revenue"].textContent = window.ASHURE_UTILS.formatCurrency(totalRevenue);
+        totalRevenue = totalCents / 100;
+        if (valueEls["Estimated Booking Value"]) {
+            valueEls["Estimated Booking Value"].textContent = window.ASHURE_UTILS.formatCurrency(totalRevenue);
+            if (incompleteRevenue) valueEls["Estimated Booking Value"].textContent =
+                (knownAmounts ? window.ASHURE_UTILS.formatCurrency(totalRevenue) + " known subtotal" : "Unknown") + " (incomplete)";
         }
 
         // Occupancy Rate
         var totalRooms = rooms.length;
         var occupiedRooms = 0;
         for (var o = 0; o < rooms.length; o++) {
-            if (rooms[o].status === "occupied") occupiedRooms++;
+            if (rooms[o] && rooms[o].status === "occupied") occupiedRooms++;
         }
         var occupancyRate = totalRooms > 0 ? Math.round((occupiedRooms / totalRooms) * 100) : 0;
-        if (valueEls["Occupancy Rate"]) {
-            valueEls["Occupancy Rate"].textContent = occupancyRate + "%";
+        if (valueEls["Current Operational Occupancy"]) {
+            valueEls["Current Operational Occupancy"].textContent = occupancyRate + "%";
         }
 
         // Average Stay
         var totalNights = 0;
         var validCount = 0;
         for (var s = 0; s < filteredReservations.length; s++) {
-            var stay = filteredReservations[s];
-            var stayCheckIn = new Date(stay.checkIn + "T00:00:00");
-            var stayCheckOut = new Date(stay.checkOut + "T00:00:00");
-            var stayNights = (stayCheckOut - stayCheckIn) / (1000 * 60 * 60 * 24);
-            if (stayNights > 0) {
+            var stayNights = inspectReportRecord(filteredReservations[s]).nights;
+            if (stayNights !== null) {
                 totalNights += stayNights;
                 validCount++;
             }
         }
         var averageStay = validCount > 0 ? (totalNights / validCount) : 0;
-        if (valueEls["Average Stay"]) {
-            valueEls["Average Stay"].textContent = averageStay.toFixed(1) + " days";
+        if (valueEls["Average Booked Stay"]) {
+            valueEls["Average Booked Stay"].textContent = averageStay.toFixed(1) + " days";
+            if (validCount < filteredReservations.length) valueEls["Average Booked Stay"].textContent =
+                validCount ? averageStay.toFixed(1) + " days (partial)" : "Unknown (invalid stays)";
         }
 
         if (!state.reservations) {
             if (valueEls["Total Reservations"]) valueEls["Total Reservations"].textContent = "Unavailable";
-            if (valueEls["Average Stay"]) valueEls["Average Stay"].textContent = "Unavailable";
+            if (valueEls["Average Booked Stay"]) valueEls["Average Booked Stay"].textContent = "Unavailable";
         }
         if (!state.reservations || !state.rooms) {
-            if (valueEls["Total Revenue"]) valueEls["Total Revenue"].textContent = "Unavailable";
+            if (valueEls["Estimated Booking Value"]) valueEls["Estimated Booking Value"].textContent = "Unavailable";
         }
-        if (!state.rooms && valueEls["Occupancy Rate"]) valueEls["Occupancy Rate"].textContent = "Unavailable";
+        if (!state.rooms && valueEls["Current Operational Occupancy"]) valueEls["Current Operational Occupancy"].textContent = "Unavailable";
         refreshReports();
     }
 
@@ -183,6 +255,7 @@
         }
 
         return reservations.filter(function (res) {
+            if (!res || calendarDay(res.checkIn) === null) return true;
             var checkIn = new Date(res.checkIn + "T00:00:00");
             return checkIn >= start && checkIn < end;
         });
@@ -194,31 +267,33 @@
 
         for (var i = 0; i < reservations.length; i++) {
             var res = reservations[i];
-            var checkIn = new Date(res.checkIn + "T00:00:00");
-            var checkOut = new Date(res.checkOut + "T00:00:00");
-            var nights = (checkOut - checkIn) / (1000 * 60 * 60 * 24);
-
-            if (nights <= 0) continue;
-
-            var year = checkIn.getFullYear();
-            var month = checkIn.getMonth();
-            var monthKey = year + "-" + String(month + 1).padStart(2, "0");
-
-            var room = rooms.find(function (rm) { return rm.roomNumber === res.roomNumber; });
-            var price = room ? room.price : 0;
-            var revenue = nights * price;
+            var info = inspectReportRecord(res);
+            var nights = info.nights;
+            // Invalid eligible stays still affect their identifiable financial month.
+            if (nights === null && (!info.financialEligible || !res || calendarDay(res.checkIn) === null)) continue;
+            var monthKey = res.checkIn.slice(0, 7);
 
             if (!monthlyData[monthKey]) {
                 monthlyData[monthKey] = {
                     reservations: 0,
                     revenue: 0,
-                    totalNights: 0
+                    revenueCents: 0,
+                    totalNights: 0,
+                    financialReservations: 0
                 };
             }
 
-            monthlyData[monthKey].reservations++;
-            monthlyData[monthKey].revenue += revenue;
-            monthlyData[monthKey].totalNights += nights;
+            if (nights !== null) monthlyData[monthKey].reservations++;
+            if (info.financialEligible) {
+                monthlyData[monthKey].financialReservations++;
+                if (info.amountCents === null || !Number.isSafeInteger(monthlyData[monthKey].revenueCents + info.amountCents)) monthlyData[monthKey].incompleteRevenue = true;
+                else {
+                    monthlyData[monthKey].revenueCents += info.amountCents;
+                    monthlyData[monthKey].revenue = monthlyData[monthKey].revenueCents / 100;
+                    monthlyData[monthKey].knownAmounts = (monthlyData[monthKey].knownAmounts || 0) + 1;
+                }
+            }
+            if (nights !== null) monthlyData[monthKey].totalNights += nights;
         }
 
         return { keys: Object.keys(monthlyData).sort(), data: monthlyData };
@@ -297,20 +372,26 @@
             var avgStay = data.reservations > 0 ? (data.totalNights / data.reservations) : 0;
 
             var growthHtml;
-            if (k === 0) {
+            var previousFinancialKeys = keys.slice(0, k).filter(function (month) { return monthlyData[month].financialReservations > 0; });
+            if (!data.financialReservations) {
+                growthHtml = "Not applicable";
+            } else if (!previousFinancialKeys.length) {
                 growthHtml = '<span class="growth-badge growth-badge--first"><span class="growth-badge__icon">⚪ —</span></span>';
             } else {
-                var prevKey = keys[k - 1];
+                var prevKey = previousFinancialKeys[previousFinancialKeys.length - 1];
                 var prevRevenue = monthlyData[prevKey].revenue;
                 var growth = prevRevenue > 0 ? ((data.revenue - prevRevenue) / prevRevenue) * 100 : 0;
-                growthHtml = formatGrowthBadge(growth);
+                growthHtml = data.incompleteRevenue || monthlyData[prevKey].incompleteRevenue || !Number.isFinite(growth)
+                    ? "Unavailable (incomplete estimate)" : formatGrowthBadge(growth);
             }
 
             rows.push(
                 '<tr>' +
                 '<td>' + monthName + '</td>' +
                 '<td>' + data.reservations + '</td>' +
-                '<td>' + (state.rooms ? window.ASHURE_UTILS.formatCurrency(data.revenue) : "Unavailable") + '</td>' +
+                '<td>' + (state.rooms ? data.incompleteRevenue
+                    ? (data.knownAmounts ? window.ASHURE_UTILS.formatCurrency(data.revenue) + " known subtotal" : "Unknown") + " (incomplete)"
+                    : window.ASHURE_UTILS.formatCurrency(data.revenue) : "Unavailable") + '</td>' +
                 '<td>' + (state.rooms ? formatOccupancy(occupancyRate) : "Unavailable") + '</td>' +
                 '<td>' + avgStay.toFixed(1) + ' days</td>' +
                 '<td>' + (state.rooms ? growthHtml : "Unavailable") + '</td>' +
@@ -418,8 +499,18 @@
 
         var filteredReservations = getFilteredReservations();
         var aggregated = aggregateMonthlyData(filteredReservations);
-        var keys = aggregated.keys;
+        var keys = aggregated.keys.filter(function (key) { return aggregated.data[key].financialReservations > 0; });
         var monthlyData = aggregated.data;
+
+        if (filteredReservations.some(function (record) {
+            var info = inspectReportRecord(record);
+            return info.financialEligible && info.amount === null;
+        }) ||
+            keys.some(function (key) { return monthlyData[key].incompleteRevenue || monthlyData[key].revenue > Number.MAX_VALUE / 100; })) {
+            chartContainer.classList.remove("chart-container--single");
+            chartContainer.textContent = "Booking value chart incomplete; review data-quality warnings and monthly table.";
+            return;
+        }
 
         if (keys.length === 0) {
             chartContainer.innerHTML = '<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;color:var(--color-text-muted);">No data available</div>';
@@ -572,20 +663,20 @@
         } else if (type === "revenue") {
             for (var i = 0; i < statCards.length; i++) {
                 var label = statCards[i].querySelector(".stat-card__label");
-                if (label && label.textContent.trim() !== "Total Revenue") {
+                if (label && label.textContent.trim() !== "Estimated Booking Value") {
                     statCards[i].style.display = "none";
                 }
             }
             for (var i = 0; i < chartCards.length; i++) {
                 var title = chartCards[i].querySelector(".card__title");
-                if (title && title.textContent.trim() !== "Monthly Revenue") {
+                if (title && title.textContent.trim() !== "Monthly Estimated Booking Value") {
                     chartCards[i].style.display = "none";
                 }
             }
         } else if (type === "occupancy") {
             for (var i = 0; i < statCards.length; i++) {
                 var label = statCards[i].querySelector(".stat-card__label");
-                if (label && label.textContent.trim() !== "Occupancy Rate") {
+                if (label && label.textContent.trim() !== "Current Operational Occupancy") {
                     statCards[i].style.display = "none";
                 }
             }
@@ -669,6 +760,13 @@
                     doc.text("Unsaved in-memory data; persisted records may differ.", margin, y);
                     y += 6;
                 }
+                var qualityMessage = reportQualityMessage();
+                if (qualityMessage) {
+                    doc.setFontSize(8);
+                    var qualityLines = doc.splitTextToSize(qualityMessage, contentWidth);
+                    doc.text(qualityLines, margin, y);
+                    y += qualityLines.length * 4 + 4;
+                }
                 doc.setDrawColor(226, 232, 240);
                 doc.line(margin, y, pageWidth - margin, y);
                 y += 8;
@@ -699,6 +797,13 @@
                                 doc.setTextColor(51, 65, 85);
                                 doc.text(labelText + ": " + valueText, margin, y);
                                 y += 7;
+                                var meta = statCards[i].querySelector(".stat-card__meta");
+                                if (meta && meta.textContent.trim()) {
+                                    doc.setFontSize(8);
+                                    var explanationLines = doc.splitTextToSize(meta.textContent.trim(), contentWidth);
+                                    doc.text(explanationLines, margin, y);
+                                    y += explanationLines.length * 4 + 2;
+                                }
                             }
                         }
                         y += 6;
@@ -706,6 +811,14 @@
 
                     var tableCard = reportsPage.querySelector(".reports-table-card");
                     if (tableCard && tableCard.style.display !== "none") {
+                        var explanation = reportsPage.querySelector("#reportMonthlyExplanation");
+                        if (explanation) {
+                            doc.setFontSize(8);
+                            var monthlyLines = doc.splitTextToSize(explanation.textContent.trim(), contentWidth);
+                            if (y + monthlyLines.length * 4 > 270) { doc.addPage(); y = 22; }
+                            doc.text(monthlyLines, margin, y);
+                            y += monthlyLines.length * 4 + 4;
+                        }
                         var tbody = tableCard.querySelector(".table tbody");
                         var hasNoData = false;
                         if (tbody) {

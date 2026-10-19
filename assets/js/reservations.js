@@ -306,8 +306,21 @@ window.ASHURE_APP.reservations = reservations;
         resPhone.value = guest.phone;
     });
 
+    var rateConfirmationPending = false;
+    var reservationModalVersion = 0;
+
+    function bookingRate(room) {
+        var price = room && room.price;
+        if (typeof price !== "number" || !Number.isFinite(price) || price <= 0) return null;
+        var cents = price * 100, rounded = Math.round(cents);
+        var tolerance = Math.min(0.000001, Number.EPSILON * Math.max(1, Math.abs(cents)) * 4);
+        if (!Number.isSafeInteger(rounded) || rounded <= 0 || Math.abs(cents - rounded) > tolerance) return null;
+        return rounded / 100;
+    }
+
     // ---- Open modal for new reservation ----
     function openModal() {
+        reservationModalVersion++;
         editingId = null;
         reservationModalTitle.textContent = "New Reservation";
         populateGuestSelection(null);
@@ -327,6 +340,7 @@ window.ASHURE_APP.reservations = reservations;
 
     // ---- Open modal for editing ----
     function openEditModal(id) {
+        reservationModalVersion++;
         var r = reservations.find(function (item) { return item.id === id; });
         if (!r) return;
 
@@ -349,14 +363,20 @@ window.ASHURE_APP.reservations = reservations;
 
     // ---- Close modal ----
     function closeModal() {
+        reservationModalVersion++;
         reservationModal.classList.remove("modal--visible");
         reservationModal.setAttribute("aria-hidden", "true");
         editingId = null;
     }
 
     // ---- Save reservation (add or update) ----
-    function saveReservation(e) {
+    async function saveReservation(e) {
         e.preventDefault();
+        if (rateConfirmationPending) return;
+        if (window.ASHURE_UTILS.isStoredRecordsBlocked("ashure_reservations")) {
+            window.alert("Restore access to stored reservations and reload before saving.");
+            return;
+        }
 
         var guestName = resGuestName.value.trim();
         var email = resEmail.value.trim();
@@ -411,6 +431,10 @@ window.ASHURE_APP.reservations = reservations;
             (existingReservation.status === "cancelled" && status !== "cancelled");
 
         if (bookingChanged) {
+            if (window.ASHURE_UTILS.isStoredRecordsBlocked("ashure_rooms")) {
+                window.ASHURE_UTILS.showFieldError(resRoomNumber, "Room data is unavailable. Restore access and reload.");
+                return;
+            }
             var rooms = (window.ASHURE_APP && window.ASHURE_APP.rooms) || [];
             var room = rooms.find(function (r) { return r.roomNumber === roomNumber; });
             if (!room) {
@@ -469,6 +493,60 @@ window.ASHURE_APP.reservations = reservations;
             return;
         }
 
+        var captureRate = !existingReservation || existingReservation.roomNumber !== roomNumber;
+        var proposedRate = captureRate ? bookingRate(room) : null;
+        if (captureRate && proposedRate === null) {
+            window.ASHURE_UTILS.showFieldError(resRoomNumber,
+                "This room needs a positive nightly rate with no more than two decimal places. Update it in Room Management.");
+            return;
+        }
+        if (captureRate && !Number.isSafeInteger(Math.round(proposedRate * 100) *
+            Math.ceil((checkOutDate - checkInDate) / 86400000))) {
+            window.ASHURE_UTILS.showFieldError(resRoomNumber, "This rate is too large for the selected stay. Review the room rate.");
+            return;
+        }
+        if (existingReservation && captureRate) {
+            var originalId = editingId, modalVersion = reservationModalVersion;
+            var originalRecord = JSON.stringify(existingReservation);
+            var fields = [resGuestName, resEmail, resPhone, resRoomType, resRoomNumber, resGuests, resCheckIn, resCheckOut, resStatus, resExistingGuest];
+            var originalForm = JSON.stringify(fields.map(function (field) { return field.value; }));
+            var originalGuestId = selectedGuestId, originalLinkChanged = guestLinkChanged;
+            var legacyNotice = Object.prototype.hasOwnProperty.call(existingReservation, "bookedRoomRate")
+                ? "" : "The original historical nightly rate is unknown. ";
+            rateConfirmationPending = true;
+            var confirmed;
+            try {
+                confirmed = await window.ASHURE_UTILS.confirm(legacyNotice + "Change room " +
+                    existingReservation.roomNumber + " to " + roomNumber + " at \u20b1" +
+                    proposedRate.toFixed(2) + " per night? Accepting replaces the reservation's saved nightly rate.");
+            } finally {
+                rateConfirmationPending = false;
+            }
+            if (!confirmed) return;
+            var currentRoom = ((window.ASHURE_APP && window.ASHURE_APP.rooms) || []).find(function (r) {
+                return r.roomNumber === roomNumber;
+            });
+            var currentRecord = reservations.find(function (r) { return r.id === originalId; });
+            var conflictNow = reservations.some(function (r) {
+                return r.id !== originalId && r.roomNumber === roomNumber &&
+                    status !== "cancelled" && r.status !== "cancelled" &&
+                    checkInDate < new Date(r.checkOut + "T00:00:00") &&
+                    checkOutDate > new Date(r.checkIn + "T00:00:00");
+            });
+            if (editingId !== originalId || reservationModalVersion !== modalVersion ||
+                JSON.stringify(currentRecord) !== originalRecord ||
+                JSON.stringify(fields.map(function (field) { return field.value; })) !== originalForm ||
+                selectedGuestId !== originalGuestId || guestLinkChanged !== originalLinkChanged ||
+                window.ASHURE_UTILS.isStoredRecordsBlocked("ashure_reservations") ||
+                window.ASHURE_UTILS.isStoredRecordsBlocked("ashure_rooms") ||
+                !currentRoom || bookingRate(currentRoom) !== proposedRate ||
+                !Number.isSafeInteger(currentRoom.capacity) || currentRoom.capacity < guests ||
+                ["available", "occupied", "reserved"].indexOf(currentRoom.status) === -1 || conflictNow) {
+                window.alert("Booking or room details changed while confirming. Please review and save again.");
+                return;
+            }
+        }
+
         if (editingId) {
             var index = reservations.findIndex(function (item) { return item.id === editingId; });
             if (index !== -1) {
@@ -499,6 +577,13 @@ window.ASHURE_APP.reservations = reservations;
                 status: status,
                 guests: guests
             });
+        }
+
+        if (captureRate) {
+            var pricedReservation = existingReservation
+                ? reservations.find(function (r) { return r.id === editingId; })
+                : reservations[reservations.length - 1];
+            pricedReservation.bookedRoomRate = proposedRate;
         }
 
         if (guestLinkChanged) {
@@ -571,10 +656,10 @@ window.ASHURE_APP.reservations = reservations;
                 r.checkOut,
                 r.guests,
                 window.ASHURE_UTILS.capitalize(r.status)
-            ].map(function (cell) { return "\"" + cell + "\""; }).join(",");
+            ].map(window.ASHURE_UTILS.csvField).join(",");
         });
 
-        var csv = headers.join(",") + "\n" + rows.join("\n");
+        var csv = headers.map(window.ASHURE_UTILS.csvField).join(",") + "\r\n" + rows.join("\r\n");
         var blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
         var url = URL.createObjectURL(blob);
         var link = document.createElement("a");

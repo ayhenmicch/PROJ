@@ -168,6 +168,64 @@
         });
     }
 
+    function hotelReferenceDate() {
+        var parts = new Intl.DateTimeFormat("en-US", {
+            timeZone: "Asia/Manila", year: "numeric", month: "2-digit", day: "2-digit"
+        }).formatToParts(new Date());
+        function part(type) { return parts.find(function (p) { return p.type === type; }).value; }
+        return part("year") + "-" + part("month") + "-" + part("day");
+    }
+
+    function roomEvidenceText(room) {
+        var reservations = window.ASHURE_APP && window.ASHURE_APP.reservations;
+        var unavailable = window.ASHURE_UTILS.isStoredRecordsBlocked("ashure_reservations") ||
+            !Array.isArray(reservations);
+        var date;
+        try { date = hotelReferenceDate(); } catch (error) { date = null; }
+        var evidence = window.ASHURE_UTILS.getRoomReservationEvidence(room,
+            unavailable ? { available: false } : reservations, date);
+        if (unavailable) return "Reservation evidence: Reservation data unavailable";
+        if (evidence.dataState === "unknown") return "Reservation evidence: Availability unknown; review reservation data";
+        var notes = [];
+        if (evidence.current.checkedIn.length) notes.push("Checked-in evidence: " + evidence.current.checkedIn.length);
+        if (evidence.overdueCheckedIn.length) notes.push("Overdue checked-in: " + evidence.overdueCheckedIn.length);
+        if (evidence.current.scheduled.length) notes.push("Scheduled stay; check-in not confirmed");
+        if (evidence.current.pending.length) notes.push("Pending booking: " + evidence.current.pending.length);
+        if (evidence.upcoming.length) {
+            var pending = evidence.upcoming.filter(function (r) { return r.status === "pending"; }).length;
+            notes.push("Upcoming reservations: " + evidence.upcoming.length + (pending ? " (pending: " + pending + ")" : ""));
+        }
+        if (evidence.pastDue.length) notes.push("Past-due booking; review status");
+        var warnings = {
+            "available-with-checked-in-evidence": "Status disagreement",
+            "manual-occupancy-unverified": "Manual occupancy unverified",
+            "maintenance-with-checked-in-evidence": "Maintenance conflict",
+            "future-booking-not-current-occupancy": "Future booking is not current occupancy",
+            "conflicting-checked-in-evidence": "Conflicting checked-in records",
+            "checked-in-before-arrival": "Checked-in before scheduled arrival",
+            "unknown-room-status": "Unknown operational status"
+        };
+        evidence.warnings.forEach(function (warning) {
+            if (warnings[warning.code]) notes.push(warnings[warning.code]);
+        });
+        if (!notes.length) notes.push("No current or upcoming reservation evidence");
+        return "Reservation evidence: " + notes.filter(function (note, index) {
+            return notes.indexOf(note) === index;
+        }).join("; ");
+    }
+
+    function refreshReservationEvidence() {
+        if (roomsTableBody) {
+            roomsTableBody.querySelectorAll("[data-room-evidence]").forEach(function (note) {
+                var room = rooms.find(function (r) { return String(r.id) === note.getAttribute("data-room-evidence"); });
+                if (room) note.textContent = roomEvidenceText(room);
+            });
+        }
+        var viewed = rooms.find(function (r) { return r.id === viewingRoomId; });
+        var modalNote = document.getElementById("viewRoomReservationEvidence");
+        if (viewed && modalNote) modalNote.textContent = roomEvidenceText(viewed);
+    }
+
     // ---- Render table rows for current page ----
     function renderTable() {
         if (!roomsTableBody) return;
@@ -201,7 +259,9 @@
                 "<td>" + r.floor + "</td>" +
                 "<td>" + r.capacity + "</td>" +
                 "<td>" + window.ASHURE_UTILS.formatCurrency(r.price) + "</td>" +
-                "<td><span class=\"badge " + getStatusBadgeClass(r.status) + "\">" + window.ASHURE_UTILS.escapeHtml(window.ASHURE_UTILS.capitalize(r.status)) + "</span></td>" +
+                "<td><span class=\"badge " + getStatusBadgeClass(r.status) + "\">" + window.ASHURE_UTILS.escapeHtml(window.ASHURE_UTILS.capitalize(r.status)) + "</span>" +
+                "<small class=\"uk-text-meta uk-display-block\" data-room-evidence=\"" + window.ASHURE_UTILS.escapeHtml(String(r.id)) + "\">" +
+                window.ASHURE_UTILS.escapeHtml(roomEvidenceText(r)) + "</small></td>" +
                 "<td><div class=\"actions-cell\">" +
                     "<button class=\"action-btn action-btn--view\" data-action=\"view\" data-id=\"" + r.id + "\" aria-label=\"View\">" +
                         "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z\"/><circle cx=\"12\" cy=\"12\" r=\"3\"/></svg>" +
@@ -364,6 +424,7 @@
         if (!r) return;
 
         viewingRoomId = id;
+        refreshReservationEvidence();
 
         if (viewRoomNumber) viewRoomNumber.value = r.roomNumber || "";
         if (viewRoomType) viewRoomType.value = window.ASHURE_UTILS.capitalize(r.roomType) || "";
@@ -540,10 +601,10 @@
                 r.capacity,
                 r.price,
                 window.ASHURE_UTILS.capitalize(r.status)
-            ].map(function (cell) { return "\"" + cell + "\""; }).join(",");
+            ].map(window.ASHURE_UTILS.csvField).join(",");
         });
 
-        var csv = headers.join(",") + "\n" + rows.join("\n");
+        var csv = headers.map(window.ASHURE_UTILS.csvField).join(",") + "\r\n" + rows.join("\r\n");
         var blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
         var url = URL.createObjectURL(blob);
         var link = document.createElement("a");
@@ -680,6 +741,10 @@
         updateStats();
         renderTable();
     }
+
+    document.addEventListener("ashure:data-changed", refreshReservationEvidence);
+    var roomsLink = document.querySelector('.sidebar__link[data-page="rooms"]');
+    if (roomsLink) roomsLink.addEventListener("click", refreshReservationEvidence);
 
     // ---- Start when DOM is ready ----
     if (document.readyState === "loading") {
