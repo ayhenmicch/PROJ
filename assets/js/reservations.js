@@ -326,11 +326,11 @@ window.ASHURE_APP.reservations = reservations;
             return;
         }
 
-        // Check-in cannot be earlier than today
+        // New reservations cannot check in earlier than today.
         var today = new Date();
         today.setHours(0, 0, 0, 0);
         var checkInDate = new Date(checkIn + "T00:00:00");
-        if (checkInDate < today) {
+        if (!editingId && checkInDate < today) {
             window.ASHURE_UTILS.showFieldError(resCheckIn, "Check-in date cannot be in the past.");
             hasError = true;
         }
@@ -349,6 +349,7 @@ window.ASHURE_APP.reservations = reservations;
         // Check for overlapping reservations in the same room
         var hasOverlap = reservations.some(function (r) {
             if (r.id === editingId) return false;
+            if (status === "cancelled" || r.status === "cancelled") return false;
             if (r.roomNumber !== roomNumber) return false;
             var existingCheckIn = new Date(r.checkIn + "T00:00:00");
             var existingCheckOut = new Date(r.checkOut + "T00:00:00");
