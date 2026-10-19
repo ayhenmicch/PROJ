@@ -232,7 +232,7 @@
             html += '<td>' + window.ASHURE_UTILS.escapeHtml(r.roomNumber) + '</td>';
             html += '<td>' + window.ASHURE_UTILS.escapeHtml(window.ASHURE_UTILS.formatDate(r.checkIn)) + '</td>';
             html += '<td>' + window.ASHURE_UTILS.escapeHtml(window.ASHURE_UTILS.formatDate(r.checkOut)) + '</td>';
-            html += '<td><span class="badge ' + badgeClass + '">' + window.ASHURE_UTILS.escapeHtml(capitalizeStatus(r.status)) + '</span></td>';
+            html += '<td><span class="badge ' + badgeClass + '">' + window.ASHURE_UTILS.escapeHtml(window.ASHURE_UTILS.capitalize(r.status)) + '</span></td>';
             html += '</tr>';
         }
         tbody.innerHTML = html;

@@ -401,7 +401,9 @@ window.ASHURE_APP.reservations = reservations;
     function deleteReservation(id) {
         window.ASHURE_UTILS.confirm("Are you sure you want to delete this reservation?").then(function (confirmed) {
             if (!confirmed) return;
-            reservations = reservations.filter(function (r) { return r.id !== id; });
+            for (var i = reservations.length - 1; i >= 0; i--) {
+                if (reservations[i].id === id) reservations.splice(i, 1);
+            }
             applyFilters();
             saveToLocalStorage();
             document.dispatchEvent(new CustomEvent("ashure:data-changed"));
