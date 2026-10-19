@@ -644,12 +644,57 @@
     }
 
     // ---- Delete guest ----
+    var guestDeletionPending = false;
+
+    function inspectGuestDeletion(guest) {
+        var shared = window.ASHURE_APP && window.ASHURE_APP.reservations;
+        var stored = window.ASHURE_UTILS.loadStoredRecords("ashure_reservations",
+            ["guestName", "email", "phone", "roomNumber", "roomType", "checkIn", "checkOut", "status"], ["id", "guests"]);
+        if (!Array.isArray(shared) || window.ASHURE_UTILS.isStoredRecordsBlocked("ashure_reservations")) {
+            return { blocked: "Guest deletion is blocked because reservation data cannot be reliably inspected. Restore storage access or recover the records, then reload." };
+        }
+        var reservations = shared.concat(stored || []);
+        if (reservations.some(function (reservation) {
+            return Object.prototype.hasOwnProperty.call(reservation, "guestId") &&
+                String(reservation.guestId) === String(guest.id);
+        })) {
+            return { blocked: "This guest cannot be deleted because existing reservations are linked to their guest ID, including cancelled or historical reservations." };
+        }
+        var email = guest.email.trim().toLowerCase();
+        var possibleMatch = email && reservations.some(function (reservation) {
+            return !Object.prototype.hasOwnProperty.call(reservation, "guestId") &&
+                reservation.email.trim().toLowerCase() === email;
+        });
+        var duplicateEmail = guests.filter(function (g) {
+            return g.email.trim().toLowerCase() === email;
+        }).length > 1;
+        return { message: possibleMatch
+            ? "Unlinked legacy reservations have the same email as this guest. These are possible matches, not confirmed links. " +
+                (duplicateEmail ? "Multiple guests share this email, so identity is ambiguous. " : "") +
+                "Continue deleting only this unlinked guest? Reservations will remain unchanged."
+            : "Are you sure you want to delete this guest?" };
+    }
+
     function deleteGuest(id) {
-        window.ASHURE_UTILS.confirm("Are you sure you want to delete this guest?").then(function (confirmed) {
+        if (guestDeletionPending) return;
+        var guest = guests.find(function (g) { return g.id === id; });
+        if (!guest) return;
+        var inspection = inspectGuestDeletion(guest);
+        if (inspection.blocked) {
+            window.alert(inspection.blocked);
+            return;
+        }
+        guestDeletionPending = true;
+        window.ASHURE_UTILS.confirm(inspection.message).then(function (confirmed) {
             if (!confirmed) return;
 
             var index = guests.findIndex(function (g) { return g.id === id; });
             if (index === -1) return;
+            var latest = inspectGuestDeletion(guests[index]);
+            if (latest.blocked || latest.message !== inspection.message) {
+                window.alert(latest.blocked || "Possible reservation references changed. Review the guest deletion again.");
+                return;
+            }
 
             guests.splice(index, 1);
             var persisted = saveGuests();
@@ -658,6 +703,8 @@
             refreshGuests();
             document.dispatchEvent(new CustomEvent("ashure:data-changed"));
             if (persisted) window.ASHURE_UTILS.showNotification("Guest deleted.", "danger");
+        }).finally(function () {
+            guestDeletionPending = false;
         });
     }
 
