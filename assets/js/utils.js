@@ -11,6 +11,10 @@
 
     // Keep unreadable stored records untouched, including on later saves.
     var blockedStorageKeys = {};
+    var unsavedStorageKeys = {};
+    window.ASHURE_UTILS.isStoredRecordsUnsaved = function (key) {
+        return unsavedStorageKeys[key] === true;
+    };
     window.ASHURE_UTILS.isStoredRecordsBlocked = function (key) {
         return blockedStorageKeys[key] === true;
     };
@@ -39,8 +43,10 @@
         try {
             if (blockedStorageKeys[key]) throw new Error("Stored data requires recovery");
             localStorage.setItem(key, JSON.stringify(records));
+            delete unsavedStorageKeys[key];
             return true;
         } catch (error) {
+            unsavedStorageKeys[key] = true;
             window.alert("Unable to save " + key + ". Changes are only in memory and will be lost on refresh. " +
                 "Existing stored data has not been replaced.");
             return false;

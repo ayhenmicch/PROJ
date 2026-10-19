@@ -9,11 +9,58 @@
 
     var reportsPage = document.getElementById("reportsPage");
 
+    function reportDataState() {
+        var app = window.ASHURE_APP || {};
+        return {
+            reservations: Array.isArray(app.reservations) && !window.ASHURE_UTILS.isStoredRecordsBlocked("ashure_reservations"),
+            rooms: Array.isArray(app.rooms) && !window.ASHURE_UTILS.isStoredRecordsBlocked("ashure_rooms")
+        };
+    }
+
+    function updateDataWarning(state) {
+        var warning = reportsPage.querySelector("#reportDataWarning");
+        if (!warning) {
+            warning = document.createElement("p");
+            warning.id = "reportDataWarning";
+            warning.className = "uk-text-meta uk-margin-small";
+            warning.setAttribute("role", "status");
+            reportsPage.insertBefore(warning, reportsPage.firstChild);
+        }
+        var missing = [];
+        if (!state.reservations) missing.push("reservation");
+        if (!state.rooms) missing.push("room");
+        var unsaved = window.ASHURE_UTILS.isStoredRecordsUnsaved("ashure_reservations") ||
+            window.ASHURE_UTILS.isStoredRecordsUnsaved("ashure_rooms");
+        warning.textContent = (missing.length ? "Unavailable " + missing.join(" and ") +
+            " data: affected values are unknown and PDF export is blocked. " : "") +
+            (unsaved ? "Reports reflect unsaved in-memory changes; saved records may differ after refresh." : "");
+        warning.hidden = !warning.textContent;
+    }
+
+    function showUnavailable(container) {
+        if (container) {
+            container.classList.remove("chart-container--single");
+            container.textContent = "Data unavailable";
+        }
+    }
+
+    function canExportReport() {
+        var state = reportDataState();
+        if (state.reservations && state.rooms) return true;
+        updateReportSummary();
+        window.alert("PDF export is unavailable because " +
+            (!state.reservations && !state.rooms ? "reservation and room data are" : !state.reservations ? "reservation data is" : "room data is") +
+            " unavailable. Existing records have not been changed.");
+        return false;
+    }
+
     function updateReportSummary() {
         if (!reportsPage) return;
 
+        var state = reportDataState();
+        updateDataWarning(state);
         var filteredReservations = getFilteredReservations();
-        var rooms = (window.ASHURE_APP && window.ASHURE_APP.rooms) || [];
+        var rooms = state.rooms ? window.ASHURE_APP.rooms : [];
 
         var statCards = reportsPage.querySelectorAll(".stat-card");
         var valueEls = {};
@@ -76,6 +123,14 @@
             valueEls["Average Stay"].textContent = averageStay.toFixed(1) + " days";
         }
 
+        if (!state.reservations) {
+            if (valueEls["Total Reservations"]) valueEls["Total Reservations"].textContent = "Unavailable";
+            if (valueEls["Average Stay"]) valueEls["Average Stay"].textContent = "Unavailable";
+        }
+        if (!state.reservations || !state.rooms) {
+            if (valueEls["Total Revenue"]) valueEls["Total Revenue"].textContent = "Unavailable";
+        }
+        if (!state.rooms && valueEls["Occupancy Rate"]) valueEls["Occupancy Rate"].textContent = "Unavailable";
         refreshReports();
     }
 
@@ -86,6 +141,7 @@
     }
 
     function getFilteredReservations() {
+        if (!reportDataState().reservations) return [];
         var reservations = (window.ASHURE_APP && window.ASHURE_APP.reservations) || [];
         var dateRangeEl = reportsPage ? reportsPage.querySelector("#reportDateRange") : null;
         var dateRange = dateRangeEl ? dateRangeEl.value : "";
@@ -133,7 +189,7 @@
     }
 
     function aggregateMonthlyData(reservations) {
-        var rooms = (window.ASHURE_APP && window.ASHURE_APP.rooms) || [];
+        var rooms = reportDataState().rooms ? window.ASHURE_APP.rooms : [];
         var monthlyData = {};
 
         for (var i = 0; i < reservations.length; i++) {
@@ -207,10 +263,15 @@
     function renderMonthlyPerformanceTable() {
         if (!reportsPage) return;
 
-        var rooms = (window.ASHURE_APP && window.ASHURE_APP.rooms) || [];
+        var state = reportDataState();
+        var rooms = state.rooms ? window.ASHURE_APP.rooms : [];
 
         var tbody = reportsPage.querySelector(".reports-table-card .table tbody");
         if (!tbody) return;
+        if (!state.reservations) {
+            tbody.innerHTML = '<tr><td colspan="6">Reservation data unavailable</td></tr>';
+            return;
+        }
 
         var filteredReservations = getFilteredReservations();
         var aggregated = aggregateMonthlyData(filteredReservations);
@@ -249,10 +310,10 @@
                 '<tr>' +
                 '<td>' + monthName + '</td>' +
                 '<td>' + data.reservations + '</td>' +
-                '<td>' + window.ASHURE_UTILS.formatCurrency(data.revenue) + '</td>' +
-                '<td>' + formatOccupancy(occupancyRate) + '</td>' +
+                '<td>' + (state.rooms ? window.ASHURE_UTILS.formatCurrency(data.revenue) : "Unavailable") + '</td>' +
+                '<td>' + (state.rooms ? formatOccupancy(occupancyRate) : "Unavailable") + '</td>' +
                 '<td>' + avgStay.toFixed(1) + ' days</td>' +
-                '<td>' + growthHtml + '</td>' +
+                '<td>' + (state.rooms ? growthHtml : "Unavailable") + '</td>' +
                 '</tr>'
             );
         }
@@ -263,6 +324,10 @@
     function renderMonthlyReservationsChart() {
         var chartContainer = reportsPage.querySelector(".chart-card .chart-container");
         if (!chartContainer) return;
+        if (!reportDataState().reservations) {
+            showUnavailable(chartContainer);
+            return;
+        }
 
         var filteredReservations = getFilteredReservations();
         var aggregated = aggregateMonthlyData(filteredReservations);
@@ -345,6 +410,11 @@
     function renderMonthlyRevenueChart() {
         var chartContainer = reportsPage.querySelector(".chart-container--line");
         if (!chartContainer) return;
+        var state = reportDataState();
+        if (!state.reservations || !state.rooms) {
+            showUnavailable(chartContainer);
+            return;
+        }
 
         var filteredReservations = getFilteredReservations();
         var aggregated = aggregateMonthlyData(filteredReservations);
@@ -550,12 +620,15 @@
 
     function exportReportPDF() {
         if (!reportsPage) return;
+        if (!canExportReport()) return;
 
         var btn = reportsPage.querySelector("#btnExportPDF");
         if (btn) btn.disabled = true;
 
         loadJsPDF(function () {
             try {
+                if (!canExportReport()) return;
+                updateReportSummary();
                 if (!window.jspdf || !window.jspdf.jsPDF) {
                     if (btn) btn.disabled = false;
                     return;
@@ -591,6 +664,11 @@
                 y += 6;
                 doc.text("Report Type: " + reportTypeText, margin, y);
                 y += 6;
+                if (window.ASHURE_UTILS.isStoredRecordsUnsaved("ashure_reservations") ||
+                    window.ASHURE_UTILS.isStoredRecordsUnsaved("ashure_rooms")) {
+                    doc.text("Unsaved in-memory data; persisted records may differ.", margin, y);
+                    y += 6;
+                }
                 doc.setDrawColor(226, 232, 240);
                 doc.line(margin, y, pageWidth - margin, y);
                 y += 8;
