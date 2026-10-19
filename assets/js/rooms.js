@@ -41,7 +41,7 @@
     var roomsPagination = document.getElementById("roomsPagination");
 
     var roomSearch = document.getElementById("roomSearch");
-    var roomTypeFilter = document.querySelector("#roomsPage #roomTypeFilter");
+    var roomTypeFilter = document.querySelector("#roomsPage #roomsRoomTypeFilter");
     var floorFilter = document.getElementById("floorFilter");
     var roomStatusFilter = document.getElementById("roomStatusFilter");
     var btnResetRoomFilters = document.getElementById("btnResetRoomFilters");
@@ -582,9 +582,10 @@
         }
         if (btnEditFromViewRoom) {
             btnEditFromViewRoom.addEventListener("click", function () {
+                var roomId = viewingRoomId;
                 closeViewRoomModal();
-                if (viewingRoomId) {
-                    openEditRoomModal(viewingRoomId);
+                if (roomId) {
+                    openEditRoomModal(roomId);
                 }
             });
         }

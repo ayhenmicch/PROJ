@@ -26,16 +26,16 @@
     }
 
     function isOpen() {
-        return sidebar.classList.contains("open");
+        return sidebar.classList.contains("sidebar--open");
     }
 
     function closeSidebar() {
-        sidebar.classList.remove("open");
+        sidebar.classList.remove("sidebar--open");
         document.body.style.overflow = "";
     }
 
     function openSidebar() {
-        sidebar.classList.add("open");
+        sidebar.classList.add("sidebar--open");
         document.body.style.overflow = "hidden";
     }
 
