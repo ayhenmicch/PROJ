@@ -48,14 +48,23 @@
     };
 
     // ---- UIkit confirmation modal helper ----
+    var cancelActiveConfirmation = null;
+
     window.ASHURE_UTILS.confirm = function (message) {
-        var modal = UIkit.modal("#confirmModal");
+        if (cancelActiveConfirmation) cancelActiveConfirmation();
+
         var messageEl = document.getElementById("confirmMessage");
         var yesBtn = document.getElementById("confirmYes");
         var confirmModalEl = document.getElementById("confirmModal");
 
-        if (!modal || !messageEl || !yesBtn) {
-            return Promise.resolve(confirm(message));
+        if (typeof UIkit === "undefined" || !UIkit || typeof UIkit.modal !== "function" ||
+            !confirmModalEl || !messageEl || !yesBtn) {
+            return Promise.resolve(window.confirm(message));
+        }
+
+        var modal = UIkit.modal("#confirmModal");
+        if (!modal) {
+            return Promise.resolve(window.confirm(message));
         }
 
         messageEl.textContent = message;
@@ -63,22 +72,29 @@
         return new Promise(function (resolve) {
             var resolved = false;
 
-            function doResolve(value) {
+            function doResolve(value, hideModal) {
                 if (resolved) return;
                 resolved = true;
-                modal.hide();
+                yesBtn.removeEventListener("click", onConfirm);
+                confirmModalEl.removeEventListener("hide", onHide);
+                cancelActiveConfirmation = null;
+                if (hideModal) modal.hide();
                 resolve(value);
             }
 
-            yesBtn.addEventListener("click", function () {
-                doResolve(true);
-            });
-
-            if (confirmModalEl) {
-                confirmModalEl.addEventListener("hidden", function () {
-                    doResolve(false);
-                }, { once: true });
+            function onConfirm() {
+                doResolve(true, true);
             }
+
+            function onHide(event) {
+                if (event.target === confirmModalEl) doResolve(false, false);
+            }
+
+            cancelActiveConfirmation = function () {
+                doResolve(false, false);
+            };
+            yesBtn.addEventListener("click", onConfirm);
+            confirmModalEl.addEventListener("hide", onHide);
 
             modal.show();
         });
