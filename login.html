@@ -12,6 +12,8 @@
         rel="stylesheet"
     />
 
+    <!-- UIkit 3 CSS (loaded first so custom styles take precedence) -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/uikit@3.16.26/dist/css/uikit.min.css" />
     <!-- Splash screen styles (CSS custom properties used by login.css) -->
     <link rel="stylesheet" href="assets/css/splash.css" />
     <link rel="stylesheet" href="assets/css/login.css" />
@@ -68,10 +70,14 @@
                 <div class="login__message" id="loginMessage" aria-live="polite"></div>
 
                 <button type="submit" class="login__btn login__btn--primary">Login</button>
+                <button type="button" class="login__btn login__btn--exit" id="exitBtn">Exit</button>
             </form>
         </div>
     </main>
 
     <script src="assets/js/login.js"></script>
+    <!-- UIkit 3 JS + Icons -->
+    <script src="https://cdn.jsdelivr.net/npm/uikit@3.16.26/dist/js/uikit.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/uikit@3.16.26/dist/js/uikit-icons.min.js"></script>
 </body>
 </html>

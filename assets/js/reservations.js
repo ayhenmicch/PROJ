@@ -1,9 +1,9 @@
 /* ============================================================
-   Ashure Heaben Resort Management System
-   Reservation Management (Screen 4)
-   Handles page routing, reservation table rendering, filtering,
-   pagination, and CRUD operations via modal forms.
-   ============================================================ */
+    Ashure Heaben Resort Management System
+    Reservation Management (Screen 4)
+    Handles page routing, reservation table rendering, filtering,
+    pagination, and CRUD operations via modal forms.
+    ============================================================ */
 
 (function () {
     "use strict";
@@ -113,14 +113,6 @@ window.ASHURE_APP.reservations = reservations;
     var viewCheckOut = document.getElementById("viewCheckOut");
     var viewStatus = document.getElementById("viewStatus");
 
-    // ---- Utility: Format date ----
-    function formatDate(dateStr) {
-        if (!dateStr) return "—";
-        var d = new Date(dateStr + "T00:00:00");
-        var months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-        return months[d.getMonth()] + " " + d.getDate() + ", " + d.getFullYear();
-    }
-
     // ---- Utility: Badge class mapping ----
     function getStatusBadgeClass(status) {
         switch (status) {
@@ -133,47 +125,13 @@ window.ASHURE_APP.reservations = reservations;
         }
     }
 
-    // ---- Utility: Capitalize first letter ----
-    function capitalize(str) {
-        return str.charAt(0).toUpperCase() + str.slice(1);
-    }
-
-    // ---- Validate a single form field, show inline error ----
-    function showFieldError(fieldEl, message) {
-        if (!fieldEl) return;
-        var formGroup = fieldEl.closest('.form-group');
-        if (!formGroup) return;
-
-        formGroup.classList.add('form-group--error');
-
-        var existing = formGroup.querySelector('.form-group__error');
-        if (existing) existing.remove();
-
-        var errorEl = document.createElement('span');
-        errorEl.className = 'form-group__error';
-        errorEl.textContent = message;
-        formGroup.appendChild(errorEl);
-    }
-
-    // ---- Clear all inline validation errors ----
-    function clearValidation() {
-        var errorEls = document.querySelectorAll('.form-group--error');
-        for (var i = 0; i < errorEls.length; i++) {
-            errorEls[i].classList.remove('form-group--error');
-        }
-        var msgEls = document.querySelectorAll('.form-group__error');
-        for (var j = 0; j < msgEls.length; j++) {
-            msgEls[j].remove();
-        }
-    }
-
     // ---- Bind input listeners to clear validation on user input ----
     function bindValidationClear() {
         var validatable = [resGuestName, resRoomNumber, resCheckIn, resCheckOut];
         for (var i = 0; i < validatable.length; i++) {
             if (validatable[i]) {
-                validatable[i].addEventListener('input', clearValidation);
-                validatable[i].addEventListener('change', clearValidation);
+                validatable[i].addEventListener('input', window.ASHURE_UTILS.clearValidation);
+                validatable[i].addEventListener('change', window.ASHURE_UTILS.clearValidation);
             }
         }
     }
@@ -232,18 +190,18 @@ window.ASHURE_APP.reservations = reservations;
 
         reservationsTableBody.innerHTML = pageItems.map(function (r) {
             return "<tr>" +
-                "<td>" + escapeHtml(r.guestName) + "</td>" +
-                "<td>" + escapeHtml(r.roomNumber) + "</td>" +
-                "<td>" + escapeHtml(capitalize(r.roomType)) + "</td>" +
-                "<td>" + formatDate(r.checkIn) + "</td>" +
-                "<td>" + formatDate(r.checkOut) + "</td>" +
-                "<td><span class=\"badge " + getStatusBadgeClass(r.status) + "\">" + escapeHtml(capitalize(r.status)) + "</span></td>" +
+                "<td>" + window.ASHURE_UTILS.escapeHtml(r.guestName) + "</td>" +
+                "<td>" + window.ASHURE_UTILS.escapeHtml(r.roomNumber) + "</td>" +
+                "<td>" + window.ASHURE_UTILS.escapeHtml(window.ASHURE_UTILS.capitalize(r.roomType)) + "</td>" +
+                "<td>" + window.ASHURE_UTILS.formatDate(r.checkIn) + "</td>" +
+                "<td>" + window.ASHURE_UTILS.formatDate(r.checkOut) + "</td>" +
+                "<td><span class=\"badge " + getStatusBadgeClass(r.status) + "\">" + window.ASHURE_UTILS.escapeHtml(window.ASHURE_UTILS.capitalize(r.status)) + "</span></td>" +
                 "<td><div class=\"actions-cell\">" +
                 "<button class=\"action-btn action-btn--view\" data-action=\"view\" data-id=\"" + r.id + "\" aria-label=\"View\">" +
                 "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z\"/><circle cx=\"12\" cy=\"12\" r=\"3\"/></svg>" +
                 "</button>" +
                 "<button class=\"action-btn action-btn--edit\" data-action=\"edit\" data-id=\"" + r.id + "\" aria-label=\"Edit\">" +
-                "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7\"/><path d=\"M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z\"/></svg>" +
+                "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0-2-2v-7\"/><path d=\"M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z\"/></svg>" +
                 "</button>" +
                 "<button class=\"action-btn action-btn--delete\" data-action=\"delete\" data-id=\"" + r.id + "\" aria-label=\"Delete\">" +
                 "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><polyline points=\"3 6 5 6 21 6\"/><path d=\"M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2\"/></svg>" +
@@ -251,13 +209,6 @@ window.ASHURE_APP.reservations = reservations;
                 "</div></td>" +
                 "</tr>";
         }).join("");
-    }
-
-    // ---- Escape HTML ----
-    function escapeHtml(text) {
-        var div = document.createElement("div");
-        div.textContent = text;
-        return div.innerHTML;
     }
 
     // ---- Render pagination ----
@@ -348,22 +299,22 @@ window.ASHURE_APP.reservations = reservations;
         var status = resStatus.value;
 
         var hasError = false;
-        clearValidation();
+        window.ASHURE_UTILS.clearValidation();
 
         if (!guestName) {
-            showFieldError(resGuestName, "Guest name is required.");
+            window.ASHURE_UTILS.showFieldError(resGuestName, "Guest name is required.");
             hasError = true;
         }
         if (!roomNumber) {
-            showFieldError(resRoomNumber, "Room number is required.");
+            window.ASHURE_UTILS.showFieldError(resRoomNumber, "Room number is required.");
             hasError = true;
         }
         if (!checkIn) {
-            showFieldError(resCheckIn, "Check-in date is required.");
+            window.ASHURE_UTILS.showFieldError(resCheckIn, "Check-in date is required.");
             hasError = true;
         }
         if (!checkOut) {
-            showFieldError(resCheckOut, "Check-out date is required.");
+            window.ASHURE_UTILS.showFieldError(resCheckOut, "Check-out date is required.");
             hasError = true;
         }
         if (hasError) {
@@ -375,14 +326,14 @@ window.ASHURE_APP.reservations = reservations;
         today.setHours(0, 0, 0, 0);
         var checkInDate = new Date(checkIn + "T00:00:00");
         if (checkInDate < today) {
-            showFieldError(resCheckIn, "Check-in date cannot be in the past.");
+            window.ASHURE_UTILS.showFieldError(resCheckIn, "Check-in date cannot be in the past.");
             hasError = true;
         }
 
         // Check-out must be later than check-in
         var checkOutDate = new Date(checkOut + "T00:00:00");
         if (checkOutDate <= checkInDate) {
-            showFieldError(resCheckOut, "Check-out date must be after check-in.");
+            window.ASHURE_UTILS.showFieldError(resCheckOut, "Check-out date must be after check-in.");
             hasError = true;
         }
 
@@ -399,7 +350,7 @@ window.ASHURE_APP.reservations = reservations;
             return checkInDate < existingCheckOut && checkOutDate > existingCheckIn;
         });
         if (hasOverlap) {
-            showFieldError(resRoomNumber, "This room is already booked for the selected dates.");
+            window.ASHURE_UTILS.showFieldError(resRoomNumber, "This room is already booked for the selected dates.");
             hasError = true;
         }
 
@@ -443,17 +394,19 @@ window.ASHURE_APP.reservations = reservations;
         applyFilters();
         saveToLocalStorage();
         document.dispatchEvent(new CustomEvent("ashure:data-changed"));
+        window.ASHURE_UTILS.showNotification("Reservation saved successfully.");
     }
 
     // ---- Delete reservation ----
     function deleteReservation(id) {
-        if (!confirm("Are you sure you want to delete this reservation?")) {
-            return;
-        }
-        reservations = reservations.filter(function (r) { return r.id !== id; });
-        applyFilters();
-        saveToLocalStorage();
-        document.dispatchEvent(new CustomEvent("ashure:data-changed"));
+        window.ASHURE_UTILS.confirm("Are you sure you want to delete this reservation?").then(function (confirmed) {
+            if (!confirmed) return;
+            reservations = reservations.filter(function (r) { return r.id !== id; });
+            applyFilters();
+            saveToLocalStorage();
+            document.dispatchEvent(new CustomEvent("ashure:data-changed"));
+            window.ASHURE_UTILS.showNotification("Reservation deleted.", "danger");
+        });
     }
 
     // ---- View reservation (read-only modal) ----
@@ -462,16 +415,16 @@ window.ASHURE_APP.reservations = reservations;
         var r = reservations.find(function (item) { return item.id === id; });
         if (!r) return;
 
-        viewReservationModalTitle.textContent = "Reservation Details — " + r.guestName;
+        viewReservationModalTitle.textContent = "Reservation Details � " + r.guestName;
         viewGuestName.value = r.guestName;
         viewEmail.value = r.email;
         viewPhone.value = r.phone;
         viewReservationRoomNumber.value = r.roomNumber;
-        viewReservationRoomType.value = capitalize(r.roomType);
+        viewReservationRoomType.value = window.ASHURE_UTILS.capitalize(r.roomType);
         viewGuests.value = r.guests;
         viewCheckIn.value = r.checkIn;
         viewCheckOut.value = r.checkOut;
-        viewStatus.value = capitalize(r.status);
+        viewStatus.value = window.ASHURE_UTILS.capitalize(r.status);
         viewReservationModal.classList.add("modal--visible");
         viewReservationModal.setAttribute("aria-hidden", "false");
     }
@@ -492,11 +445,11 @@ window.ASHURE_APP.reservations = reservations;
                 r.email,
                 r.phone,
                 r.roomNumber,
-                capitalize(r.roomType),
+                window.ASHURE_UTILS.capitalize(r.roomType),
                 r.checkIn,
                 r.checkOut,
                 r.guests,
-                capitalize(r.status)
+                window.ASHURE_UTILS.capitalize(r.status)
             ].map(function (cell) { return "\"" + cell + "\""; }).join(",");
         });
 
@@ -612,15 +565,6 @@ window.ASHURE_APP.reservations = reservations;
     });
 
     // ---- Initialize reservations page ----
-    function initReservations() {
-        applyFilters();
-        // Hide reservations section initially; dashboard is visible by default
-        var reservationsSection = document.getElementById("reservationsPage");
-        if (reservationsSection) {
-            reservationsSection.style.display = "none";
-        }
-    }
-
     function initReservations() {
         applyFilters();
         // Hide reservations section initially; dashboard is visible by default

@@ -44,7 +44,7 @@
             }
         }
         if (valueEls["Total Revenue"]) {
-            valueEls["Total Revenue"].textContent = formatRevenue(totalRevenue);
+            valueEls["Total Revenue"].textContent = window.ASHURE_UTILS.formatCurrency(totalRevenue);
         }
 
         // Occupancy Rate
@@ -168,10 +168,6 @@
         return { keys: Object.keys(monthlyData).sort(), data: monthlyData };
     }
 
-    function formatRevenue(value) {
-        return "₱" + Math.round(value).toLocaleString("en-US");
-    }
-
     function formatOccupancy(value) {
         return '<span class="occupancy-bar-wrap">' +
             '<span class="occupancy-bar"><span class="occupancy-bar__fill" style="width:' + value + '%;"></span></span>' +
@@ -253,7 +249,7 @@
                 '<tr>' +
                 '<td>' + monthName + '</td>' +
                 '<td>' + data.reservations + '</td>' +
-                '<td>' + formatRevenue(data.revenue) + '</td>' +
+                '<td>' + window.ASHURE_UTILS.formatCurrency(data.revenue) + '</td>' +
                 '<td>' + formatOccupancy(occupancyRate) + '</td>' +
                 '<td>' + avgStay.toFixed(1) + ' days</td>' +
                 '<td>' + growthHtml + '</td>' +
@@ -302,7 +298,27 @@
                 '</div>';
         } else {
             chartContainer.classList.remove("chart-container--single");
+            var tickCount = 4;
+            var tickStep = maxVal > 0 ? Math.ceil(maxVal / tickCount / 10) * 10 : 10;
+            if (tickStep < 10) tickStep = 10;
+            var yMax = tickStep * tickCount;
+            while (yMax < maxVal) yMax += tickStep;
+
+            var gridLines = "";
+            var yLabels = "";
+            for (var t = 0; t <= tickCount; t++) {
+                var tickVal = t * tickStep;
+                var yPercent = yMax > 0 ? (tickVal / yMax) * 100 : 0;
+                gridLines += '<div class="chart-grid-line" style="bottom:' + yPercent + '%;"><span class="chart-grid-label">' + tickVal + '</span></div>';
+            }
+
             var bars = [];
+            var barCount = keys.length;
+            var barGap = 24;
+            var barWidth = barCount <= 6 ? 56 : Math.max(32, Math.floor((chartContainer.clientWidth - (barCount + 1) * barGap) / barCount));
+            barWidth = Math.min(barWidth, 64);
+            var actualGap = Math.max(barGap, Math.floor((chartContainer.clientWidth - barCount * barWidth) / (barCount + 1)));
+
             for (var k = 0; k < keys.length; k++) {
                 var key = keys[k];
                 var data = monthlyData[key];
@@ -311,16 +327,18 @@
                 var monthLabel = date.toLocaleString("en-US", { month: "short" });
                 var heightPercent = maxVal > 0 ? Math.round((data.reservations / maxVal) * 100) : 0;
 
-            bars.push(
-                '<div class="chart-bar-wrap">' +
-                '<span class="chart-bar-value">' + data.reservations + '</span>' +
-                '<div class="chart-bar chart-bar--animated" style="height:' + heightPercent + '%;" title="' + monthLabel + ': ' + data.reservations + ' reservation' + (data.reservations !== 1 ? 's' : '') + '"></div>' +
-                '<span class="chart-bar-label">' + monthLabel + '</span>' +
-                '</div>'
-            );
-        }
+                bars.push(
+                    '<div class="chart-bar-wrap" style="width:' + barWidth + 'px; margin: 0 ' + (actualGap / 2) + 'px;">' +
+                    '<span class="chart-bar-value">' + data.reservations + '</span>' +
+                    '<div class="chart-bar chart-bar--animated" style="height:' + heightPercent + '%;" data-month="' + monthLabel + '" data-value="' + data.reservations + '"></div>' +
+                    '<span class="chart-bar-label">' + monthLabel + '</span>' +
+                    '</div>'
+                );
+            }
 
-        chartContainer.innerHTML = bars.join("");
+            chartContainer.innerHTML =
+                '<div class="chart-grid">' + gridLines + '</div>' +
+                '<div class="chart-bars-row">' + bars.join("") + '</div>';
         }
     }
 
@@ -348,7 +366,7 @@
             chartContainer.innerHTML =
                 '<div class="chart-single-revenue">' +
                 '<div class="chart-single-point"></div>' +
-                '<span class="chart-single-value">' + formatRevenue(singleData.revenue) + '</span>' +
+                '<span class="chart-single-value">' + window.ASHURE_UTILS.formatCurrency(singleData.revenue) + '</span>' +
                 '<span class="chart-single-label">' + singleMonth + '</span>' +
                 '</div>';
         } else {
@@ -377,7 +395,7 @@
         for (var t = 0; t <= tickCount; t++) {
             var tickVal = t * tickStep;
             var y = pad.top + chartH - (yMax > 0 ? (tickVal / yMax) * chartH : 0);
-            gridLines += '<line x1="' + pad.left + '" y1="' + y + '" x2="' + (pad.left + chartW) + '" y2="' + y + '" stroke="rgba(13,59,115,0.08)" stroke-width="1" stroke-dasharray="4,4"/>';
+            gridLines += '<line x1="' + pad.left + '" y1="' + y + '" x2="' + (pad.left + chartW) + '" y2="' + y + '" class="chart-grid-line"/>';
             var label;
             if (tickVal >= 1000000) {
                 label = "₱" + (tickVal / 1000000).toFixed(1) + "M";
@@ -386,7 +404,7 @@
             } else {
                 label = "₱" + tickVal;
             }
-            yLabels += '<text x="' + (pad.left - 8) + '" y="' + (y + 4) + '" text-anchor="end" fill="var(--color-text-muted)" font-size="10" font-weight="500" font-family="Poppins, system-ui, sans-serif">' + label + '</text>';
+            yLabels += '<text x="' + (pad.left - 10) + '" y="' + (y + 4) + '" text-anchor="end" class="chart-y-label">' + label + '</text>';
         }
 
         var points = [];
@@ -412,7 +430,8 @@
         var circles = "";
         for (var c = 0; c < points.length; c++) {
             var rev = points[c].revenue;
-            circles += '<circle cx="' + points[c].x + '" cy="' + points[c].y + '" r="4" fill="var(--color-primary)" class="chart-point" style="animation-delay:' + (0.5 + c * 0.12) + 's" title="' + formatRevenue(rev) + '"/>';
+            circles += '<circle cx="' + points[c].x + '" cy="' + points[c].y + '" r="5" fill="var(--color-white)" stroke="var(--color-primary)" stroke-width="2.5" class="chart-point-ring" style="animation-delay:' + (0.5 + c * 0.12) + 's" data-value="' + window.ASHURE_UTILS.formatCurrency(rev) + '"/>';
+            circles += '<circle cx="' + points[c].x + '" cy="' + points[c].y + '" r="3" fill="var(--color-primary)" class="chart-point" style="animation-delay:' + (0.5 + c * 0.12) + 's" data-value="' + window.ASHURE_UTILS.formatCurrency(rev) + '"/>';
         }
 
         var labels = "";
@@ -427,7 +446,7 @@
             '<svg class="chart-line" viewBox="0 0 ' + svgWidth + ' ' + svgHeight + '" preserveAspectRatio="none">' +
             '<defs>' +
             '<linearGradient id="lineGradient" x1="0" y1="0" x2="0" y2="1">' +
-            '<stop offset="0%" stop-color="var(--color-primary)" stop-opacity="0.2"/>' +
+            '<stop offset="0%" stop-color="var(--color-primary)" stop-opacity="0.15"/>' +
             '<stop offset="100%" stop-color="var(--color-primary)" stop-opacity="0"/>' +
             '</linearGradient>' +
             '</defs>' +

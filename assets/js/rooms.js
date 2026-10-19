@@ -1,12 +1,12 @@
 /* ============================================================
-   Ashure Heaben Resort Management System
-   Rooms Module — Data Foundation, Table Rendering, Filtering, Pagination, Add Room, View Room
-   ============================================================ */
-
-(function () {
-    "use strict";
-
-    // ---- Storage key ----
+     Ashure Heaben Resort Management System
+     Rooms Module — Data Foundation, Table Rendering, Filtering, Pagination, Add Room, View Room
+     ============================================================ */
+ 
+ (function () {
+     "use strict";
+ 
+     // ---- Storage key ----
     var STORAGE_KEY = "ashure_rooms";
 
     // ---- Room data ----
@@ -108,57 +108,13 @@
         }
     }
 
-    // ---- Utility: Capitalize first letter ----
-    function capitalize(str) {
-        if (!str || typeof str !== "string") return "";
-        return str.charAt(0).toUpperCase() + str.slice(1);
-    }
-
-    // ---- Utility: Format price with peso symbol and commas ----
-    function formatPrice(num) {
-        return "&#8369;" + Math.round(num).toLocaleString("en-US");
-    }
-
-    // ---- Utility: Escape HTML ----
-    function escapeHtml(text) {
-        var div = document.createElement("div");
-        div.textContent = text;
-        return div.innerHTML;
-    }
-
-    // ---- Validate a single form field, show inline error ----
-    function showFieldError(fieldEl, message) {
-        if (!fieldEl) return;
-        var formGroup = fieldEl.closest(".form-group");
-        if (!formGroup) return;
-        formGroup.classList.add("form-group--error");
-        var existing = formGroup.querySelector(".form-group__error");
-        if (existing) existing.remove();
-        var errorEl = document.createElement("span");
-        errorEl.className = "form-group__error";
-        errorEl.textContent = message;
-        formGroup.appendChild(errorEl);
-    }
-
-    // ---- Clear all inline validation errors ----
-    function clearValidation() {
-        var errorEls = document.querySelectorAll(".form-group--error");
-        for (var i = 0; i < errorEls.length; i++) {
-            errorEls[i].classList.remove("form-group--error");
-        }
-        var msgEls = document.querySelectorAll(".form-group__error");
-        for (var j = 0; j < msgEls.length; j++) {
-            msgEls[j].remove();
-        }
-    }
-
     // ---- Bind input listeners to clear validation on user input ----
     function bindValidationClear() {
         var fields = [addRoomNumber, addRoomType, addRoomFloor, addRoomCapacity, addRoomPrice, addRoomStatus, editRoomNumber, editRoomType, editRoomFloor, editRoomCapacity, editRoomPrice, editRoomStatus];
         for (var i = 0; i < fields.length; i++) {
             if (fields[i]) {
-                fields[i].addEventListener("input", clearValidation);
-                fields[i].addEventListener("change", clearValidation);
+                fields[i].addEventListener("input", window.ASHURE_UTILS.clearValidation);
+                fields[i].addEventListener("change", window.ASHURE_UTILS.clearValidation);
             }
         }
     }
@@ -239,12 +195,12 @@
         for (var i = 0; i < pageItems.length; i++) {
             var r = pageItems[i];
             html += "<tr>" +
-                "<td>" + escapeHtml(r.roomNumber) + "</td>" +
-                "<td>" + escapeHtml(capitalize(r.roomType)) + "</td>" +
+                "<td>" + window.ASHURE_UTILS.escapeHtml(r.roomNumber) + "</td>" +
+                "<td>" + window.ASHURE_UTILS.escapeHtml(window.ASHURE_UTILS.capitalize(r.roomType)) + "</td>" +
                 "<td>" + r.floor + "</td>" +
                 "<td>" + r.capacity + "</td>" +
-                "<td>" + formatPrice(r.price) + "</td>" +
-                "<td><span class=\"badge " + getStatusBadgeClass(r.status) + "\">" + escapeHtml(capitalize(r.status)) + "</span></td>" +
+                "<td>" + window.ASHURE_UTILS.formatCurrency(r.price) + "</td>" +
+                "<td><span class=\"badge " + getStatusBadgeClass(r.status) + "\">" + window.ASHURE_UTILS.escapeHtml(window.ASHURE_UTILS.capitalize(r.status)) + "</span></td>" +
                 "<td><div class=\"actions-cell\">" +
                     "<button class=\"action-btn action-btn--view\" data-action=\"view\" data-id=\"" + r.id + "\" aria-label=\"View\">" +
                         "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z\"/><circle cx=\"12\" cy=\"12\" r=\"3\"/></svg>" +
@@ -326,7 +282,7 @@
     function saveRoom(e) {
         if (e) e.preventDefault();
 
-        clearValidation();
+        window.ASHURE_UTILS.clearValidation();
 
         var roomNumber = addRoomNumber ? addRoomNumber.value.trim() : "";
         var roomType = addRoomType ? addRoomType.value : "";
@@ -338,38 +294,38 @@
         var hasError = false;
 
         if (!roomNumber) {
-            showFieldError(addRoomNumber, "Room number is required.");
+            window.ASHURE_UTILS.showFieldError(addRoomNumber, "Room number is required.");
             hasError = true;
         } else if (rooms.some(function (r) { return r.roomNumber.toLowerCase() === roomNumber.toLowerCase(); })) {
-            showFieldError(addRoomNumber, "Room number must be unique.");
+            window.ASHURE_UTILS.showFieldError(addRoomNumber, "Room number must be unique.");
             hasError = true;
         }
 
         if (!roomType) {
-            showFieldError(addRoomType, "Room type is required.");
+            window.ASHURE_UTILS.showFieldError(addRoomType, "Room type is required.");
             hasError = true;
         }
 
         var floorVal = parseInt(floor, 10);
         if (!floor || isNaN(floorVal) || floorVal <= 0) {
-            showFieldError(addRoomFloor, "Floor must be a positive integer.");
+            window.ASHURE_UTILS.showFieldError(addRoomFloor, "Floor must be a positive integer.");
             hasError = true;
         }
 
         var capacityVal = parseInt(capacity, 10);
         if (!capacity || isNaN(capacityVal) || capacityVal <= 0) {
-            showFieldError(addRoomCapacity, "Capacity must be a positive integer.");
+            window.ASHURE_UTILS.showFieldError(addRoomCapacity, "Capacity must be a positive integer.");
             hasError = true;
         }
 
         var priceVal = parseInt(price, 10);
         if (!price || isNaN(priceVal) || priceVal <= 0) {
-            showFieldError(addRoomPrice, "Price per night must be greater than zero.");
+            window.ASHURE_UTILS.showFieldError(addRoomPrice, "Price per night must be greater than zero.");
             hasError = true;
         }
 
         if (!status) {
-            showFieldError(addRoomStatus, "Status is required.");
+            window.ASHURE_UTILS.showFieldError(addRoomStatus, "Status is required.");
             hasError = true;
         }
 
@@ -398,6 +354,7 @@
         renderTable();
         saveRooms();
         document.dispatchEvent(new CustomEvent("ashure:data-changed"));
+        window.ASHURE_UTILS.showNotification("Room added successfully.");
     }
 
     // ---- View Room ----
@@ -408,11 +365,11 @@
         viewingRoomId = id;
 
         if (viewRoomNumber) viewRoomNumber.value = r.roomNumber || "";
-        if (viewRoomType) viewRoomType.value = capitalize(r.roomType) || "";
+        if (viewRoomType) viewRoomType.value = window.ASHURE_UTILS.capitalize(r.roomType) || "";
         if (viewRoomFloor) viewRoomFloor.value = r.floor || "";
         if (viewRoomCapacity) viewRoomCapacity.value = r.capacity || "";
-        if (viewRoomPrice) viewRoomPrice.value = formatPrice(r.price).replace("&#8369;", "₱") || "";
-        if (viewRoomStatus) viewRoomStatus.value = capitalize(r.status) || "";
+        if (viewRoomPrice) viewRoomPrice.value = window.ASHURE_UTILS.formatCurrency(r.price) || "";
+        if (viewRoomStatus) viewRoomStatus.value = window.ASHURE_UTILS.capitalize(r.status) || "";
 
         if (viewRoomModal) {
             viewRoomModal.classList.add("modal--visible");
@@ -459,7 +416,7 @@
     function saveEditRoom(e) {
         if (e) e.preventDefault();
 
-        clearValidation();
+        window.ASHURE_UTILS.clearValidation();
 
         var r = rooms.find(function (item) { return item.id === editingRoomId; });
         if (!r) return;
@@ -474,38 +431,38 @@
         var hasError = false;
 
         if (!roomNumber) {
-            showFieldError(editRoomNumber, "Room number is required.");
+            window.ASHURE_UTILS.showFieldError(editRoomNumber, "Room number is required.");
             hasError = true;
         } else if (rooms.some(function (item) { return item.id !== editingRoomId && item.roomNumber.toLowerCase() === roomNumber.toLowerCase(); })) {
-            showFieldError(editRoomNumber, "Room number must be unique.");
+            window.ASHURE_UTILS.showFieldError(editRoomNumber, "Room number must be unique.");
             hasError = true;
         }
 
         if (!roomType) {
-            showFieldError(editRoomType, "Room type is required.");
+            window.ASHURE_UTILS.showFieldError(editRoomType, "Room type is required.");
             hasError = true;
         }
 
         var floorVal = parseInt(floor, 10);
         if (!floor || isNaN(floorVal) || floorVal <= 0) {
-            showFieldError(editRoomFloor, "Floor must be a positive integer.");
+            window.ASHURE_UTILS.showFieldError(editRoomFloor, "Floor must be a positive integer.");
             hasError = true;
         }
 
         var capacityVal = parseInt(capacity, 10);
         if (!capacity || isNaN(capacityVal) || capacityVal <= 0) {
-            showFieldError(editRoomCapacity, "Capacity must be a positive integer.");
+            window.ASHURE_UTILS.showFieldError(editRoomCapacity, "Capacity must be a positive integer.");
             hasError = true;
         }
 
         var priceVal = parseInt(price, 10);
         if (!price || isNaN(priceVal) || priceVal <= 0) {
-            showFieldError(editRoomPrice, "Price per night must be greater than zero.");
+            window.ASHURE_UTILS.showFieldError(editRoomPrice, "Price per night must be greater than zero.");
             hasError = true;
         }
 
         if (!status) {
-            showFieldError(editRoomStatus, "Status is required.");
+            window.ASHURE_UTILS.showFieldError(editRoomStatus, "Status is required.");
             hasError = true;
         }
 
@@ -523,30 +480,33 @@
         renderTable();
         saveRooms();
         document.dispatchEvent(new CustomEvent("ashure:data-changed"));
+        window.ASHURE_UTILS.showNotification("Room updated successfully.");
     }
 
     // ---- Delete Room ----
     function deleteRoom(id) {
-        var confirmed = confirm("Are you sure you want to delete this room?");
-        if (!confirmed) return;
+        window.ASHURE_UTILS.confirm("Are you sure you want to delete this room?").then(function (confirmed) {
+            if (!confirmed) return;
 
-        var index = rooms.findIndex(function (r) { return r.id === id; });
-        if (index === -1) return;
+            var index = rooms.findIndex(function (r) { return r.id === id; });
+            if (index === -1) return;
 
-        rooms.splice(index, 1);
+            rooms.splice(index, 1);
 
-        var filtered = getFilteredRooms();
-        var totalPages = Math.ceil(filtered.length / ITEMS_PER_PAGE);
-        if (totalPages === 0) {
-            currentPage = 1;
-        } else if (currentPage > totalPages) {
-            currentPage = totalPages;
-        }
+            var filtered = getFilteredRooms();
+            var totalPages = Math.ceil(filtered.length / ITEMS_PER_PAGE);
+            if (totalPages === 0) {
+                currentPage = 1;
+            } else if (currentPage > totalPages) {
+                currentPage = totalPages;
+            }
 
-        updateStats();
-        renderTable();
-        saveRooms();
-        document.dispatchEvent(new CustomEvent("ashure:data-changed"));
+            updateStats();
+            renderTable();
+            saveRooms();
+            document.dispatchEvent(new CustomEvent("ashure:data-changed"));
+            window.ASHURE_UTILS.showNotification("Room deleted.", "danger");
+        });
     }
 
     // ---- Export Rooms ----
@@ -556,11 +516,11 @@
         var rows = filtered.map(function (r) {
             return [
                 r.roomNumber,
-                capitalize(r.roomType),
+                window.ASHURE_UTILS.capitalize(r.roomType),
                 r.floor,
                 r.capacity,
                 r.price,
-                capitalize(r.status)
+                window.ASHURE_UTILS.capitalize(r.status)
             ].map(function (cell) { return "\"" + cell + "\""; }).join(",");
         });
 
@@ -638,11 +598,11 @@
         if (editRoomModalBackdrop) {
             editRoomModalBackdrop.addEventListener("click", closeEditRoomModal);
         }
-if (editRoomForm) {
-             editRoomForm.addEventListener("submit", saveEditRoom);
-         }
+        if (editRoomForm) {
+            editRoomForm.addEventListener("submit", saveEditRoom);
+        }
 
-         bindValidationClear();
+        bindValidationClear();
 
         document.addEventListener("keydown", function (e) {
             if (e.key === "Escape") {
@@ -690,14 +650,14 @@ if (editRoomForm) {
                 renderTable();
             });
         }
-if (roomsPagination) {
-             roomsPagination.addEventListener("click", handlePaginationClick);
-         }
-         if (btnRoomExport) {
-             btnRoomExport.addEventListener("click", exportRooms);
-         }
+        if (roomsPagination) {
+            roomsPagination.addEventListener("click", handlePaginationClick);
+        }
+        if (btnRoomExport) {
+            btnRoomExport.addEventListener("click", exportRooms);
+        }
 
-         updateStats();
+        updateStats();
         renderTable();
     }
 

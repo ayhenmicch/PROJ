@@ -13,16 +13,15 @@
     var statValues = document.querySelectorAll(".dashboard .stat-card__value");
     var circularFill = document.querySelector(".circular-progress__fill");
     var circularText = document.querySelector(".circular-progress__text");
-    var progressFills = document.querySelectorAll(".progress-bar__fill");
     var greetingEl = document.getElementById("dashboardGreeting");
 
     // ---- Configuration ----
     var CIRCLE_CIRCUMFERENCE = 365; // 2 * PI * 58
-    var CIRCLE_TARGET_PERCENT = 82;
-    var CIRCLE_TARGET_OFFSET = 66; // circumference - (percent/100 * circumference)
     var COUNT_UP_DURATION = 1500; // ms
     var PROGRESS_DURATION = 800; // ms
-    var TOTAL_ROOMS = 250;
+
+    // ---- Dynamic targets (set by update functions, read by animation functions) ----
+    var occupancyTargetPercent = 0;
 
     // ---- Utility: Format number with commas ----
     function formatNumber(num) {
@@ -43,53 +42,135 @@
     function updateStatistics() {
         var reservations = (window.ASHURE_APP && window.ASHURE_APP.reservations) || [];
         var guests = (window.ASHURE_APP && window.ASHURE_APP.guests) || [];
+        var rooms = (window.ASHURE_APP && window.ASHURE_APP.rooms) || [];
 
         var totalReservations = reservations.length || 0;
         var totalGuests = guests.length || 0;
+
         var checkedInCount = 0;
         for (var i = 0; i < reservations.length; i++) {
             if (reservations[i].status === "checked-in") {
                 checkedInCount++;
             }
         }
-        var availableRooms = Math.max(0, TOTAL_ROOMS - checkedInCount);
-        var occupancyRate = TOTAL_ROOMS > 0 ? (checkedInCount / TOTAL_ROOMS) * 100 : 0;
 
-        // Update Total Reservations card
+        var availableRooms = 0;
+        for (var j = 0; j < rooms.length; j++) {
+            if (rooms[j].status === "available") {
+                availableRooms++;
+            }
+        }
+
+        var today = new Date();
+        var todayStr = today.getFullYear() + "-" + String(today.getMonth() + 1).padStart(2, "0") + "-" + String(today.getDate()).padStart(2, "0");
+        var checkedOutToday = 0;
+        for (var k = 0; k < reservations.length; k++) {
+            if (reservations[k].checkOut === todayStr) {
+                checkedOutToday++;
+            }
+        }
+
         var statCards = document.querySelectorAll(".dashboard .stat-card__value");
         if (statCards.length >= 1) {
             statCards[0].textContent = formatNumber(totalReservations);
         }
-
-        // Update Available Rooms card
         if (statCards.length >= 2) {
             statCards[1].textContent = formatNumber(availableRooms);
         }
+        if (statCards.length >= 3) {
+            statCards[2].textContent = formatNumber(checkedInCount);
+        }
+        if (statCards.length >= 4) {
+            statCards[3].textContent = formatNumber(checkedOutToday);
+        }
 
-        // Update Total Guests card
         var totalGuestsEl = document.getElementById("totalGuestsCount");
         if (totalGuestsEl) {
             totalGuestsEl.textContent = formatNumber(totalGuests);
         }
+    }
 
-        // Update Occupancy Rate card (in reports section)
-        var occupancyEl = document.querySelector(".reports .stat-card__value");
-        if (!occupancyEl) {
-            var allStatCards = document.querySelectorAll(".stat-card__value");
-            for (var j = 0; j < allStatCards.length; j++) {
-                var parent = allStatCards[j].parentElement;
-                if (parent && parent.querySelector(".stat-card__label")) {
-                    var label = parent.querySelector(".stat-card__label").textContent;
-                    if (label.indexOf("ccupancy") !== -1) {
-                        occupancyEl = allStatCards[j];
-                        break;
-                    }
-                }
+    // ---- Update Hotel Occupancy Panel ----
+    function updateOccupancyPanel() {
+        var rooms = (window.ASHURE_APP && window.ASHURE_APP.rooms) || [];
+
+        var totalRooms = rooms.length || 0;
+        var occupiedRooms = 0;
+        var availableRooms = 0;
+        var maintenanceRooms = 0;
+        for (var i = 0; i < rooms.length; i++) {
+            if (rooms[i].status === "available") {
+                availableRooms++;
+            } else if (rooms[i].status === "occupied" || rooms[i].status === "reserved") {
+                occupiedRooms++;
+            } else if (rooms[i].status === "maintenance") {
+                maintenanceRooms++;
             }
         }
-        if (occupancyEl) {
-            occupancyEl.textContent = formatPercent(occupancyRate);
+
+        var occupancyRate = totalRooms > 0 ? Math.round((occupiedRooms / totalRooms) * 100) : 0;
+        occupancyTargetPercent = occupancyRate;
+
+        if (circularText) {
+            circularText.textContent = occupancyRate + "%";
         }
+
+        var detailItems = document.querySelectorAll(".occupancy-details__item span:last-child");
+        if (detailItems.length >= 3) {
+            detailItems[0].textContent = "Occupied: " + occupiedRooms + " rooms";
+            detailItems[1].textContent = "Available: " + availableRooms + " rooms";
+            detailItems[2].textContent = "Total Rooms: " + totalRooms;
+        }
+    }
+
+    // ---- Update Reservation Status Panel ----
+    function updateReservationStatusPanel() {
+        var reservations = (window.ASHURE_APP && window.ASHURE_APP.reservations) || [];
+
+        var statuses = ["confirmed", "pending", "checked-in", "checked-out", "cancelled"];
+        var counts = {};
+        for (var s = 0; s < statuses.length; s++) {
+            counts[statuses[s]] = 0;
+        }
+
+        for (var i = 0; i < reservations.length; i++) {
+            var st = reservations[i].status;
+            if (counts.hasOwnProperty(st)) {
+                counts[st]++;
+            }
+        }
+
+        var total = reservations.length || 0;
+
+        var statusLabels = {
+            "confirmed": { label: "Confirmed", color: "rgba(39, 174, 96, 0.85)" },
+            "pending": { label: "Pending", color: "rgba(242, 201, 76, 0.9)" },
+            "cancelled": { label: "Cancelled", color: "rgba(235, 87, 87, 0.85)" },
+            "checked-in": { label: "Checked-in", color: "rgba(47, 128, 237, 0.85)" },
+            "checked-out": { label: "Checked-out", color: "rgba(107, 114, 128, 0.75)" }
+        };
+
+        var panelBody = document.querySelector(".dashboard-panel:nth-child(2) .dashboard-panel__body");
+        if (!panelBody) return;
+
+        var html = '<div class="progress-group">';
+        for (var j = 0; j < statuses.length; j++) {
+            var st = statuses[j];
+            var percent = total > 0 ? Math.round((counts[st] / total) * 100) : 0;
+            var info = statusLabels[st] || { label: st, color: "rgba(47, 128, 237, 0.85)" };
+            html += '<div class="progress-item">' +
+                '<div class="progress-item__header">' +
+                    '<span class="progress-item__label">' + info.label + '</span>' +
+                    '<span class="progress-item__value" style="color: ' + info.color + ';">' + counts[st] + '</span>' +
+                '</div>' +
+                '<div class="progress-bar">' +
+                    '<div class="progress-bar__fill" style="width: ' + percent + '%; background: ' + info.color + ';"></div>' +
+                '</div>' +
+            '</div>';
+        }
+        html += '</div>';
+
+        panelBody.innerHTML = html;
     }
 
     // ---- Quick Action navigation ----
@@ -147,33 +228,14 @@
             else if (r.status === "cancelled") badgeClass = "badge--danger";
 
             html += '<tr>';
-            html += '<td>' + escapeHtml(r.guestName) + '</td>';
-            html += '<td>' + escapeHtml(r.roomNumber) + '</td>';
-            html += '<td>' + escapeHtml(formatDate(r.checkIn)) + '</td>';
-            html += '<td>' + escapeHtml(formatDate(r.checkOut)) + '</td>';
-            html += '<td><span class="badge ' + badgeClass + '">' + escapeHtml(capitalizeStatus(r.status)) + '</span></td>';
+            html += '<td>' + window.ASHURE_UTILS.escapeHtml(r.guestName) + '</td>';
+            html += '<td>' + window.ASHURE_UTILS.escapeHtml(r.roomNumber) + '</td>';
+            html += '<td>' + window.ASHURE_UTILS.escapeHtml(window.ASHURE_UTILS.formatDate(r.checkIn)) + '</td>';
+            html += '<td>' + window.ASHURE_UTILS.escapeHtml(window.ASHURE_UTILS.formatDate(r.checkOut)) + '</td>';
+            html += '<td><span class="badge ' + badgeClass + '">' + window.ASHURE_UTILS.escapeHtml(capitalizeStatus(r.status)) + '</span></td>';
             html += '</tr>';
         }
         tbody.innerHTML = html;
-    }
-
-    function escapeHtml(str) {
-        if (!str) return "";
-        var div = document.createElement("div");
-        div.appendChild(document.createTextNode(str));
-        return div.innerHTML;
-    }
-
-    function formatDate(dateStr) {
-        if (!dateStr) return "—";
-        var d = new Date(dateStr + "T00:00:00");
-        var months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-        return months[d.getMonth()] + " " + d.getDate() + ", " + d.getFullYear();
-    }
-
-    function capitalizeStatus(status) {
-        if (!status) return "";
-        return status.charAt(0).toUpperCase() + status.slice(1).replace("-", " ");
     }
 
     // ---- Dynamic Greeting based on time ----
@@ -191,7 +253,6 @@
 
     // ---- Count-up animation for statistic cards ----
     function animateCountUp(element, targetText, duration) {
-        // Parse target number (remove commas)
         var targetStr = targetText.replace(/,/g, "");
         var target = parseInt(targetStr, 10);
         if (isNaN(target)) return;
@@ -225,35 +286,35 @@
         });
     }
 
-    // ---- Animate circular progress from 0% to 82% ----
+    // ---- Animate circular progress from 0% to target ----
     function animateCircularProgress() {
         if (!circularFill || !circularText) return;
 
-        // Start from 0%
+        var targetPercent = occupancyTargetPercent;
+        var targetOffset = CIRCLE_CIRCUMFERENCE - (targetPercent / 100 * CIRCLE_CIRCUMFERENCE);
+
+        circularFill.style.strokeDasharray = CIRCLE_CIRCUMFERENCE;
         circularFill.style.strokeDashoffset = CIRCLE_CIRCUMFERENCE;
         circularText.textContent = "0%";
 
-        // Force reflow
         void circularFill.offsetWidth;
 
-        // Animate to target
         circularFill.style.transition = "stroke-dashoffset 1.2s cubic-bezier(0.22, 1, 0.36, 1)";
-        circularFill.style.strokeDashoffset = CIRCLE_TARGET_OFFSET;
+        circularFill.style.strokeDashoffset = targetOffset;
 
-        // Animate text
         var startTime = null;
         function animateText(timestamp) {
             if (!startTime) startTime = timestamp;
             var elapsed = timestamp - startTime;
             var progress = Math.min(elapsed / 1200, 1);
             var easedProgress = easeOutCubic(progress);
-            var currentPercent = Math.round(easedProgress * CIRCLE_TARGET_PERCENT);
+            var currentPercent = Math.round(easedProgress * targetPercent);
             circularText.textContent = currentPercent + "%";
 
             if (progress < 1) {
                 requestAnimationFrame(animateText);
             } else {
-                circularText.textContent = CIRCLE_TARGET_PERCENT + "%";
+                circularText.textContent = targetPercent + "%";
             }
         }
 
@@ -262,18 +323,15 @@
 
     // ---- Animate progress bars from 0% to target ----
     function animateProgressBars() {
-        progressFills.forEach(function (fill) {
-            // Read target width from inline style
+        var fills = document.querySelectorAll(".progress-bar__fill");
+        fills.forEach(function (fill) {
             var targetWidth = fill.style.width || "0%";
 
-            // Reset to 0%
             fill.style.transition = "none";
             fill.style.width = "0%";
 
-            // Force reflow
             void fill.offsetWidth;
 
-            // Animate to target
             fill.style.transition = "width " + PROGRESS_DURATION + "ms cubic-bezier(0.22, 1, 0.36, 1)";
             fill.style.width = targetWidth;
         });
@@ -282,7 +340,6 @@
     // ---- Initialize dashboard animations when app is visible ----
     function initDashboard() {
         if (!appShell || !appShell.classList.contains("app--visible")) {
-            // Wait for app to become visible
             var observer = new MutationObserver(function () {
                 if (appShell.classList.contains("app--visible")) {
                     observer.disconnect();
@@ -299,12 +356,16 @@
     // ---- Listen for data changes to auto-refresh dashboard ----
     document.addEventListener("ashure:data-changed", function () {
         updateStatistics();
+        updateOccupancyPanel();
+        updateReservationStatusPanel();
         updateRecentReservations();
     });
 
     function startAnimations() {
         updateGreeting();
         updateStatistics();
+        updateOccupancyPanel();
+        updateReservationStatusPanel();
         updateRecentReservations();
         initQuickActions();
         animateStatistics();

@@ -1,14 +1,14 @@
 /* ============================================================
-   Ashure Heaben Resort Management System
-   Guest Management (Screen 5)
-   UI only — no CRUD functionality implemented.
-   ============================================================ */
-
-(function () {
-    "use strict";
-
-    // ---- Load guests from localStorage or initialize with sample data ----
-    var STORAGE_KEY = "asure_guests";
+     Ashure Heaben Resort Management System
+     Guest Management (Screen 5)
+     Handles CRUD operations, filtering, pagination, and statistics.
+     ============================================================ */
+ 
+ (function () {
+     "use strict";
+ 
+     // ---- Load guests from localStorage or initialize with sample data ----
+    var STORAGE_KEY = "ashure_guests";
     var storedGuests = localStorage.getItem(STORAGE_KEY);
     var guests = storedGuests ? JSON.parse(storedGuests) : [
         { id: 1, name: "James Wilson", email: "james.wilson@email.com", phone: "+1 555-0101", nationality: "American", visits: 5, status: "active", membership: "gold" },
@@ -36,42 +36,19 @@
     }
 
     // ---- Validation utilities ----
-    function showFieldError(fieldEl, message) {
-        if (!fieldEl) return;
-        var formGroup = fieldEl.closest(".form-group");
-        if (!formGroup) return;
-        formGroup.classList.add("form-group--error");
-        var existing = formGroup.querySelector(".form-group__error");
-        if (existing) existing.remove();
-        var errorEl = document.createElement("span");
-        errorEl.className = "form-group__error";
-        errorEl.textContent = message;
-        formGroup.appendChild(errorEl);
-    }
-
-    function clearValidation() {
-        var errorEls = document.querySelectorAll(".form-group--error");
-        for (var i = 0; i < errorEls.length; i++) {
-            errorEls[i].classList.remove("form-group--error");
-        }
-        var msgEls = document.querySelectorAll(".form-group__error");
-        for (var j = 0; j < msgEls.length; j++) {
-            msgEls[j].remove();
-        }
-    }
-
     function bindValidationClear() {
         var fields = [guestFirstName, guestLastName, guestEmail, guestPhone, editGuestFirstName, editGuestLastName, editGuestEmail, editGuestPhone];
         for (var i = 0; i < fields.length; i++) {
             if (fields[i]) {
-                fields[i].addEventListener("input", clearValidation);
-                fields[i].addEventListener("change", clearValidation);
+                fields[i].addEventListener("input", window.ASHURE_UTILS.clearValidation);
+                fields[i].addEventListener("change", window.ASHURE_UTILS.clearValidation);
             }
         }
     }
 
     var ITEMS_PER_PAGE = 8;
     var currentPage = 1;
+    var filteredGuests = [];
 
     var guestsTableBody = document.getElementById("guestsTableBody");
     var guestsEmpty = document.getElementById("guestsEmpty");
@@ -86,6 +63,107 @@
     var vipGuestsCount = document.getElementById("vipGuestsCount");
     var returningGuestsCount = document.getElementById("returningGuestsCount");
     var inactiveGuestsCount = document.getElementById("inactiveGuestsCount");
+
+    function applyFilters() {
+        var searchTerm = guestSearch ? guestSearch.value.trim().toLowerCase() : "";
+        var statusVal = guestStatusFilter ? guestStatusFilter.value : "";
+        var membershipVal = guestMembershipFilter ? guestMembershipFilter.value : "";
+        var nationalityVal = guestNationalityFilter ? guestNationalityFilter.value : "";
+
+        filteredGuests = guests.filter(function (g) {
+            var matchesSearch = !searchTerm ||
+                g.name.toLowerCase().indexOf(searchTerm) !== -1 ||
+                g.email.toLowerCase().indexOf(searchTerm) !== -1 ||
+                g.phone.toLowerCase().indexOf(searchTerm) !== -1;
+
+            var matchesStatus = !statusVal || g.status === statusVal;
+            var matchesMembership = !membershipVal || g.membership === membershipVal;
+            var matchesNationality = !nationalityVal || g.nationality.toLowerCase() === nationalityVal;
+
+            return matchesSearch && matchesStatus && matchesMembership && matchesNationality;
+        });
+    }
+
+    // ---- Render table ----
+    function renderTable() {
+        var start = (currentPage - 1) * ITEMS_PER_PAGE;
+        var end = start + ITEMS_PER_PAGE;
+        var pageItems = filteredGuests.slice(start, end);
+
+        guestCount.textContent = filteredGuests.length + " guest" + (filteredGuests.length !== 1 ? "s" : "");
+
+        if (pageItems.length === 0) {
+            guestsTableBody.innerHTML = "";
+            guestsEmpty.style.display = "block";
+            guestsPagination.style.display = "none";
+            return;
+        }
+
+        guestsEmpty.style.display = "none";
+
+        guestsTableBody.innerHTML = pageItems.map(function (g, idx) {
+            var initials = getInitials(g.name);
+            var avatarColor = getAvatarColor(idx);
+            var visitsText = getVisitsText(g.visits);
+
+            return "<tr>" +
+                "<td>" +
+                    "<div class=\"guest-cell\">" +
+                        "<div class=\"guest-avatar\" style=\"background: " + avatarColor + ";\">" + window.ASHURE_UTILS.escapeHtml(initials) + "</div>" +
+                        "<div class=\"guest-info\">" +
+                            "<span class=\"guest-name\">" + window.ASHURE_UTILS.escapeHtml(g.name) + "</span>" +
+                            "<span class=\"guest-email\">" + window.ASHURE_UTILS.escapeHtml(g.email) + "</span>" +
+                        "</div>" +
+                    "</div>" +
+                "</td>" +
+                "<td>" + window.ASHURE_UTILS.escapeHtml(g.email) + "</td>" +
+                "<td>" + window.ASHURE_UTILS.escapeHtml(g.phone) + "</td>" +
+                "<td>" + window.ASHURE_UTILS.escapeHtml(g.nationality) + "</td>" +
+                "<td><span class=\"visits-text\">" + visitsText + "</span></td>" +
+                "<td><span class=\"badge " + getStatusBadgeClass(g.status) + "\">" + window.ASHURE_UTILS.escapeHtml(window.ASHURE_UTILS.capitalize(g.status)) + "</span></td>" +
+                "<td><div class=\"actions-cell\">" +
+                "<button class=\"action-btn action-btn--view\" data-action=\"view\" data-id=\"" + g.id + "\" aria-label=\"View\">" +
+                "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z\"/><circle cx=\"12\" cy=\"12\" r=\"3\"/></svg>" +
+                "</button>" +
+                "<button class=\"action-btn action-btn--edit\" data-action=\"edit\" data-id=\"" + g.id + "\" aria-label=\"Edit\">" +
+                "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7\"/><path d=\"M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z\"/></svg>" +
+                "</button>" +
+                "<button class=\"action-btn action-btn--delete\" data-action=\"delete\" data-id=\"" + g.id + "\" aria-label=\"Delete\">" +
+                "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><polyline points=\"3 6 5 6 21 6\"/><path d=\"M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2\"/></svg>" +
+                "</button>" +
+                "</div></td>" +
+                "</tr>";
+        }).join("");
+    }
+
+    // ---- Render pagination (UI only) ----
+    function renderPagination() {
+        var totalPages = Math.ceil(filteredGuests.length / ITEMS_PER_PAGE);
+        if (totalPages <= 1) {
+            guestsPagination.innerHTML = "";
+            guestsPagination.style.display = "none";
+            return;
+        }
+
+        guestsPagination.style.display = "flex";
+
+        var html = "";
+        html += "<button class=\"pagination__btn\" data-page-num=\"" + (currentPage - 1) + "\" " + (currentPage === 1 ? "disabled" : "") + ">&laquo;</button>";
+
+        for (var i = 1; i <= totalPages; i++) {
+            html += "<button class=\"pagination__btn" + (i === currentPage ? " pagination__btn--active" : "") + "\" data-page-num=\"" + i + "\">" + i + "</button>";
+        }
+
+        html += "<button class=\"pagination__btn\" data-page-num=\"" + (currentPage + 1) + "\" " + (currentPage === totalPages ? "disabled" : "") + ">&raquo;</button>";
+
+        guestsPagination.innerHTML = html;
+    }
+
+    function refreshGuests() {
+        applyFilters();
+        renderTable();
+        renderPagination();
+    }
 
     var addGuestModal = document.getElementById("addGuestModal");
     var addGuestModalBackdrop = document.getElementById("addGuestModalBackdrop");
@@ -142,13 +220,6 @@
     var guestAddress = document.getElementById("guestAddress");
     var guestNotes = document.getElementById("guestNotes");
 
-    // ---- Utility: Escape HTML ----
-    function escapeHtml(text) {
-        var div = document.createElement("div");
-        div.textContent = text;
-        return div.innerHTML;
-    }
-
     // ---- Utility: Get initials from name ----
     function getInitials(name) {
         var parts = name.split(" ");
@@ -190,12 +261,6 @@
         }
     }
 
-    // ---- Utility: Capitalize first letter ----
-    function capitalize(str) {
-        if (!str || typeof str !== "string") return "";
-        return str.charAt(0).toUpperCase() + str.slice(1);
-    }
-
     // ---- Update summary stats ----
     function updateStats() {
         var total = guests.length;
@@ -209,153 +274,57 @@
         inactiveGuestsCount.textContent = inactiveCount;
     }
 
-    // ---- Render table ----
-    function renderTable() {
-        var searchTerm = guestSearch ? guestSearch.value.trim().toLowerCase() : "";
-        var statusVal = guestStatusFilter ? guestStatusFilter.value : "";
-        var membershipVal = guestMembershipFilter ? guestMembershipFilter.value : "";
-        var nationalityVal = guestNationalityFilter ? guestNationalityFilter.value : "";
-
-        var filtered = guests.filter(function (g) {
-            var matchesSearch = !searchTerm ||
-                g.name.toLowerCase().indexOf(searchTerm) !== -1 ||
-                g.email.toLowerCase().indexOf(searchTerm) !== -1 ||
-                g.phone.toLowerCase().indexOf(searchTerm) !== -1;
-
-            var matchesStatus = !statusVal || g.status === statusVal;
-            var matchesMembership = !membershipVal || g.membership === membershipVal;
-            var matchesNationality = !nationalityVal || g.nationality.toLowerCase() === nationalityVal;
-
-            return matchesSearch && matchesStatus && matchesMembership && matchesNationality;
-        });
-
-        var start = (currentPage - 1) * ITEMS_PER_PAGE;
-        var end = start + ITEMS_PER_PAGE;
-        var pageItems = filtered.slice(start, end);
-
-        guestCount.textContent = filtered.length + " guest" + (filtered.length !== 1 ? "s" : "");
-
-        if (pageItems.length === 0) {
-            guestsTableBody.innerHTML = "";
-            guestsEmpty.style.display = "block";
-            guestsPagination.style.display = "none";
-            return;
-        }
-
-        guestsEmpty.style.display = "none";
-
-        guestsTableBody.innerHTML = pageItems.map(function (g, idx) {
-            var initials = getInitials(g.name);
-            var avatarColor = getAvatarColor(idx);
-            var visitsText = getVisitsText(g.visits);
-
-            return "<tr>" +
-                "<td>" +
-                    "<div class=\"guest-cell\">" +
-                        "<div class=\"guest-avatar\" style=\"background: " + avatarColor + ";\">" + escapeHtml(initials) + "</div>" +
-                        "<div class=\"guest-info\">" +
-                            "<span class=\"guest-name\">" + escapeHtml(g.name) + "</span>" +
-                            "<span class=\"guest-email\">" + escapeHtml(g.email) + "</span>" +
-                        "</div>" +
-                    "</div>" +
-                "</td>" +
-                "<td>" + escapeHtml(g.email) + "</td>" +
-                "<td>" + escapeHtml(g.phone) + "</td>" +
-                "<td>" + escapeHtml(g.nationality) + "</td>" +
-                "<td><span class=\"visits-text\">" + visitsText + "</span></td>" +
-                "<td><span class=\"badge " + getStatusBadgeClass(g.status) + "\">" + escapeHtml(capitalize(g.status)) + "</span></td>" +
-                "<td><div class=\"actions-cell\">" +
-                "<button class=\"action-btn action-btn--view\" data-action=\"view\" data-id=\"" + g.id + "\" aria-label=\"View\">" +
-                "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z\"/><circle cx=\"12\" cy=\"12\" r=\"3\"/></svg>" +
-                "</button>" +
-                "<button class=\"action-btn action-btn--edit\" data-action=\"edit\" data-id=\"" + g.id + "\" aria-label=\"Edit\">" +
-                "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7\"/><path d=\"M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z\"/></svg>" +
-                "</button>" +
-                "<button class=\"action-btn action-btn--delete\" data-action=\"delete\" data-id=\"" + g.id + "\" aria-label=\"Delete\">" +
-                "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><polyline points=\"3 6 5 6 21 6\"/><path d=\"M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2\"/></svg>" +
-                "</button>" +
-                "</div></td>" +
-                "</tr>";
-        }).join("");
-    }
-
-    // ---- Render pagination (UI only) ----
-    function renderPagination() {
-        var searchTerm = guestSearch ? guestSearch.value.trim().toLowerCase() : "";
-        var statusVal = guestStatusFilter ? guestStatusFilter.value : "";
-        var membershipVal = guestMembershipFilter ? guestMembershipFilter.value : "";
-        var nationalityVal = guestNationalityFilter ? guestNationalityFilter.value : "";
-
-        var filtered = guests.filter(function (g) {
-            var matchesSearch = !searchTerm ||
-                g.name.toLowerCase().indexOf(searchTerm) !== -1 ||
-                g.email.toLowerCase().indexOf(searchTerm) !== -1 ||
-                g.phone.toLowerCase().indexOf(searchTerm) !== -1;
-
-            var matchesStatus = !statusVal || g.status === statusVal;
-            var matchesMembership = !membershipVal || g.membership === membershipVal;
-            var matchesNationality = !nationalityVal || g.nationality.toLowerCase() === nationalityVal;
-
-            return matchesSearch && matchesStatus && matchesMembership && matchesNationality;
-        });
-
-        var totalPages = Math.ceil(filtered.length / ITEMS_PER_PAGE);
-        if (totalPages <= 1) {
-            guestsPagination.innerHTML = "";
-            guestsPagination.style.display = "none";
-            return;
-        }
-
-        guestsPagination.style.display = "flex";
-
-        var html = "";
-        html += "<button class=\"pagination__btn\" data-page-num=\"" + (currentPage - 1) + "\" " + (currentPage === 1 ? "disabled" : "") + ">&laquo;</button>";
-
-        for (var i = 1; i <= totalPages; i++) {
-            html += "<button class=\"pagination__btn" + (i === currentPage ? " pagination__btn--active" : "") + "\" data-page-num=\"" + i + "\">" + i + "</button>";
-        }
-
-        html += "<button class=\"pagination__btn\" data-page-num=\"" + (currentPage + 1) + "\" " + (currentPage === totalPages ? "disabled" : "") + ">&raquo;</button>";
-
-        guestsPagination.innerHTML = html;
-    }
-
     // ---- Initialize guests page ----
     function initGuests() {
         if (guestsPage) {
             guestsPage.style.display = "none";
         }
         updateStats();
-        renderTable();
-        renderPagination();
+        refreshGuests();
         bindValidationClear();
     }
 
     if (guestSearch) {
         guestSearch.addEventListener("input", function () {
-            renderTable();
-            renderPagination();
+            currentPage = 1;
+            refreshGuests();
         });
     }
 
     if (guestStatusFilter) {
         guestStatusFilter.addEventListener("change", function () {
-            renderTable();
-            renderPagination();
+            currentPage = 1;
+            refreshGuests();
         });
     }
 
     if (guestMembershipFilter) {
         guestMembershipFilter.addEventListener("change", function () {
-            renderTable();
-            renderPagination();
+            currentPage = 1;
+            refreshGuests();
         });
     }
 
     if (guestNationalityFilter) {
         guestNationalityFilter.addEventListener("change", function () {
-            renderTable();
-            renderPagination();
+            currentPage = 1;
+            refreshGuests();
+        });
+    }
+
+    // ---- Pagination listener (delegation) ----
+    if (guestsPagination) {
+        guestsPagination.addEventListener("click", function (e) {
+            var btn = e.target.closest("button[data-page-num]");
+            if (!btn || btn.disabled) return;
+            var pageNum = parseInt(btn.getAttribute("data-page-num"), 10);
+
+            var totalPages = Math.ceil(filteredGuests.length / ITEMS_PER_PAGE);
+            if (pageNum >= 1 && pageNum <= totalPages) {
+                currentPage = pageNum;
+                renderTable();
+                renderPagination();
+            }
         });
     }
 
@@ -390,13 +359,13 @@
         viewGuestPhone.value = g.phone || "";
         viewGuestNationality.value = g.nationality || "";
         viewGuestBirthday.value = g.birthday || "";
-        viewGuestGender.value = capitalize(g.gender) || "";
-        viewGuestMembership.value = capitalize(g.membership) || "";
+        viewGuestGender.value = window.ASHURE_UTILS.capitalize(g.gender) || "";
+        viewGuestMembership.value = window.ASHURE_UTILS.capitalize(g.membership) || "";
         viewGuestAddress.value = g.address || "";
         viewGuestNotes.value = g.notes || "";
 
         viewGuestStatusBadge.className = "badge " + getStatusBadgeClass(g.status || "");
-        viewGuestStatusBadge.textContent = capitalize(g.status) || "";
+        viewGuestStatusBadge.textContent = window.ASHURE_UTILS.capitalize(g.status) || "";
         viewGuestVisitsBadge.className = "badge badge--info";
         viewGuestVisitsBadge.textContent = (g.visits || 0) + " Visits";
 
@@ -518,28 +487,28 @@
         var membership = guestMembership.value;
 
         var hasError = false;
-        clearValidation();
+        window.ASHURE_UTILS.clearValidation();
 
         if (!firstName) {
-            showFieldError(guestFirstName, "First name is required.");
+            window.ASHURE_UTILS.showFieldError(guestFirstName, "First name is required.");
             hasError = true;
         }
         if (!lastName) {
-            showFieldError(guestLastName, "Last name is required.");
+            window.ASHURE_UTILS.showFieldError(guestLastName, "Last name is required.");
             hasError = true;
         }
         if (!email) {
-            showFieldError(guestEmail, "Email is required.");
+            window.ASHURE_UTILS.showFieldError(guestEmail, "Email is required.");
             hasError = true;
         } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-            showFieldError(guestEmail, "Please enter a valid email address.");
+            window.ASHURE_UTILS.showFieldError(guestEmail, "Please enter a valid email address.");
             hasError = true;
         } else if (guests.some(function (g) { return g.email.toLowerCase() === email.toLowerCase(); })) {
-            showFieldError(guestEmail, "A guest with this email already exists.");
+            window.ASHURE_UTILS.showFieldError(guestEmail, "A guest with this email already exists.");
             hasError = true;
         }
         if (!phone) {
-            showFieldError(guestPhone, "Phone number is required.");
+            window.ASHURE_UTILS.showFieldError(guestPhone, "Phone number is required.");
             hasError = true;
         }
         if (hasError) {
@@ -560,11 +529,11 @@
         });
 
         updateStats();
-        renderTable();
-        renderPagination();
+        refreshGuests();
         closeAddGuestModal();
         saveGuests();
         document.dispatchEvent(new CustomEvent("ashure:data-changed"));
+        window.ASHURE_UTILS.showNotification("Guest added successfully.");
     }
 
     // ---- Save edited guest ----
@@ -578,28 +547,28 @@
         var phone = editGuestPhone.value.trim();
 
         var hasError = false;
-        clearValidation();
+        window.ASHURE_UTILS.clearValidation();
 
         if (!firstName) {
-            showFieldError(editGuestFirstName, "First name is required.");
+            window.ASHURE_UTILS.showFieldError(editGuestFirstName, "First name is required.");
             hasError = true;
         }
         if (!lastName) {
-            showFieldError(editGuestLastName, "Last name is required.");
+            window.ASHURE_UTILS.showFieldError(editGuestLastName, "Last name is required.");
             hasError = true;
         }
         if (!email) {
-            showFieldError(editGuestEmail, "Email is required.");
+            window.ASHURE_UTILS.showFieldError(editGuestEmail, "Email is required.");
             hasError = true;
         } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-            showFieldError(editGuestEmail, "Please enter a valid email address.");
+            window.ASHURE_UTILS.showFieldError(editGuestEmail, "Please enter a valid email address.");
             hasError = true;
         } else if (guests.some(function (item) { return item.id !== editingGuestId && item.email.toLowerCase() === email.toLowerCase(); })) {
-            showFieldError(editGuestEmail, "A guest with this email already exists.");
+            window.ASHURE_UTILS.showFieldError(editGuestEmail, "A guest with this email already exists.");
             hasError = true;
         }
         if (!phone) {
-            showFieldError(editGuestPhone, "Phone number is required.");
+            window.ASHURE_UTILS.showFieldError(editGuestPhone, "Phone number is required.");
             hasError = true;
         }
         if (hasError) {
@@ -617,31 +586,32 @@
         g.notes = editGuestNotes.value.trim();
 
         updateStats();
-        renderTable();
-        renderPagination();
+        refreshGuests();
         closeEditGuestModal();
         if (editGuestForm) {
             editGuestForm.reset();
         }
         saveGuests();
         document.dispatchEvent(new CustomEvent("ashure:data-changed"));
+        window.ASHURE_UTILS.showNotification("Guest updated successfully.");
     }
 
     // ---- Delete guest ----
     function deleteGuest(id) {
-        var confirmed = confirm("Are you sure you want to delete this guest?");
-        if (!confirmed) return;
+        window.ASHURE_UTILS.confirm("Are you sure you want to delete this guest?").then(function (confirmed) {
+            if (!confirmed) return;
 
-        var index = guests.findIndex(function (g) { return g.id === id; });
-        if (index === -1) return;
+            var index = guests.findIndex(function (g) { return g.id === id; });
+            if (index === -1) return;
 
-        guests.splice(index, 1);
-        saveGuests();
+            guests.splice(index, 1);
+            saveGuests();
 
-        updateStats();
-        renderTable();
-        renderPagination();
-        document.dispatchEvent(new CustomEvent("ashure:data-changed"));
+            updateStats();
+            refreshGuests();
+            document.dispatchEvent(new CustomEvent("ashure:data-changed"));
+            window.ASHURE_UTILS.showNotification("Guest deleted.", "danger");
+        });
     }
 
     // ---- Guests table action delegation ----

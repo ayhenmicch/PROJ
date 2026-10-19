@@ -15,6 +15,8 @@
         rel="stylesheet"
     />
 
+    <!-- UIkit 3 CSS (loaded first so custom styles take precedence) -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/uikit@3.16.26/dist/css/uikit.min.css" />
     <!-- Splash screen styles -->
     <link rel="stylesheet" href="assets/css/splash.css" />
     <!-- Login page styles -->
@@ -220,13 +222,24 @@
                 </div>
                 <div class="topbar__right">
                     <div class="topbar__datetime">
-                        <span class="topbar__date" id="topDate"></span>
+                        <span class="topbar__date uk-hidden@s" id="topDate"></span>
                         <span class="topbar__time" id="topTime"></span>
                     </div>
-                    <button class="topbar__icon-btn" aria-label="Notifications">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7 3 9 3 9h6s3-2 3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
-                        <span class="topbar__badge" aria-hidden="true"></span>
-                    </button>
+                    <div class="uk-inline">
+                        <button class="topbar__icon-btn" aria-label="Notifications" uk-toggle="target: #notificationsDropdown">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7 3 9 3 9h6s3-2 3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+                            <span class="topbar__badge" aria-hidden="true"></span>
+                        </button>
+                        <div id="notificationsDropdown" uk-dropdown="pos: bottom-right; animation: uk-animation-slide-top-small; duration: 300">
+                            <ul class="uk-nav uk-nav-default">
+                                <li class="uk-nav-header">Notifications</li>
+                                <li class="uk-nav-divider"></li>
+                                <li><a href="#"><span class="uk-margin-small-right" uk-icon="icon: check; ratio: 0.8"></span> New reservation received</a></li>
+                                <li><a href="#"><span class="uk-margin-small-right" uk-icon="icon: home; ratio: 0.8"></span> Room 302 maintenance completed</a></li>
+                                <li><a href="#"><span class="uk-margin-small-right" uk-icon="icon: user; ratio: 0.8"></span> Guest checked in</a></li>
+                            </ul>
+                        </div>
+                    </div>
                     <div class="topbar__profile">
                         <img
                             class="topbar__avatar"
@@ -237,7 +250,7 @@
                         <div class="topbar__avatar-fallback" aria-hidden="true">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
                         </div>
-                        <span class="topbar__profile-name">Admin</span>
+                        <span class="topbar__profile-name uk-visible@s">Admin</span>
                     </div>
                 </div>
             </header>
@@ -327,28 +340,46 @@
                                     <div class="progress-item">
                                         <div class="progress-item__header">
                                             <span class="progress-item__label">Confirmed</span>
-                                            <span class="progress-item__value">78</span>
+                                            <span class="progress-item__value">7</span>
                                         </div>
                                         <div class="progress-bar">
-                                            <div class="progress-bar__fill" style="width: 78%;"></div>
+                                            <div class="progress-bar__fill" style="width: 70%; background: rgba(39, 174, 96, 0.85);"></div>
                                         </div>
                                     </div>
                                     <div class="progress-item">
                                         <div class="progress-item__header">
                                             <span class="progress-item__label">Pending</span>
-                                            <span class="progress-item__value">15</span>
+                                            <span class="progress-item__value">3</span>
                                         </div>
                                         <div class="progress-bar">
-                                            <div class="progress-bar__fill" style="width: 15%; background: var(--color-warning);"></div>
+                                            <div class="progress-bar__fill" style="width: 30%; background: rgba(242, 201, 76, 0.9);"></div>
+                                        </div>
+                                    </div>
+                                    <div class="progress-item">
+                                        <div class="progress-item__header">
+                                            <span class="progress-item__label">Checked-in</span>
+                                            <span class="progress-item__value">2</span>
+                                        </div>
+                                        <div class="progress-bar">
+                                            <div class="progress-bar__fill" style="width: 20%; background: rgba(47, 128, 237, 0.85);"></div>
+                                        </div>
+                                    </div>
+                                    <div class="progress-item">
+                                        <div class="progress-item__header">
+                                            <span class="progress-item__label">Checked-out</span>
+                                            <span class="progress-item__value">1</span>
+                                        </div>
+                                        <div class="progress-bar">
+                                            <div class="progress-bar__fill" style="width: 10%; background: rgba(107, 114, 128, 0.75);"></div>
                                         </div>
                                     </div>
                                     <div class="progress-item">
                                         <div class="progress-item__header">
                                             <span class="progress-item__label">Cancelled</span>
-                                            <span class="progress-item__value">5</span>
+                                            <span class="progress-item__value">0</span>
                                         </div>
                                         <div class="progress-bar">
-                                            <div class="progress-bar__fill" style="width: 5%; background: var(--color-danger);"></div>
+                                            <div class="progress-bar__fill" style="width: 0%; background: rgba(235, 87, 87, 0.85);"></div>
                                         </div>
                                     </div>
                                 </div>
@@ -424,7 +455,7 @@
                     <div class="page-header">
                         <div>
                             <h1 class="page-header__title">Reservation Management</h1>
-                            <p class="page-header__subtitle">Manage all hotel reservations efficiently.</p>
+                            <p class="page-header__subtitle uk-hidden@s">Manage all hotel reservations efficiently.</p>
                         </div>
                         <button class="btn btn--primary" id="btnNewReservation">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
@@ -438,12 +469,12 @@
                                 <circle cx="11" cy="11" r="8"/>
                                 <line x1="21" y1="21" x2="16.65" y2="16.65"/>
                             </svg>
-                            <input type="text" class="input" id="reservationSearch" placeholder="Search reservations..." />
+                            <input type="text" class="input uk-input" id="reservationSearch" placeholder="Search reservations..." />
                         </div>
 
                         <div class="toolbar__sort">
                             <label for="statusFilter">Status</label>
-                            <select id="statusFilter" class="input">
+                            <select id="statusFilter" class="input uk-input">
                                 <option value="">All Statuses</option>
                                 <option value="confirmed">Confirmed</option>
                                 <option value="pending">Pending</option>
@@ -455,7 +486,7 @@
 
                         <div class="toolbar__sort">
                             <label for="roomTypeFilter">Room Type</label>
-                            <select id="roomTypeFilter" class="input">
+                            <select id="roomTypeFilter" class="input uk-input">
                                 <option value="">All Types</option>
                                 <option value="standard">Standard</option>
                                 <option value="deluxe">Deluxe</option>
@@ -466,7 +497,7 @@
 
                         <div class="toolbar__sort">
                             <label for="dateFilter">Date</label>
-                            <input type="date" id="dateFilter" class="input" />
+                            <input type="date" id="dateFilter" class="input uk-input" />
                         </div>
 
                         <button class="btn btn--secondary" id="btnExport">
@@ -519,7 +550,7 @@
                     <div class="page-header">
                         <div>
                             <h1 class="page-header__title">Guest Management</h1>
-                            <p class="page-header__subtitle">Manage guest profiles and information.</p>
+                            <p class="page-header__subtitle uk-hidden@s">Manage guest profiles and information.</p>
                         </div>
                         <button class="btn btn--primary" id="btnAddGuest">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
@@ -571,17 +602,17 @@
                     </div>
 
                     <div class="toolbar">
-                        <div class="toolbar__search toolbar__search--wide">
+                        <div class="toolbar__search">
                             <svg class="toolbar__search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                 <circle cx="11" cy="11" r="8"/>
                                 <line x1="21" y1="21" x2="16.65" y2="16.65"/>
                             </svg>
-                            <input type="text" class="input" id="guestSearch" placeholder="Search guests..." />
+                            <input type="text" class="input uk-input" id="guestSearch" placeholder="Search guests..." />
                         </div>
 
-                        <div class="toolbar__sort toolbar__sort--equal">
+                        <div class="toolbar__sort">
                             <label for="guestNationalityFilter">Nationality</label>
-                            <select id="guestNationalityFilter" class="input">
+                            <select id="guestNationalityFilter" class="input uk-input">
                                 <option value="">All Nationalities</option>
                                 <option value="american">American</option>
                                 <option value="spanish">Spanish</option>
@@ -598,7 +629,7 @@
 
                         <div class="toolbar__sort toolbar__sort--equal">
                             <label for="guestMembershipFilter">Membership</label>
-                            <select id="guestMembershipFilter" class="input">
+                            <select id="guestMembershipFilter" class="input uk-input">
                                 <option value="">All Memberships</option>
                                 <option value="gold">Gold</option>
                                 <option value="silver">Silver</option>
@@ -609,7 +640,7 @@
 
                         <div class="toolbar__sort toolbar__sort--equal">
                             <label for="guestStatusFilter">Status</label>
-                            <select id="guestStatusFilter" class="input">
+                            <select id="guestStatusFilter" class="input uk-input">
                                 <option value="">All Statuses</option>
                                 <option value="active">Active</option>
                                 <option value="vip">VIP</option>
@@ -665,7 +696,7 @@
                     <div class="page-header">
                         <div>
                             <h1 class="page-header__title">Reports & Analytics</h1>
-                            <p class="page-header__subtitle">View hotel performance, reservations, revenue, and occupancy statistics.</p>
+                            <p class="page-header__subtitle uk-hidden@s">View hotel performance, reservations, revenue, and occupancy statistics.</p>
                         </div>
                         <button class="btn btn--secondary" id="btnExportPDF">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18" aria-hidden="true">
@@ -736,7 +767,7 @@
                     <div class="toolbar">
                         <div class="toolbar__sort toolbar__sort--equal">
                             <label for="reportDateRange">Date Range</label>
-                            <select id="reportDateRange" class="input">
+                            <select id="reportDateRange" class="input uk-input">
                                 <option value="">All Time</option>
                                 <option value="today">Today</option>
                                 <option value="week">This Week</option>
@@ -747,7 +778,7 @@
                         </div>
                         <div class="toolbar__sort toolbar__sort--equal">
                             <label for="reportType">Report Type</label>
-                            <select id="reportType" class="input">
+                            <select id="reportType" class="input uk-input">
                                 <option value="">All Types</option>
                                 <option value="reservations">Reservations</option>
                                 <option value="revenue">Revenue</option>
@@ -893,7 +924,7 @@
                     <div class="page-header">
                         <div>
                             <h1 class="page-header__title">About</h1>
-                            <p class="page-header__subtitle">System information and project details.</p>
+                            <p class="page-header__subtitle uk-hidden@s">System information and project details.</p>
                         </div>
                     </div>
 
@@ -987,7 +1018,7 @@
                     <div class="page-header">
                         <div>
                             <h1 class="page-header__title">Room Management</h1>
-                            <p class="page-header__subtitle">Manage hotel rooms and availability.</p>
+                            <p class="page-header__subtitle uk-hidden@s">Manage hotel rooms and availability.</p>
                         </div>
                         <button class="btn btn--primary" id="btnAddRoom">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
@@ -1040,12 +1071,12 @@
                                 <circle cx="11" cy="11" r="8"/>
                                 <line x1="21" y1="21" x2="16.65" y2="16.65"/>
                             </svg>
-                            <input type="text" class="input" id="roomSearch" placeholder="Search rooms..." />
+                            <input type="text" class="input uk-input" id="roomSearch" placeholder="Search rooms..." />
                         </div>
 
                         <div class="toolbar__sort">
                             <label for="roomTypeFilter">Room Type</label>
-                            <select id="roomTypeFilter" class="input">
+                            <select id="roomTypeFilter" class="input uk-input">
                                 <option value="">All Types</option>
                                 <option value="standard">Standard</option>
                                 <option value="deluxe">Deluxe</option>
@@ -1056,7 +1087,7 @@
 
                         <div class="toolbar__sort">
                             <label for="floorFilter">Floor</label>
-                            <select id="floorFilter" class="input">
+                            <select id="floorFilter" class="input uk-input">
                                 <option value="">All Floors</option>
                                 <option value="1">Floor 1</option>
                                 <option value="2">Floor 2</option>
@@ -1068,7 +1099,7 @@
 
                         <div class="toolbar__sort">
                             <label for="roomStatusFilter">Status</label>
-                            <select id="roomStatusFilter" class="input">
+                            <select id="roomStatusFilter" class="input uk-input">
                                 <option value="">All Statuses</option>
                                 <option value="available">Available</option>
                                 <option value="occupied">Occupied</option>
@@ -1157,19 +1188,19 @@
                     <div class="form-grid">
                         <div class="form-group">
                             <label class="form-label" for="resGuestName">Guest Name</label>
-                            <input type="text" id="resGuestName" class="input" placeholder="Full name" required />
+                            <input type="text" id="resGuestName" class="input uk-input" placeholder="Full name" required />
                         </div>
                         <div class="form-group">
                             <label class="form-label" for="resEmail">Email</label>
-                            <input type="email" id="resEmail" class="input" placeholder="guest@example.com" />
+                            <input type="email" id="resEmail" class="input uk-input" placeholder="guest@example.com" />
                         </div>
                         <div class="form-group">
                             <label class="form-label" for="resPhone">Phone</label>
-                            <input type="tel" id="resPhone" class="input" placeholder="+63 912 345 6789" />
+                            <input type="tel" id="resPhone" class="input uk-input" placeholder="+63 912 345 6789" />
                         </div>
                         <div class="form-group">
                             <label class="form-label" for="resRoomType">Room Type</label>
-                            <select id="resRoomType" class="input">
+                            <select id="resRoomType" class="input uk-input">
                                 <option value="standard">Standard</option>
                                 <option value="deluxe">Deluxe</option>
                                 <option value="suite">Suite</option>
@@ -1178,23 +1209,23 @@
                         </div>
                         <div class="form-group">
                             <label class="form-label" for="resRoomNumber">Room Number</label>
-                            <input type="text" id="resRoomNumber" class="input" placeholder="e.g. 101" />
+                            <input type="text" id="resRoomNumber" class="input uk-input" placeholder="e.g. 101" />
                         </div>
                         <div class="form-group">
                             <label class="form-label" for="resGuests">Guests</label>
-                            <input type="number" id="resGuests" class="input" min="1" value="1" />
+                            <input type="number" id="resGuests" class="input uk-input" min="1" value="1" />
                         </div>
                         <div class="form-group">
                             <label class="form-label" for="resCheckIn">Check-in</label>
-                            <input type="date" id="resCheckIn" class="input" required />
+                            <input type="date" id="resCheckIn" class="input uk-input" required />
                         </div>
                         <div class="form-group">
                             <label class="form-label" for="resCheckOut">Check-out</label>
-                            <input type="date" id="resCheckOut" class="input" required />
+                            <input type="date" id="resCheckOut" class="input uk-input" required />
                         </div>
                         <div class="form-group form-group--full">
                             <label class="form-label" for="resStatus">Status</label>
-                            <select id="resStatus" class="input">
+                            <select id="resStatus" class="input uk-input">
                                 <option value="confirmed">Confirmed</option>
                                 <option value="pending">Pending</option>
                                 <option value="checked-in">Checked-in</option>
@@ -1223,39 +1254,39 @@
                 <div class="form-grid">
                     <div class="form-group">
                         <label class="form-label">Guest Name</label>
-                        <input type="text" id="viewGuestName" class="input" disabled />
+                        <input type="text" id="viewGuestName" class="input uk-input" disabled />
                     </div>
                     <div class="form-group">
                         <label class="form-label">Email</label>
-                        <input type="email" id="viewEmail" class="input" disabled />
+                        <input type="email" id="viewEmail" class="input uk-input" disabled />
                     </div>
                     <div class="form-group">
                         <label class="form-label">Phone</label>
-                        <input type="tel" id="viewPhone" class="input" disabled />
+                        <input type="tel" id="viewPhone" class="input uk-input" disabled />
                     </div>
                     <div class="form-group">
                         <label class="form-label">Room Number</label>
-                        <input type="text" id="viewReservationRoomNumber" class="input" disabled />
+                        <input type="text" id="viewReservationRoomNumber" class="input uk-input" disabled />
                     </div>
                     <div class="form-group">
                         <label class="form-label">Room Type</label>
-                        <input type="text" id="viewReservationRoomType" class="input" disabled />
+                        <input type="text" id="viewReservationRoomType" class="input uk-input" disabled />
                     </div>
                     <div class="form-group">
                         <label class="form-label">Guests</label>
-                        <input type="number" id="viewGuests" class="input" disabled />
+                        <input type="number" id="viewGuests" class="input uk-input" disabled />
                     </div>
                     <div class="form-group">
                         <label class="form-label">Check-in</label>
-                        <input type="date" id="viewCheckIn" class="input" disabled />
+                        <input type="date" id="viewCheckIn" class="input uk-input" disabled />
                     </div>
                     <div class="form-group">
                         <label class="form-label">Check-out</label>
-                        <input type="date" id="viewCheckOut" class="input" disabled />
+                        <input type="date" id="viewCheckOut" class="input uk-input" disabled />
                     </div>
                     <div class="form-group form-group--full">
                         <label class="form-label">Status</label>
-                        <input type="text" id="viewStatus" class="input" disabled />
+                        <input type="text" id="viewStatus" class="input uk-input" disabled />
                     </div>
                 </div>
             </div>
@@ -1279,11 +1310,11 @@
                     <div class="form-grid">
                         <div class="form-group">
                             <label class="form-label" for="addRoomNumber">Room Number</label>
-                            <input type="text" id="addRoomNumber" class="input" placeholder="101" />
+                            <input type="text" id="addRoomNumber" class="input uk-input" placeholder="101" />
                         </div>
                         <div class="form-group">
                             <label class="form-label" for="addRoomType">Room Type</label>
-                            <select id="addRoomType" class="input">
+                            <select id="addRoomType" class="input uk-input">
                                 <option value="">Select type</option>
                                 <option value="standard">Standard</option>
                                 <option value="deluxe">Deluxe</option>
@@ -1293,7 +1324,7 @@
                         </div>
                         <div class="form-group">
                             <label class="form-label" for="addRoomFloor">Floor</label>
-                            <select id="addRoomFloor" class="input">
+                            <select id="addRoomFloor" class="input uk-input">
                                 <option value="">Select floor</option>
                                 <option value="1">Floor 1</option>
                                 <option value="2">Floor 2</option>
@@ -1304,15 +1335,15 @@
                         </div>
                         <div class="form-group">
                             <label class="form-label" for="addRoomCapacity">Capacity</label>
-                            <input type="number" id="addRoomCapacity" class="input" placeholder="2" />
+                            <input type="number" id="addRoomCapacity" class="input uk-input" placeholder="2" />
                         </div>
                         <div class="form-group">
                             <label class="form-label" for="addRoomPrice">Price / Night</label>
-                            <input type="number" id="addRoomPrice" class="input" placeholder="1200" />
+                            <input type="number" id="addRoomPrice" class="input uk-input" placeholder="1200" />
                         </div>
                         <div class="form-group">
                             <label class="form-label" for="addRoomStatus">Status</label>
-                            <select id="addRoomStatus" class="input">
+                            <select id="addRoomStatus" class="input uk-input">
                                 <option value="">Select status</option>
                                 <option value="available">Available</option>
                                 <option value="occupied">Occupied</option>
@@ -1341,27 +1372,27 @@
                 <div class="form-grid">
                     <div class="form-group">
                         <label class="form-label">Room Number</label>
-                        <input type="text" id="viewRoomNumber" class="input" disabled />
+                        <input type="text" id="viewRoomNumber" class="input uk-input" disabled />
                     </div>
                     <div class="form-group">
                         <label class="form-label">Room Type</label>
-                        <input type="text" id="viewRoomType" class="input" disabled />
+                        <input type="text" id="viewRoomType" class="input uk-input" disabled />
                     </div>
                     <div class="form-group">
                         <label class="form-label">Floor</label>
-                        <input type="number" id="viewRoomFloor" class="input" disabled />
+                        <input type="number" id="viewRoomFloor" class="input uk-input" disabled />
                     </div>
                     <div class="form-group">
                         <label class="form-label">Capacity</label>
-                        <input type="number" id="viewRoomCapacity" class="input" disabled />
+                        <input type="number" id="viewRoomCapacity" class="input uk-input" disabled />
                     </div>
                     <div class="form-group">
                         <label class="form-label">Price / Night</label>
-                        <input type="text" id="viewRoomPrice" class="input" disabled />
+                        <input type="text" id="viewRoomPrice" class="input uk-input" disabled />
                     </div>
                     <div class="form-group">
                         <label class="form-label">Status</label>
-                        <input type="text" id="viewRoomStatus" class="input" disabled />
+                        <input type="text" id="viewRoomStatus" class="input uk-input" disabled />
                     </div>
                 </div>
             </div>
@@ -1385,11 +1416,11 @@
                     <div class="form-grid">
                         <div class="form-group">
                             <label class="form-label" for="editRoomNumber">Room Number</label>
-                            <input type="text" id="editRoomNumber" class="input" />
+                            <input type="text" id="editRoomNumber" class="input uk-input" />
                         </div>
                         <div class="form-group">
                             <label class="form-label" for="editRoomType">Room Type</label>
-                            <select id="editRoomType" class="input">
+                            <select id="editRoomType" class="input uk-input">
                                 <option value="">Select type</option>
                                 <option value="standard">Standard</option>
                                 <option value="deluxe">Deluxe</option>
@@ -1399,7 +1430,7 @@
                         </div>
                         <div class="form-group">
                             <label class="form-label" for="editRoomFloor">Floor</label>
-                            <select id="editRoomFloor" class="input">
+                            <select id="editRoomFloor" class="input uk-input">
                                 <option value="">Select floor</option>
                                 <option value="1">Floor 1</option>
                                 <option value="2">Floor 2</option>
@@ -1410,15 +1441,15 @@
                         </div>
                         <div class="form-group">
                             <label class="form-label" for="editRoomCapacity">Capacity</label>
-                            <input type="number" id="editRoomCapacity" class="input" />
+                            <input type="number" id="editRoomCapacity" class="input uk-input" />
                         </div>
                         <div class="form-group">
                             <label class="form-label" for="editRoomPrice">Price / Night</label>
-                            <input type="number" id="editRoomPrice" class="input" />
+                            <input type="number" id="editRoomPrice" class="input uk-input" />
                         </div>
                         <div class="form-group">
                             <label class="form-label" for="editRoomStatus">Status</label>
-                            <select id="editRoomStatus" class="input">
+                            <select id="editRoomStatus" class="input uk-input">
                                 <option value="">Select status</option>
                                 <option value="available">Available</option>
                                 <option value="occupied">Occupied</option>
@@ -1448,23 +1479,23 @@
                     <div class="form-grid">
                         <div class="form-group">
                             <label class="form-label" for="guestFirstName">First Name</label>
-                            <input type="text" id="guestFirstName" class="input" placeholder="John" />
+                            <input type="text" id="guestFirstName" class="input uk-input" placeholder="John" />
                         </div>
                         <div class="form-group">
                             <label class="form-label" for="guestLastName">Last Name</label>
-                            <input type="text" id="guestLastName" class="input" placeholder="Doe" />
+                            <input type="text" id="guestLastName" class="input uk-input" placeholder="Doe" />
                         </div>
                         <div class="form-group">
                             <label class="form-label" for="guestEmail">Email</label>
-                            <input type="email" id="guestEmail" class="input" placeholder="john@example.com" />
+                            <input type="email" id="guestEmail" class="input uk-input" placeholder="john@example.com" />
                         </div>
                         <div class="form-group">
                             <label class="form-label" for="guestPhone">Phone</label>
-                            <input type="tel" id="guestPhone" class="input" placeholder="+63 912 345 6789" />
+                            <input type="tel" id="guestPhone" class="input uk-input" placeholder="+63 912 345 6789" />
                         </div>
                         <div class="form-group">
                             <label class="form-label" for="guestNationality">Nationality</label>
-                            <select id="guestNationality" class="input">
+                            <select id="guestNationality" class="input uk-input">
                                 <option value="">Select nationality</option>
                                 <option value="american">American</option>
                                 <option value="spanish">Spanish</option>
@@ -1480,11 +1511,11 @@
                         </div>
                         <div class="form-group">
                             <label class="form-label" for="guestBirthday">Birthday</label>
-                            <input type="date" id="guestBirthday" class="input" />
+                            <input type="date" id="guestBirthday" class="input uk-input" />
                         </div>
                         <div class="form-group">
                             <label class="form-label" for="guestGender">Gender</label>
-                            <select id="guestGender" class="input">
+                            <select id="guestGender" class="input uk-input">
                                 <option value="">Select gender</option>
                                 <option value="male">Male</option>
                                 <option value="female">Female</option>
@@ -1494,7 +1525,7 @@
                         </div>
                         <div class="form-group">
                             <label class="form-label" for="guestMembership">Membership</label>
-                            <select id="guestMembership" class="input">
+                            <select id="guestMembership" class="input uk-input">
                                 <option value="">Select membership</option>
                                 <option value="gold">Gold</option>
                                 <option value="silver">Silver</option>
@@ -1504,7 +1535,7 @@
                         </div>
                         <div class="form-group form-group--full">
                             <label class="form-label" for="guestAddress">Address</label>
-                            <input type="text" id="guestAddress" class="input" placeholder="Street, City, Country" />
+                            <input type="text" id="guestAddress" class="input uk-input" placeholder="Street, City, Country" />
                         </div>
                         <div class="form-group form-group--full">
                             <label class="form-label" for="guestNotes">Notes</label>
@@ -1536,39 +1567,39 @@
                 <div class="form-grid">
                     <div class="form-group">
                         <label class="form-label">First Name</label>
-                        <input type="text" id="viewGuestFirstName" class="input" disabled />
+                        <input type="text" id="viewGuestFirstName" class="input uk-input" disabled />
                     </div>
                     <div class="form-group">
                         <label class="form-label">Last Name</label>
-                        <input type="text" id="viewGuestLastName" class="input" disabled />
+                        <input type="text" id="viewGuestLastName" class="input uk-input" disabled />
                     </div>
                     <div class="form-group">
                         <label class="form-label">Email</label>
-                        <input type="email" id="viewGuestEmail" class="input" disabled />
+                        <input type="email" id="viewGuestEmail" class="input uk-input" disabled />
                     </div>
                     <div class="form-group">
                         <label class="form-label">Phone</label>
-                        <input type="tel" id="viewGuestPhone" class="input" disabled />
+                        <input type="tel" id="viewGuestPhone" class="input uk-input" disabled />
                     </div>
                     <div class="form-group">
                         <label class="form-label">Nationality</label>
-                        <input type="text" id="viewGuestNationality" class="input" disabled />
+                        <input type="text" id="viewGuestNationality" class="input uk-input" disabled />
                     </div>
                     <div class="form-group">
                         <label class="form-label">Birthday</label>
-                        <input type="date" id="viewGuestBirthday" class="input" disabled />
+                        <input type="date" id="viewGuestBirthday" class="input uk-input" disabled />
                     </div>
                     <div class="form-group">
                         <label class="form-label">Gender</label>
-                        <input type="text" id="viewGuestGender" class="input" disabled />
+                        <input type="text" id="viewGuestGender" class="input uk-input" disabled />
                     </div>
                     <div class="form-group">
                         <label class="form-label">Membership</label>
-                        <input type="text" id="viewGuestMembership" class="input" disabled />
+                        <input type="text" id="viewGuestMembership" class="input uk-input" disabled />
                     </div>
                     <div class="form-group form-group--full">
                         <label class="form-label">Address</label>
-                        <input type="text" id="viewGuestAddress" class="input" disabled />
+                        <input type="text" id="viewGuestAddress" class="input uk-input" disabled />
                     </div>
                     <div class="form-group form-group--full">
                         <label class="form-label">Notes</label>
@@ -1596,23 +1627,23 @@
                     <div class="form-grid">
                         <div class="form-group">
                             <label class="form-label" for="editGuestFirstName">First Name</label>
-                            <input type="text" id="editGuestFirstName" class="input" placeholder="John" />
+                            <input type="text" id="editGuestFirstName" class="input uk-input" placeholder="John" />
                         </div>
                         <div class="form-group">
                             <label class="form-label" for="editGuestLastName">Last Name</label>
-                            <input type="text" id="editGuestLastName" class="input" placeholder="Doe" />
+                            <input type="text" id="editGuestLastName" class="input uk-input" placeholder="Doe" />
                         </div>
                         <div class="form-group">
                             <label class="form-label" for="editGuestEmail">Email</label>
-                            <input type="email" id="editGuestEmail" class="input" placeholder="john@example.com" />
+                            <input type="email" id="editGuestEmail" class="input uk-input" placeholder="john@example.com" />
                         </div>
                         <div class="form-group">
                             <label class="form-label" for="editGuestPhone">Phone</label>
-                            <input type="tel" id="editGuestPhone" class="input" placeholder="+63 912 345 6789" />
+                            <input type="tel" id="editGuestPhone" class="input uk-input" placeholder="+63 912 345 6789" />
                         </div>
                         <div class="form-group">
                             <label class="form-label" for="editGuestNationality">Nationality</label>
-                            <select id="editGuestNationality" class="input">
+                            <select id="editGuestNationality" class="input uk-input">
                                 <option value="">Select nationality</option>
                                 <option value="american">American</option>
                                 <option value="spanish">Spanish</option>
@@ -1628,11 +1659,11 @@
                         </div>
                         <div class="form-group">
                             <label class="form-label" for="editGuestBirthday">Birthday</label>
-                            <input type="date" id="editGuestBirthday" class="input" />
+                            <input type="date" id="editGuestBirthday" class="input uk-input" />
                         </div>
                         <div class="form-group">
                             <label class="form-label" for="editGuestGender">Gender</label>
-                            <select id="editGuestGender" class="input">
+                            <select id="editGuestGender" class="input uk-input">
                                 <option value="">Select gender</option>
                                 <option value="male">Male</option>
                                 <option value="female">Female</option>
@@ -1642,7 +1673,7 @@
                         </div>
                         <div class="form-group">
                             <label class="form-label" for="editGuestMembership">Membership</label>
-                            <select id="editGuestMembership" class="input">
+                            <select id="editGuestMembership" class="input uk-input">
                                 <option value="">Select membership</option>
                                 <option value="gold">Gold</option>
                                 <option value="silver">Silver</option>
@@ -1652,7 +1683,7 @@
                         </div>
                         <div class="form-group form-group--full">
                             <label class="form-label" for="editGuestAddress">Address</label>
-                            <input type="text" id="editGuestAddress" class="input" placeholder="Street, City, Country" />
+                            <input type="text" id="editGuestAddress" class="input uk-input" placeholder="Street, City, Country" />
                         </div>
                         <div class="form-group form-group--full">
                             <label class="form-label" for="editGuestNotes">Notes</label>
@@ -1668,12 +1699,26 @@
         </div>
     </div>
 
+    <!-- Generic Confirmation Modal (UIkit) -->
+    <div id="confirmModal" uk-modal>
+        <div class="uk-modal-dialog uk-modal-body uk-modal-body--confirm">
+            <h3 class="uk-modal-title">Confirm Action</h3>
+            <p id="confirmMessage" class="uk-margin-small">Are you sure?</p>
+            <div class="uk-modal-footer uk-text-right">
+                <button class="uk-button uk-button-default uk-modal-close" type="button">Cancel</button>
+                <button class="uk-button uk-button-danger" id="confirmYes" type="button">Yes, proceed</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Splash screen behavior (loading simulation) -->
     <script src="assets/js/splash.js"></script>
     <!-- Login page behavior -->
     <script src="assets/js/login.js"></script>
     <!-- Sidebar toggle behavior -->
     <script src="assets/js/sidebar.js"></script>
+    <!-- Shared Utilities -->
+    <script src="assets/js/utils.js"></script>
     <!-- Dashboard animations -->
     <script src="assets/js/dashboard.js"></script>
     <!-- Reservation Management -->
@@ -1686,5 +1731,8 @@
     <script src="assets/js/reports.js"></script>
     <!-- About Page -->
     <script src="assets/js/about.js"></script>
+    <!-- UIkit 3 JS + Icons -->
+    <script src="https://cdn.jsdelivr.net/npm/uikit@3.16.26/dist/js/uikit.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/uikit@3.16.26/dist/js/uikit-icons.min.js"></script>
 </body>
 </html>
