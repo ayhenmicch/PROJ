@@ -9,8 +9,9 @@
  
      // ---- Load guests from localStorage or initialize with sample data ----
     var STORAGE_KEY = "ashure_guests";
-    var storedGuests = localStorage.getItem(STORAGE_KEY);
-    var guests = storedGuests ? JSON.parse(storedGuests) : [
+    var storedGuests = window.ASHURE_UTILS.loadStoredRecords(STORAGE_KEY,
+        ["name", "email", "phone", "nationality", "status", "membership"], ["id", "visits"]);
+    var guests = storedGuests !== null ? storedGuests : [
         { id: 1, name: "James Wilson", email: "james.wilson@email.com", phone: "+1 555-0101", nationality: "American", visits: 5, status: "active", membership: "gold" },
         { id: 2, name: "Sophia Martinez", email: "sophia.martinez@email.com", phone: "+34 555-0102", nationality: "Spanish", visits: 12, status: "vip", membership: "platinum" },
         { id: 3, name: "Li Wei", email: "li.wei@email.com", phone: "+86 555-0103", nationality: "Chinese", visits: 3, status: "active", membership: "silver" },
@@ -22,7 +23,7 @@
         { id: 9, name: "Carlos Silva", email: "carlos.silva@email.com", phone: "+55 555-0109", nationality: "Brazilian", visits: 1, status: "inactive", membership: "none" },
         { id: 10, name: "Sophie Dubois", email: "sophie.dubois@email.com", phone: "+33 555-0110", nationality: "French", visits: 7, status: "active", membership: "gold" }
     ];
-    if (!storedGuests) {
+    if (storedGuests === null) {
         saveGuests();
     }
 
@@ -32,7 +33,7 @@
 
     // ---- Persist guests to localStorage ----
     function saveGuests() {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(guests));
+        return window.ASHURE_UTILS.saveStoredRecords(STORAGE_KEY, guests);
     }
 
     // ---- Validation utilities ----
@@ -553,9 +554,9 @@
         updateStats();
         refreshGuests();
         closeAddGuestModal();
-        saveGuests();
+        var persisted = saveGuests();
         document.dispatchEvent(new CustomEvent("ashure:data-changed"));
-        window.ASHURE_UTILS.showNotification("Guest added successfully.");
+        if (persisted) window.ASHURE_UTILS.showNotification("Guest added successfully.");
     }
 
     // ---- Save edited guest ----
@@ -613,9 +614,9 @@
         if (editGuestForm) {
             editGuestForm.reset();
         }
-        saveGuests();
+        var persisted = saveGuests();
         document.dispatchEvent(new CustomEvent("ashure:data-changed"));
-        window.ASHURE_UTILS.showNotification("Guest updated successfully.");
+        if (persisted) window.ASHURE_UTILS.showNotification("Guest updated successfully.");
     }
 
     // ---- Delete guest ----
@@ -627,12 +628,12 @@
             if (index === -1) return;
 
             guests.splice(index, 1);
-            saveGuests();
+            var persisted = saveGuests();
 
             updateStats();
             refreshGuests();
             document.dispatchEvent(new CustomEvent("ashure:data-changed"));
-            window.ASHURE_UTILS.showNotification("Guest deleted.", "danger");
+            if (persisted) window.ASHURE_UTILS.showNotification("Guest deleted.", "danger");
         });
     }
 

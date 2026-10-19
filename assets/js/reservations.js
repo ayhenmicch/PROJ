@@ -27,10 +27,11 @@ var STORAGE_KEY = "ashure_reservations";
 
 // ---- Load reservations from localStorage or initialize with sample data ----
 var reservations = (function () {
-    var stored = localStorage.getItem(STORAGE_KEY);
-    if (stored) {
+    var stored = window.ASHURE_UTILS.loadStoredRecords(STORAGE_KEY,
+        ["guestName", "email", "phone", "roomNumber", "roomType", "checkIn", "checkOut", "status"], ["id", "guests"]);
+    if (stored !== null) {
         try {
-            return JSON.parse(stored);
+            return stored;
         } catch (e) {
             // Corrupted data — fall through to initialize
         }
@@ -49,7 +50,7 @@ var reservations = (function () {
         { id: 11, guestName: "David Kim", email: "david@example.com", phone: "+63 912 345 6780", roomNumber: "310", roomType: "suite", checkIn: "2026-07-28", checkOut: "2026-07-31", status: "confirmed", guests: 3 },
         { id: 12, guestName: "Elena Garcia", email: "elena@example.com", phone: "+63 923 456 7891", roomNumber: "405", roomType: "family", checkIn: "2026-07-29", checkOut: "2026-08-01", status: "checked-in", guests: 5 }
     ];
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(sample));
+    window.ASHURE_UTILS.saveStoredRecords(STORAGE_KEY, sample);
     return sample;
 })();
 
@@ -127,7 +128,7 @@ window.ASHURE_APP.reservations = reservations;
 
     // ---- Bind input listeners to clear validation on user input ----
     function bindValidationClear() {
-        var validatable = [resGuestName, resRoomNumber, resCheckIn, resCheckOut];
+        var validatable = [resGuestName, resRoomNumber, resCheckIn, resCheckOut, resGuests];
         for (var i = 0; i < validatable.length; i++) {
             if (validatable[i]) {
                 validatable[i].addEventListener('input', window.ASHURE_UTILS.clearValidation);
@@ -139,7 +140,7 @@ window.ASHURE_APP.reservations = reservations;
     // ---- Persist reservations to localStorage ----
     function saveToLocalStorage() {
         try {
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(reservations));
+            return window.ASHURE_UTILS.saveStoredRecords(STORAGE_KEY, reservations);
         } catch (e) {
             // Storage unavailable or quota exceeded — continue silently
         }
@@ -293,7 +294,7 @@ window.ASHURE_APP.reservations = reservations;
         var phone = resPhone.value.trim();
         var roomType = resRoomType.value;
         var roomNumber = resRoomNumber.value.trim();
-        var guests = parseInt(resGuests.value, 10) || 1;
+        var guests = Number(resGuests.value);
         var checkIn = resCheckIn.value;
         var checkOut = resCheckOut.value;
         var status = resStatus.value;
@@ -301,6 +302,10 @@ window.ASHURE_APP.reservations = reservations;
         var hasError = false;
         window.ASHURE_UTILS.clearValidation();
 
+        if (!Number.isSafeInteger(guests) || guests <= 0) {
+            window.ASHURE_UTILS.showFieldError(resGuests, "Guest count must be a positive integer.");
+            hasError = true;
+        }
         if (!guestName) {
             window.ASHURE_UTILS.showFieldError(resGuestName, "Guest name is required.");
             hasError = true;
@@ -392,9 +397,9 @@ window.ASHURE_APP.reservations = reservations;
 
         closeModal();
         applyFilters();
-        saveToLocalStorage();
+        var persisted = saveToLocalStorage();
         document.dispatchEvent(new CustomEvent("ashure:data-changed"));
-        window.ASHURE_UTILS.showNotification("Reservation saved successfully.");
+        if (persisted) window.ASHURE_UTILS.showNotification("Reservation saved successfully.");
     }
 
     // ---- Delete reservation ----
@@ -405,9 +410,9 @@ window.ASHURE_APP.reservations = reservations;
                 if (reservations[i].id === id) reservations.splice(i, 1);
             }
             applyFilters();
-            saveToLocalStorage();
+            var persisted = saveToLocalStorage();
             document.dispatchEvent(new CustomEvent("ashure:data-changed"));
-            window.ASHURE_UTILS.showNotification("Reservation deleted.", "danger");
+            if (persisted) window.ASHURE_UTILS.showNotification("Reservation deleted.", "danger");
         });
     }
 

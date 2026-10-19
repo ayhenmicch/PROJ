@@ -9,6 +9,41 @@
 
     window.ASHURE_UTILS = window.ASHURE_UTILS || {};
 
+    // Keep unreadable stored records untouched, including on later saves.
+    var blockedStorageKeys = {};
+    window.ASHURE_UTILS.loadStoredRecords = function (key, stringFields, numberFields) {
+        try {
+            var raw = localStorage.getItem(key);
+            if (raw === null) return null;
+            var records = JSON.parse(raw);
+            if (!Array.isArray(records) || !records.every(function (record) {
+                return record && typeof record === "object" &&
+                    stringFields.every(function (field) { return typeof record[field] === "string"; }) &&
+                    numberFields.every(function (field) {
+                        return typeof record[field] === "number" && Number.isFinite(record[field]);
+                    });
+            })) throw new Error("Invalid stored records");
+            return records;
+        } catch (error) {
+            blockedStorageKeys[key] = true;
+            window.alert("Unable to load " + key + ". Existing stored data has not been changed. " +
+                "This list is empty for this session and saving is blocked to protect existing records.");
+            return [];
+        }
+    };
+
+    window.ASHURE_UTILS.saveStoredRecords = function (key, records) {
+        try {
+            if (blockedStorageKeys[key]) throw new Error("Stored data requires recovery");
+            localStorage.setItem(key, JSON.stringify(records));
+            return true;
+        } catch (error) {
+            window.alert("Unable to save " + key + ". Changes are only in memory and will be lost on refresh. " +
+                "Existing stored data has not been replaced.");
+            return false;
+        }
+    };
+
     // ---- Format date ----
     window.ASHURE_UTILS.formatDate = function (dateStr) {
         if (!dateStr) return "—";

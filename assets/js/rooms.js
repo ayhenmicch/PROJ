@@ -11,10 +11,11 @@
 
     // ---- Room data ----
     var rooms = (function () {
-        var stored = localStorage.getItem(STORAGE_KEY);
-        if (stored) {
+        var stored = window.ASHURE_UTILS.loadStoredRecords(STORAGE_KEY,
+            ["roomNumber", "roomType", "status"], ["id", "floor", "capacity", "price"]);
+        if (stored !== null) {
             try {
-                var parsed = JSON.parse(stored);
+                var parsed = stored;
                 if (Array.isArray(parsed)) return parsed;
             } catch (e) {
                 // Corrupted data — fall through to initialize
@@ -30,7 +31,7 @@
             { id: 7, roomNumber: "401", roomType: "family", floor: 4, capacity: 5, price: 3500, status: "reserved", description: "" },
             { id: 8, roomNumber: "402", roomType: "family", floor: 4, capacity: 6, price: 4200, status: "occupied", description: "" }
         ];
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(sample));
+        window.ASHURE_UTILS.saveStoredRecords(STORAGE_KEY, sample);
         return sample;
     })();
 
@@ -122,7 +123,7 @@
     // ---- Persist rooms to LocalStorage ----
     function saveRooms() {
         try {
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(rooms));
+            return window.ASHURE_UTILS.saveStoredRecords(STORAGE_KEY, rooms);
         } catch (e) {
             // Storage unavailable or quota exceeded — continue silently
         }
@@ -306,20 +307,20 @@
             hasError = true;
         }
 
-        var floorVal = parseInt(floor, 10);
-        if (!floor || isNaN(floorVal) || floorVal <= 0) {
+        var floorVal = Number(floor);
+        if (!floor || !Number.isSafeInteger(floorVal) || floorVal <= 0) {
             window.ASHURE_UTILS.showFieldError(addRoomFloor, "Floor must be a positive integer.");
             hasError = true;
         }
 
-        var capacityVal = parseInt(capacity, 10);
-        if (!capacity || isNaN(capacityVal) || capacityVal <= 0) {
+        var capacityVal = Number(capacity);
+        if (!capacity || !Number.isSafeInteger(capacityVal) || capacityVal <= 0) {
             window.ASHURE_UTILS.showFieldError(addRoomCapacity, "Capacity must be a positive integer.");
             hasError = true;
         }
 
-        var priceVal = parseInt(price, 10);
-        if (!price || isNaN(priceVal) || priceVal <= 0) {
+        var priceVal = Number(price);
+        if (!price || !Number.isFinite(priceVal) || priceVal <= 0) {
             window.ASHURE_UTILS.showFieldError(addRoomPrice, "Price per night must be greater than zero.");
             hasError = true;
         }
@@ -352,9 +353,9 @@
         currentPage = 1;
         updateStats();
         renderTable();
-        saveRooms();
+        var persisted = saveRooms();
         document.dispatchEvent(new CustomEvent("ashure:data-changed"));
-        window.ASHURE_UTILS.showNotification("Room added successfully.");
+        if (persisted) window.ASHURE_UTILS.showNotification("Room added successfully.");
     }
 
     // ---- View Room ----
@@ -443,20 +444,20 @@
             hasError = true;
         }
 
-        var floorVal = parseInt(floor, 10);
-        if (!floor || isNaN(floorVal) || floorVal <= 0) {
+        var floorVal = Number(floor);
+        if (!floor || !Number.isSafeInteger(floorVal) || floorVal <= 0) {
             window.ASHURE_UTILS.showFieldError(editRoomFloor, "Floor must be a positive integer.");
             hasError = true;
         }
 
-        var capacityVal = parseInt(capacity, 10);
-        if (!capacity || isNaN(capacityVal) || capacityVal <= 0) {
+        var capacityVal = Number(capacity);
+        if (!capacity || !Number.isSafeInteger(capacityVal) || capacityVal <= 0) {
             window.ASHURE_UTILS.showFieldError(editRoomCapacity, "Capacity must be a positive integer.");
             hasError = true;
         }
 
-        var priceVal = parseInt(price, 10);
-        if (!price || isNaN(priceVal) || priceVal <= 0) {
+        var priceVal = Number(price);
+        if (!price || !Number.isFinite(priceVal) || priceVal <= 0) {
             window.ASHURE_UTILS.showFieldError(editRoomPrice, "Price per night must be greater than zero.");
             hasError = true;
         }
@@ -478,9 +479,9 @@
         closeEditRoomModal();
         updateStats();
         renderTable();
-        saveRooms();
+        var persisted = saveRooms();
         document.dispatchEvent(new CustomEvent("ashure:data-changed"));
-        window.ASHURE_UTILS.showNotification("Room updated successfully.");
+        if (persisted) window.ASHURE_UTILS.showNotification("Room updated successfully.");
     }
 
     // ---- Delete Room ----
@@ -503,9 +504,9 @@
 
             updateStats();
             renderTable();
-            saveRooms();
+            var persisted = saveRooms();
             document.dispatchEvent(new CustomEvent("ashure:data-changed"));
-            window.ASHURE_UTILS.showNotification("Room deleted.", "danger");
+            if (persisted) window.ASHURE_UTILS.showNotification("Room deleted.", "danger");
         });
     }
 
