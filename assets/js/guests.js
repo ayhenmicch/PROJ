@@ -161,6 +161,8 @@
 
     function refreshGuests() {
         applyFilters();
+        var totalPages = Math.max(1, Math.ceil(filteredGuests.length / ITEMS_PER_PAGE));
+        currentPage = Math.max(1, Math.min(currentPage, totalPages));
         renderTable();
         renderPagination();
     }
@@ -381,6 +383,22 @@
     }
 
     // ---- Open Edit Guest Modal ----
+    function selectStoredGuestValue(selectEl, value) {
+        var storedOption = selectEl.querySelector("option[data-stored-guest-value]");
+        if (storedOption) storedOption.remove();
+
+        value = value || "";
+        selectEl.value = value;
+        if (selectEl.value !== value) {
+            storedOption = document.createElement("option");
+            storedOption.value = value;
+            storedOption.textContent = window.ASHURE_UTILS.capitalize(value);
+            storedOption.setAttribute("data-stored-guest-value", "");
+            selectEl.appendChild(storedOption);
+            selectEl.value = value;
+        }
+    }
+
     function openEditGuestModal(id) {
         var g = guests.find(function (item) { return item.id === id; });
         if (!g) return;
@@ -389,10 +407,10 @@
         editGuestLastName.value = g.name ? g.name.split(" ").slice(1).join(" ") : "";
         editGuestEmail.value = g.email || "";
         editGuestPhone.value = g.phone || "";
-        editGuestNationality.value = g.nationality || "";
+        selectStoredGuestValue(editGuestNationality, g.nationality);
         editGuestBirthday.value = g.birthday || "";
         editGuestGender.value = g.gender || "";
-        editGuestMembership.value = g.membership || "";
+        selectStoredGuestValue(editGuestMembership, g.membership);
         editGuestAddress.value = g.address || "";
         editGuestNotes.value = g.notes || "";
 
@@ -523,6 +541,10 @@
             email: email,
             phone: phone,
             nationality: nationality,
+            birthday: guestBirthday.value,
+            gender: guestGender.value,
+            address: guestAddress.value.trim(),
+            notes: guestNotes.value.trim(),
             visits: 0,
             status: "active",
             membership: membership
