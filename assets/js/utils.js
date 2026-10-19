@@ -47,6 +47,108 @@
         }
     };
 
+    // Pure evidence only: referenceDate is a hotel-local YYYY-MM-DD string.
+    // Supply an array, { available: true, records: [...] }, or { available: false }.
+    window.ASHURE_UTILS.getRoomReservationEvidence = function (room, reservationData, referenceDate) {
+        var result = {
+            operationalStatus: room && room.status,
+            referenceDate: referenceDate,
+            dataState: "known",
+            occupancyEvidence: "none",
+            current: { pending: [], scheduled: [], checkedIn: [] },
+            upcoming: [],
+            overdueCheckedIn: [],
+            pastDue: [],
+            historical: [],
+            cancelled: [],
+            warnings: []
+        };
+
+        function warn(code, index) {
+            var warning = { code: code };
+            if (index !== undefined) warning.reservationIndex = index;
+            result.warnings.push(warning);
+        }
+
+        function validDate(value) {
+            if (typeof value !== "string" || !/^\d{4}-\d{2}-\d{2}$/.test(value)) return false;
+            var year = Number(value.slice(0, 4));
+            var month = Number(value.slice(5, 7));
+            var day = Number(value.slice(8, 10));
+            var leap = year % 4 === 0 && (year % 100 !== 0 || year % 400 === 0);
+            var days = [31, leap ? 29 : 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+            return year > 0 && month >= 1 && month <= 12 && day >= 1 && day <= days[month - 1];
+        }
+
+        var records = Array.isArray(reservationData) ? reservationData
+            : reservationData && reservationData.available === true ? reservationData.records : null;
+        if (!room || typeof room.roomNumber !== "string" || !room.roomNumber ||
+            !validDate(referenceDate) || !Array.isArray(records)) {
+            result.dataState = "unknown";
+            result.occupancyEvidence = "unknown";
+            warn(!room || typeof room.roomNumber !== "string" || !room.roomNumber ? "invalid-room"
+                : !validDate(referenceDate) ? "invalid-reference-date" : "reservation-data-unavailable");
+            return result;
+        }
+
+        records.forEach(function (reservation, index) {
+            if (!reservation || typeof reservation.roomNumber !== "string") {
+                result.dataState = "unknown";
+                warn("invalid-reservation", index);
+                return;
+            }
+            // Match exactly, as the existing booking-conflict check does.
+            if (reservation.roomNumber !== room.roomNumber) return;
+            if (!validDate(reservation.checkIn) || !validDate(reservation.checkOut) ||
+                reservation.checkOut <= reservation.checkIn) {
+                result.dataState = "unknown";
+                warn("invalid-stay-dates", index);
+                return;
+            }
+            var status = reservation.status;
+            if (["pending", "confirmed", "checked-in", "checked-out", "completed", "cancelled"].indexOf(status) === -1) {
+                result.dataState = "unknown";
+                warn("unknown-reservation-status", index);
+                return;
+            }
+            // Return detached descriptors, never references to input records.
+            var evidence = { reservationIndex: index, status: status,
+                checkIn: reservation.checkIn, checkOut: reservation.checkOut };
+            if (status === "cancelled") {
+                result.cancelled.push(evidence);
+            } else if (status === "checked-out" || status === "completed") {
+                result.historical.push(evidence);
+            } else if (referenceDate < reservation.checkIn) {
+                result.upcoming.push(evidence);
+                if (status === "checked-in") warn("checked-in-before-arrival", index);
+            } else if (referenceDate >= reservation.checkOut) {
+                if (status === "checked-in") {
+                    result.overdueCheckedIn.push(evidence);
+                    warn("overdue-checked-in", index);
+                } else {
+                    result.pastDue.push(evidence);
+                    warn("past-due-booking", index);
+                }
+            } else {
+                var bucket = status === "pending" ? "pending" : status === "confirmed" ? "scheduled" : "checkedIn";
+                result.current[bucket].push(evidence);
+            }
+        });
+
+        var checkedIn = result.current.checkedIn.length;
+        var unresolvedCheckedIn = checkedIn + result.overdueCheckedIn.length;
+        if (room.status === "available" && checkedIn) warn("available-with-checked-in-evidence");
+        if (room.status === "occupied" && !unresolvedCheckedIn && result.dataState === "known") warn("manual-occupancy-unverified");
+        if (room.status === "maintenance" && unresolvedCheckedIn) warn("maintenance-with-checked-in-evidence");
+        if (room.status === "reserved" && result.upcoming.length && !unresolvedCheckedIn &&
+            !result.current.pending.length && !result.current.scheduled.length) warn("future-booking-not-current-occupancy");
+        if (checkedIn > 1) warn("conflicting-checked-in-evidence");
+        if (["available", "occupied", "reserved", "maintenance"].indexOf(room.status) === -1) warn("unknown-room-status");
+        result.occupancyEvidence = result.dataState === "unknown" ? "unknown" : checkedIn ? "checked-in"
+            : result.overdueCheckedIn.length ? "overdue-checked-in" : "none";
+        return result;
+    };
+
     // ---- Format date ----
     window.ASHURE_UTILS.formatDate = function (dateStr) {
         if (!dateStr) return "—";
