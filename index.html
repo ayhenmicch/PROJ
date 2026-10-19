@@ -881,7 +881,7 @@
                         <div class="card__header">
                             <h3 class="card__title">Monthly Performance Summary</h3>
                         </div>
-                            <p id="reportMonthlyExplanation" class="uk-text-meta">Estimated Booking Value uses saved booking rates for confirmed, checked-in and checked-out reservations; pending, cancelled, completed and unknown statuses are excluded. Full eligible values are assigned to the check-in month. Missing or invalid historical rates are Unknown/incomplete; not verified collected payments or earned revenue. Reservation counts, booked stays and historical occupancy retain all statuses.</p>
+                            <p id="reportMonthlyExplanation" class="uk-text-meta">Estimated Booking Value uses saved booking rates for confirmed, checked-in and checked-out reservations; pending, cancelled, completed and unknown statuses are excluded. Full eligible values are assigned to the check-in month. Missing or invalid historical rates are Unknown/incomplete; not verified collected payments or earned revenue. Reservation counts and booked stays retain all statuses. Scheduled Room-Night Utilization counts unique matched room-nights for confirmed, checked-in and checked-out reservations, split by calendar month; it is not verified physical occupancy. It uses only reservations included by the selected check-in-date filters, divided by current room records (including maintenance rooms) times calendar days; historical inventory is unavailable. Unmatched rooms are excluded with warnings; invalid stays make identifiable months incomplete. Zero or unavailable inventory is Unknown. Months with no check-ins can still contain scheduled nights.</p>
                         <div class="table-wrap">
                             <table class="table">
                                 <thead>
@@ -889,7 +889,7 @@
                                         <th>Month</th>
                                         <th>Reservations</th>
                                         <th>Est. Booking Value</th>
-                                        <th>Occupancy</th>
+                                        <th>Scheduled Room-Night Utilization (Current Inventory Basis)</th>
                                         <th>Average Booked Stay</th>
                                         <th>Est. Value Growth</th>
                                     </tr>

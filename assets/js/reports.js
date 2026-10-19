@@ -79,7 +79,11 @@
             if (info.excludedLegacyStatus) statuses++;
             if (info.nights === null || invalidAmount || missingRoom || info.excludedLegacyStatus) affected++;
         });
-        if (!affected) return "";
+        var utilization = scheduledRoomNightUtilization(records);
+        var utilizationWarning = (utilization.missingRooms ? "Scheduled utilization: " + utilization.missingRooms + " unmatched room reference(s) excluded. " : "") +
+            (utilization.invalidStays ? "Scheduled utilization: " + utilization.invalidStays + " invalid stay(s); identifiable months are incomplete. " : "") +
+            (utilization.unassignedStays ? utilization.unassignedStays + " invalid stay(s) cannot be assigned to a month. " : "");
+        if (!affected) return utilizationWarning;
         return "Data quality: " + affected + " reservation record(s) need review. " +
             (dates ? dates + " invalid stay(s) excluded from duration/monthly calculations. Unassignable check-in dates remain in the record count for review. " : "") +
             (financialDates ? financialDates + " eligible booking(s) with invalid stays; booking value estimates are incomplete. " : "") +
@@ -87,7 +91,7 @@
             (invalidRates ? invalidRates + " eligible booking(s) with invalid saved booking rates: Unknown amounts; estimates are incomplete. " : "") +
             (amounts ? amounts + " unsafe booking amount(s); estimates are incomplete. " : "") +
             (missingRooms ? missingRooms + " missing current room reference(s); valid saved rates remain usable. " : "") +
-            (statuses ? statuses + " legacy completed or unknown status(es) excluded from financial values; retained in nonfinancial metrics. " : "");
+            (statuses ? statuses + " legacy completed or unknown status(es) excluded from financial values; retained in reservation counts and booked-stay metrics. " : "") + utilizationWarning;
     }
 
     function updateDataWarning(state) {
@@ -299,6 +303,56 @@
         return { keys: Object.keys(monthlyData).sort(), data: monthlyData };
     }
 
+    // Calendar-day ordinals avoid local timezone/DST shifts. Merge room intervals
+    // within each month instead of allocating an object for every booked night.
+    function scheduledRoomNightUtilization(records) {
+        var state = reportDataState();
+        var rooms = state.rooms ? window.ASHURE_APP.rooms : [];
+        var result = { months: {}, missingRooms: 0, invalidStays: 0, unassignedStays: 0 };
+        function monthFor(day) { return new Date(day * 86400000).toISOString().slice(0, 7); }
+        function bucket(key) {
+            if (!result.months[key]) result.months[key] = { intervals: new Map(), nights: 0, incomplete: false };
+            return result.months[key];
+        }
+        records.forEach(function (record) {
+            if (!isFinanciallyEligible(record)) return;
+            var start = calendarDay(record.checkIn), end = calendarDay(record.checkOut);
+            var matched = rooms.some(function (room) { return room && room.roomNumber === record.roomNumber; });
+            if (state.rooms && !matched) result.missingRooms++;
+            if (start === null || end === null || end <= start) {
+                result.invalidStays++;
+                var identifiable = start !== null ? start : end;
+                if (identifiable === null) result.unassignedStays++;
+                else bucket(monthFor(identifiable)).incomplete = true;
+                return;
+            }
+            if (!matched) return;
+            while (start < end) {
+                var key = monthFor(start);
+                var boundary = new Date(start * 86400000);
+                boundary.setUTCMonth(boundary.getUTCMonth() + 1, 1);
+                var stop = Math.min(end, boundary.getTime() / 86400000);
+                var month = bucket(key);
+                if (!month.intervals.has(record.roomNumber)) month.intervals.set(record.roomNumber, []);
+                month.intervals.get(record.roomNumber).push([start, stop]);
+                start = stop;
+            }
+        });
+        Object.keys(result.months).forEach(function (key) {
+            var month = result.months[key];
+            month.intervals.forEach(function (intervals) {
+                intervals.sort(function (a, b) { return a[0] - b[0]; });
+                var start = intervals[0][0], end = intervals[0][1];
+                for (var i = 1; i < intervals.length; i++) {
+                    if (intervals[i][0] <= end) end = Math.max(end, intervals[i][1]);
+                    else { month.nights += end - start; start = intervals[i][0]; end = intervals[i][1]; }
+                }
+                month.nights += end - start;
+            });
+        });
+        return result;
+    }
+
     function formatOccupancy(value) {
         return '<span class="occupancy-bar-wrap">' +
             '<span class="occupancy-bar"><span class="occupancy-bar__fill" style="width:' + value + '%;"></span></span>' +
@@ -350,7 +404,8 @@
 
         var filteredReservations = getFilteredReservations();
         var aggregated = aggregateMonthlyData(filteredReservations);
-        var keys = aggregated.keys;
+        var utilization = scheduledRoomNightUtilization(filteredReservations);
+        var keys = Array.from(new Set(aggregated.keys.concat(Object.keys(utilization.months)))).sort();
         var monthlyData = aggregated.data;
 
         if (keys.length === 0) {
@@ -361,18 +416,19 @@
         var rows = [];
         for (var k = 0; k < keys.length; k++) {
             var key = keys[k];
-            var data = monthlyData[key];
+            var data = monthlyData[key] || { reservations: 0, revenue: 0, totalNights: 0, financialReservations: 0 };
             var parts = key.split("-");
             var date = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, 1);
             var monthName = date.toLocaleString("en-US", { month: "long", year: "numeric" });
             var daysInMonth = new Date(parseInt(parts[0]), parseInt(parts[1]), 0).getDate();
-            var occupancyRate = rooms.length > 0
-                ? Math.round((data.totalNights / (rooms.length * daysInMonth)) * 100)
-                : 0;
+            var scheduled = utilization.months[key];
+            var utilizationText = !state.rooms || !rooms.length ? "Unknown" :
+                formatOccupancy(Math.round(((scheduled ? scheduled.nights : 0) / (rooms.length * daysInMonth)) * 100)) +
+                (scheduled && scheduled.incomplete ? " (incomplete)" : "");
             var avgStay = data.reservations > 0 ? (data.totalNights / data.reservations) : 0;
 
             var growthHtml;
-            var previousFinancialKeys = keys.slice(0, k).filter(function (month) { return monthlyData[month].financialReservations > 0; });
+            var previousFinancialKeys = keys.slice(0, k).filter(function (month) { return monthlyData[month] && monthlyData[month].financialReservations > 0; });
             if (!data.financialReservations) {
                 growthHtml = "Not applicable";
             } else if (!previousFinancialKeys.length) {
@@ -392,7 +448,7 @@
                 '<td>' + (state.rooms ? data.incompleteRevenue
                     ? (data.knownAmounts ? window.ASHURE_UTILS.formatCurrency(data.revenue) + " known subtotal" : "Unknown") + " (incomplete)"
                     : window.ASHURE_UTILS.formatCurrency(data.revenue) : "Unavailable") + '</td>' +
-                '<td>' + (state.rooms ? formatOccupancy(occupancyRate) : "Unavailable") + '</td>' +
+                '<td>' + utilizationText + '</td>' +
                 '<td>' + avgStay.toFixed(1) + ' days</td>' +
                 '<td>' + (state.rooms ? growthHtml : "Unavailable") + '</td>' +
                 '</tr>'
@@ -856,24 +912,31 @@
 
                             doc.setFontSize(8);
                             doc.setFillColor(241, 245, 249);
-                            doc.rect(margin, y - 4, contentWidth, 7, "F");
+                            var wrappedHeaders = colLabels.map(function (label) { return doc.splitTextToSize(label, cellWidth - 2); });
+                            var headerHeight = Math.max.apply(null, wrappedHeaders.map(function (lines) { return lines.length * 4 + 3; }));
+                            if (y + headerHeight > 280) { doc.addPage(); y = 22; }
+                            doc.rect(margin, y - 4, contentWidth, headerHeight, "F");
                             doc.setTextColor(51, 65, 85);
                             for (var h = 0; h < colLabels.length; h++) {
-                                doc.text(colLabels[h], margin + h * cellWidth + 1, y);
+                                doc.text(wrappedHeaders[h], margin + h * cellWidth + 1, y);
                             }
-                            y += 7;
+                            y += headerHeight;
 
                             var dataRows = tbody.querySelectorAll("tr");
                             for (var r = 0; r < dataRows.length; r++) {
                                 if (y > 280) { doc.addPage(); y = 22; }
                                 var cells = dataRows[r].querySelectorAll("td");
+                                var wrappedCells = [];
+                                for (var c = 0; c < cells.length && c < colCount; c++) {
+                                    wrappedCells.push(doc.splitTextToSize(stripHtml(cells[c].innerHTML || ""), cellWidth - 2));
+                                }
+                                var rowHeight = Math.max(6, Math.max.apply(null, wrappedCells.map(function (lines) { return lines.length * 4 + 2; })));
+                                if (y + rowHeight > 280) { doc.addPage(); y = 22; }
                                 doc.setTextColor(51, 65, 85);
                                 for (var c = 0; c < cells.length && c < colCount; c++) {
-                                    var raw = cells[c].innerHTML || "";
-                                    var txt = stripHtml(raw);
-                                    doc.text(txt, margin + c * cellWidth + 1, y);
+                                    doc.text(wrappedCells[c], margin + c * cellWidth + 1, y);
                                 }
-                                y += 6;
+                                y += rowHeight;
                             }
                         }
                     }
