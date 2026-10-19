@@ -309,7 +309,7 @@
                     <!-- Quick Statistics Panels -->
                     <div class="dashboard-panels">
                         <div class="card dashboard-panel">
-                            <div class="dashboard-panel__title">Stored Room Status</div>
+                            <div class="dashboard-panel__title">Operational Occupancy</div>
                             <div class="dashboard-panel__body">
                                 <div class="circular-progress">
                                     <svg viewBox="0 0 140 140">
@@ -318,11 +318,11 @@
                                     </svg>
                                     <div class="circular-progress__text">82%</div>
                                 </div>
-                                <p class="uk-text-meta">Share of rooms stored as occupied or reserved.</p>
+                                <p class="uk-text-meta">Stored occupied rooms divided by total room inventory, including maintenance rooms.</p>
                                 <div class="occupancy-details">
                                     <div class="occupancy-details__item">
                                         <span class="occupancy-details__dot" style="background: var(--color-secondary);"></span>
-                                        <span>Occupied or Reserved: 164 rooms</span>
+                                        <span>Occupied: 164 rooms</span>
                                     </div>
                                     <div class="occupancy-details__item">
                                         <span class="occupancy-details__dot" style="background: var(--color-success);"></span>
@@ -331,6 +331,10 @@
                                     <div class="occupancy-details__item">
                                         <span class="occupancy-details__dot" style="background: var(--color-primary);"></span>
                                         <span>Total Rooms: 250</span>
+                                    </div>
+                                    <div class="occupancy-details__item">
+                                        <span class="occupancy-details__dot" style="background: var(--color-warning);"></span>
+                                        <span>Reserved: 0 rooms</span>
                                     </div>
                                 </div>
                                 <div class="uk-margin-small-top uk-text-meta" aria-live="polite">

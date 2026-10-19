@@ -94,17 +94,31 @@
 
     // ---- Update Hotel Occupancy Panel ----
     function updateOccupancyPanel() {
-        var rooms = (window.ASHURE_APP && window.ASHURE_APP.rooms) || [];
+        var rooms = window.ASHURE_APP && window.ASHURE_APP.rooms;
+        var detailItems = document.querySelectorAll(".occupancy-details__item span:last-child");
+        if (window.ASHURE_UTILS.isStoredRecordsBlocked("ashure_rooms") || !Array.isArray(rooms) ||
+            !rooms.every(function (room) { return room && typeof room.status === "string"; })) {
+            occupancyTargetPercent = null;
+            cancelCircularAnimation();
+            setCircularProgress(null);
+            ["Occupied", "Available", "Total Rooms", "Reserved"].forEach(function (label, index) {
+                if (detailItems[index]) detailItems[index].textContent = label + ": Unknown (room data unavailable)";
+            });
+            return;
+        }
 
         var totalRooms = rooms.length || 0;
         var occupiedRooms = 0;
+        var reservedRooms = 0;
         var availableRooms = 0;
         var maintenanceRooms = 0;
         for (var i = 0; i < rooms.length; i++) {
             if (rooms[i].status === "available") {
                 availableRooms++;
-            } else if (rooms[i].status === "occupied" || rooms[i].status === "reserved") {
+            } else if (rooms[i].status === "occupied") {
                 occupiedRooms++;
+            } else if (rooms[i].status === "reserved") {
+                reservedRooms++;
             } else if (rooms[i].status === "maintenance") {
                 maintenanceRooms++;
             }
@@ -116,12 +130,12 @@
         cancelCircularAnimation();
         setCircularProgress(occupancyRate);
 
-        var detailItems = document.querySelectorAll(".occupancy-details__item span:last-child");
         if (detailItems.length >= 3) {
-            detailItems[0].textContent = "Occupied or Reserved: " + occupiedRooms + " rooms";
+            detailItems[0].textContent = "Occupied: " + occupiedRooms + " rooms";
             detailItems[1].textContent = "Available: " + availableRooms + " rooms";
             detailItems[2].textContent = "Total Rooms: " + totalRooms;
         }
+        if (detailItems[3]) detailItems[3].textContent = "Reserved: " + reservedRooms + " rooms";
     }
 
     function updateReservationEvidenceSummary() {
@@ -362,17 +376,19 @@
     }
 
     function setCircularProgress(percent) {
-        if (circularText) circularText.textContent = percent + "%";
+        if (circularText) circularText.textContent = percent === null ? "Unknown" : percent + "%";
         if (circularFill) {
             circularFill.style.transition = "none";
+            circularFill.style.opacity = percent === null ? "0" : "";
             circularFill.style.strokeDasharray = CIRCLE_CIRCUMFERENCE;
-            circularFill.style.strokeDashoffset = CIRCLE_CIRCUMFERENCE - (percent / 100 * CIRCLE_CIRCUMFERENCE);
+            circularFill.style.strokeDashoffset = percent === null ? CIRCLE_CIRCUMFERENCE
+                : CIRCLE_CIRCUMFERENCE - (percent / 100 * CIRCLE_CIRCUMFERENCE);
         }
     }
 
     // ---- Animate circular progress from 0% to target ----
     function animateCircularProgress() {
-        if (!circularFill || !circularText) return;
+        if (!circularFill || !circularText || occupancyTargetPercent === null) return;
 
         cancelCircularAnimation();
         var version = circularAnimationVersion;
