@@ -496,6 +496,25 @@
         });
     }
 
+    var lastAllocatedGuestId = 0;
+
+    function allocateGuestId() {
+        if (window.ASHURE_UTILS.isStoredRecordsBlocked("ashure_guests") ||
+            window.ASHURE_UTILS.isStoredRecordsBlocked("ashure_reservations")) return null;
+        var highest = Math.max(lastAllocatedGuestId, Date.now());
+        var reservations = (window.ASHURE_APP && window.ASHURE_APP.reservations) || [];
+        guests.forEach(function (guest) {
+            if (Number.isSafeInteger(guest.id)) highest = Math.max(highest, guest.id);
+        });
+        reservations.forEach(function (reservation) {
+            var id = Number(reservation.guestId);
+            if (Number.isSafeInteger(id)) highest = Math.max(highest, id);
+        });
+        if (!Number.isSafeInteger(highest + 1)) return null;
+        lastAllocatedGuestId = highest + 1;
+        return lastAllocatedGuestId;
+    }
+
     // ---- Save new guest ----
     function saveGuest() {
         var firstName = guestFirstName.value.trim();
@@ -534,7 +553,12 @@
             return;
         }
 
-        var newId = guests.length > 0 ? Math.max.apply(null, guests.map(function (g) { return g.id; })) + 1 : 1;
+        var newId = allocateGuestId();
+        if (newId === null) {
+            window.ASHURE_UTILS.showFieldError(guestEmail,
+                "Cannot safely allocate a guest ID. Restore access to stored reservations and guests, then reload.");
+            return;
+        }
 
         guests.push({
             id: newId,

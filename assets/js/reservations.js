@@ -239,10 +239,78 @@ window.ASHURE_APP.reservations = reservations;
         reservationsPagination.innerHTML = html;
     }
 
+    var resExistingGuest = document.getElementById("resExistingGuest");
+    var resGuestLinkMessage = document.getElementById("resGuestLinkMessage");
+    var guestLinkChanged = false;
+    var selectedGuestId = null;
+
+    function selectableGuests() {
+        if (window.ASHURE_UTILS.isStoredRecordsBlocked("ashure_guests")) return [];
+        return (window.ASHURE_APP && window.ASHURE_APP.guests) || [];
+    }
+
+    function findSelectedGuest(value) {
+        var matches = selectableGuests().filter(function (guest) { return String(guest.id) === value; });
+        return matches.length === 1 ? matches[0] : null;
+    }
+
+    function populateGuestSelection(reservation) {
+        guestLinkChanged = false;
+        selectedGuestId = null;
+        resExistingGuest.innerHTML = "";
+        var manual = document.createElement("option");
+        manual.value = "";
+        manual.textContent = "Enter guest details manually";
+        resExistingGuest.appendChild(manual);
+        var guests = selectableGuests();
+        guests.forEach(function (guest) {
+            if (!Number.isSafeInteger(guest.id) || guest.id <= 0 || !findSelectedGuest(String(guest.id))) return;
+            var option = document.createElement("option");
+            option.value = String(guest.id);
+            option.textContent = guest.name + " / " + guest.email + " (ID " + guest.id + ")";
+            resExistingGuest.appendChild(option);
+        });
+        resExistingGuest.value = "";
+        resGuestLinkMessage.textContent = window.ASHURE_UTILS.isStoredRecordsBlocked("ashure_guests")
+            ? "Guest records could not be loaded. Existing guest links are preserved; manual entry is available."
+            : guests.length ? "" : "No existing guests. Enter guest details manually.";
+        if (reservation && Object.prototype.hasOwnProperty.call(reservation, "guestId")) {
+            var linked = findSelectedGuest(String(reservation.guestId));
+            if (linked && Number.isSafeInteger(linked.id) && linked.id > 0) {
+                resExistingGuest.value = String(linked.id);
+            } else {
+                var missing = document.createElement("option");
+                missing.value = "__unresolved__";
+                missing.textContent = "Unresolved guest link (preserved)";
+                missing.disabled = true;
+                resExistingGuest.appendChild(missing);
+                resExistingGuest.value = missing.value;
+                resGuestLinkMessage.textContent = "The linked guest is missing, ambiguous, or unavailable. The original link and booking details will be preserved unless you select another guest or manual entry.";
+            }
+        }
+    }
+
+    resExistingGuest.addEventListener("change", function () {
+        guestLinkChanged = true;
+        selectedGuestId = null;
+        resGuestLinkMessage.textContent = "";
+        if (!resExistingGuest.value) return;
+        var guest = findSelectedGuest(resExistingGuest.value);
+        if (!guest) {
+            resGuestLinkMessage.textContent = "This guest is unavailable or ambiguous. Select another guest or manual entry.";
+            return;
+        }
+        selectedGuestId = guest.id;
+        resGuestName.value = guest.name;
+        resEmail.value = guest.email;
+        resPhone.value = guest.phone;
+    });
+
     // ---- Open modal for new reservation ----
     function openModal() {
         editingId = null;
         reservationModalTitle.textContent = "New Reservation";
+        populateGuestSelection(null);
         resGuestName.value = "";
         resEmail.value = "";
         resPhone.value = "";
@@ -264,6 +332,7 @@ window.ASHURE_APP.reservations = reservations;
 
         editingId = id;
         reservationModalTitle.textContent = "Edit Reservation";
+        populateGuestSelection(r);
         resGuestName.value = r.guestName;
         resEmail.value = r.email;
         resPhone.value = r.phone;
@@ -300,6 +369,11 @@ window.ASHURE_APP.reservations = reservations;
         var status = resStatus.value;
 
         var hasError = false;
+        if (guestLinkChanged && resExistingGuest.value &&
+            (!findSelectedGuest(resExistingGuest.value) || selectedGuestId === null)) {
+            window.ASHURE_UTILS.showFieldError(resExistingGuest, "Select an available guest or choose manual entry.");
+            return;
+        }
         window.ASHURE_UTILS.clearValidation();
 
         if (!Number.isSafeInteger(guests) || guests <= 0) {
@@ -398,7 +472,7 @@ window.ASHURE_APP.reservations = reservations;
         if (editingId) {
             var index = reservations.findIndex(function (item) { return item.id === editingId; });
             if (index !== -1) {
-                reservations[index] = {
+                reservations[index] = Object.assign({}, reservations[index], {
                     id: editingId,
                     guestName: guestName,
                     email: email,
@@ -409,7 +483,7 @@ window.ASHURE_APP.reservations = reservations;
                     checkOut: checkOut,
                     status: status,
                     guests: guests
-                };
+                });
             }
         } else {
             var newId = reservations.length > 0 ? Math.max.apply(null, reservations.map(function (r) { return r.id; })) + 1 : 1;
@@ -425,6 +499,14 @@ window.ASHURE_APP.reservations = reservations;
                 status: status,
                 guests: guests
             });
+        }
+
+        if (guestLinkChanged) {
+            var savedReservation = editingId
+                ? reservations.find(function (r) { return r.id === editingId; })
+                : reservations[reservations.length - 1];
+            if (selectedGuestId === null) delete savedReservation.guestId;
+            else savedReservation.guestId = selectedGuestId;
         }
 
         closeModal();

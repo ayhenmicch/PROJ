@@ -11,6 +11,9 @@
 
     // Keep unreadable stored records untouched, including on later saves.
     var blockedStorageKeys = {};
+    window.ASHURE_UTILS.isStoredRecordsBlocked = function (key) {
+        return blockedStorageKeys[key] === true;
+    };
     window.ASHURE_UTILS.loadStoredRecords = function (key, stringFields, numberFields) {
         try {
             var raw = localStorage.getItem(key);

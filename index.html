@@ -1186,6 +1186,13 @@
             <div class="modal__body">
                 <form id="reservationForm" novalidate>
                     <div class="form-grid">
+                        <div class="form-group form-group--full">
+                            <label class="form-label" for="resExistingGuest">Existing Guest (optional)</label>
+                            <select id="resExistingGuest" class="input uk-input">
+                                <option value="">Enter guest details manually</option>
+                            </select>
+                            <span id="resGuestLinkMessage" aria-live="polite"></span>
+                        </div>
                         <div class="form-group">
                             <label class="form-label" for="resGuestName">Guest Name</label>
                             <input type="text" id="resGuestName" class="input uk-input" placeholder="Full name" required />
