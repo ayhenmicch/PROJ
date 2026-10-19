@@ -282,7 +282,8 @@
                             </div>
                             <div class="stat-card__info">
                                 <span class="stat-card__value">86</span>
-                                <span class="stat-card__label">Available Rooms</span>
+                                <span class="stat-card__label">Stored Available Rooms</span>
+                                <small class="uk-text-meta">Stored status; availability depends on stay dates.</small>
                             </div>
                         </div>
                         <div class="stat-card">
@@ -291,7 +292,7 @@
                             </div>
                             <div class="stat-card__info">
                                 <span class="stat-card__value">142</span>
-                                <span class="stat-card__label">Checked-in Guests</span>
+                                <span class="stat-card__label">Reservations Marked Checked-in</span>
                             </div>
                         </div>
                         <div class="stat-card">
@@ -300,7 +301,7 @@
                             </div>
                             <div class="stat-card__info">
                                 <span class="stat-card__value">38</span>
-                                <span class="stat-card__label">Checked-out Today</span>
+                                <span class="stat-card__label">Scheduled Departures Today</span>
                             </div>
                         </div>
                     </div>
@@ -308,7 +309,7 @@
                     <!-- Quick Statistics Panels -->
                     <div class="dashboard-panels">
                         <div class="card dashboard-panel">
-                            <div class="dashboard-panel__title">Hotel Occupancy</div>
+                            <div class="dashboard-panel__title">Stored Room Status</div>
                             <div class="dashboard-panel__body">
                                 <div class="circular-progress">
                                     <svg viewBox="0 0 140 140">
@@ -317,10 +318,11 @@
                                     </svg>
                                     <div class="circular-progress__text">82%</div>
                                 </div>
+                                <p class="uk-text-meta">Share of rooms stored as occupied or reserved.</p>
                                 <div class="occupancy-details">
                                     <div class="occupancy-details__item">
                                         <span class="occupancy-details__dot" style="background: var(--color-secondary);"></span>
-                                        <span>Occupied: 164 rooms</span>
+                                        <span>Occupied or Reserved: 164 rooms</span>
                                     </div>
                                     <div class="occupancy-details__item">
                                         <span class="occupancy-details__dot" style="background: var(--color-success);"></span>
@@ -330,6 +332,12 @@
                                         <span class="occupancy-details__dot" style="background: var(--color-primary);"></span>
                                         <span>Total Rooms: 250</span>
                                     </div>
+                                </div>
+                                <div class="uk-margin-small-top uk-text-meta" aria-live="polite">
+                                    <strong>Recorded Reservation Evidence</strong>
+                                    <p class="uk-margin-remove">Recorded statuses do not prove physical presence. Upcoming and overdue stays are separate.</p>
+                                    <p id="dashboardReservationEvidence" class="uk-margin-small-top"></p>
+                                    <p id="dashboardReservationWarnings" class="uk-margin-remove"></p>
                                 </div>
                             </div>
                         </div>
@@ -1400,6 +1408,7 @@
                     <div class="form-group">
                         <label class="form-label">Status</label>
                         <input type="text" id="viewRoomStatus" class="input uk-input" disabled />
+                        <small id="viewRoomReservationEvidence" class="uk-text-meta" aria-live="polite"></small>
                     </div>
                 </div>
             </div>

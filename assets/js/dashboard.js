@@ -22,6 +22,8 @@
 
     // ---- Dynamic targets (set by update functions, read by animation functions) ----
     var occupancyTargetPercent = 0;
+    var circularAnimationFrame = null;
+    var circularAnimationVersion = 0;
 
     // ---- Utility: Format number with commas ----
     function formatNumber(num) {
@@ -111,16 +113,83 @@
         var occupancyRate = totalRooms > 0 ? Math.round((occupiedRooms / totalRooms) * 100) : 0;
         occupancyTargetPercent = occupancyRate;
 
-        if (circularText) {
-            circularText.textContent = occupancyRate + "%";
-        }
+        cancelCircularAnimation();
+        setCircularProgress(occupancyRate);
 
         var detailItems = document.querySelectorAll(".occupancy-details__item span:last-child");
         if (detailItems.length >= 3) {
-            detailItems[0].textContent = "Occupied: " + occupiedRooms + " rooms";
+            detailItems[0].textContent = "Occupied or Reserved: " + occupiedRooms + " rooms";
             detailItems[1].textContent = "Available: " + availableRooms + " rooms";
             detailItems[2].textContent = "Total Rooms: " + totalRooms;
         }
+    }
+
+    function updateReservationEvidenceSummary() {
+        var summary = document.getElementById("dashboardReservationEvidence");
+        var warningEl = document.getElementById("dashboardReservationWarnings");
+        if (!summary || !warningEl) return;
+        var app = window.ASHURE_APP || {};
+        if (window.ASHURE_UTILS.isStoredRecordsBlocked("ashure_rooms") ||
+            window.ASHURE_UTILS.isStoredRecordsBlocked("ashure_reservations") ||
+            !Array.isArray(app.rooms) || !Array.isArray(app.reservations)) {
+            summary.textContent = "Reservation evidence unavailable; room or reservation data could not be loaded.";
+            warningEl.textContent = "Counts are unknown, not zero.";
+            return;
+        }
+        var referenceDate;
+        try {
+            var parts = new Intl.DateTimeFormat("en-US", {
+                timeZone: "Asia/Manila", year: "numeric", month: "2-digit", day: "2-digit"
+            }).formatToParts(new Date());
+            function part(type) { return parts.find(function (p) { return p.type === type; }).value; }
+            referenceDate = part("year") + "-" + part("month") + "-" + part("day");
+        } catch (error) {
+            summary.textContent = "Reservation evidence unavailable; hotel date could not be determined.";
+            warningEl.textContent = "Counts are unknown, not zero.";
+            return;
+        }
+        var current = new Set(), overdue = new Set(), confirmed = new Set(), pending = new Set();
+        var roomNumbers = new Set(), missing = new Set(), warningCodes = new Set();
+        var unknown = false;
+        app.rooms.forEach(function (room) {
+            var evidence = window.ASHURE_UTILS.getRoomReservationEvidence(room, app.reservations, referenceDate);
+            if (evidence.dataState === "unknown") unknown = true;
+            if (room && typeof room.roomNumber === "string") roomNumbers.add(room.roomNumber);
+            if (evidence.current.checkedIn.length) current.add(room.roomNumber);
+            if (evidence.overdueCheckedIn.length) overdue.add(room.roomNumber);
+            if (evidence.upcoming.some(function (r) { return r.status === "confirmed"; })) confirmed.add(room.roomNumber);
+            if (evidence.upcoming.some(function (r) { return r.status === "pending"; })) pending.add(room.roomNumber);
+            evidence.warnings.forEach(function (warning) { warningCodes.add(warning.code); });
+        });
+        app.reservations.forEach(function (reservation) {
+            if (!reservation || typeof reservation.roomNumber !== "string") {
+                unknown = true;
+                warningCodes.add("invalid-reservation");
+            } else if (!roomNumbers.has(reservation.roomNumber)) missing.add(reservation.roomNumber);
+        });
+        summary.textContent = unknown ? "Reservation evidence incomplete; counts are unknown. Review reservation data."
+            : "Rooms with current checked-in evidence: " + current.size +
+                "; overdue checked-in: " + overdue.size +
+                "; upcoming confirmed: " + confirmed.size +
+                "; upcoming pending: " + pending.size + ". As of " + referenceDate + " (Asia/Manila).";
+        var warningLabels = {
+            "available-with-checked-in-evidence": "Stored available / checked-in disagreement",
+            "maintenance-with-checked-in-evidence": "Maintenance / checked-in conflict",
+            "conflicting-checked-in-evidence": "Multiple checked-in records for a room",
+            "manual-occupancy-unverified": "Manual occupancy unverified",
+            "checked-in-before-arrival": "Checked-in before scheduled arrival",
+            "overdue-checked-in": "Overdue checked-in records need review",
+            "past-due-booking": "Past-due booking statuses need review",
+            "future-booking-not-current-occupancy": "Stored reserved with future bookings only",
+            "unknown-room-status": "Unknown operational room status"
+        };
+        var warnings = [];
+        warningCodes.forEach(function (code) {
+            if (warningLabels[code]) warnings.push(warningLabels[code]);
+            else if (warnings.indexOf("Invalid or unknown reservation data") === -1) warnings.push("Invalid or unknown reservation data");
+        });
+        if (missing.size) warnings.push("Reservations reference missing rooms: " + missing.size);
+        warningEl.textContent = warnings.length ? "Review: " + warnings.join("; ") + "." : "";
     }
 
     // ---- Update Reservation Status Panel ----
@@ -286,39 +355,47 @@
         });
     }
 
+    function cancelCircularAnimation() {
+        circularAnimationVersion++;
+        if (circularAnimationFrame !== null) cancelAnimationFrame(circularAnimationFrame);
+        circularAnimationFrame = null;
+    }
+
+    function setCircularProgress(percent) {
+        if (circularText) circularText.textContent = percent + "%";
+        if (circularFill) {
+            circularFill.style.transition = "none";
+            circularFill.style.strokeDasharray = CIRCLE_CIRCUMFERENCE;
+            circularFill.style.strokeDashoffset = CIRCLE_CIRCUMFERENCE - (percent / 100 * CIRCLE_CIRCUMFERENCE);
+        }
+    }
+
     // ---- Animate circular progress from 0% to target ----
     function animateCircularProgress() {
         if (!circularFill || !circularText) return;
 
+        cancelCircularAnimation();
+        var version = circularAnimationVersion;
         var targetPercent = occupancyTargetPercent;
-        var targetOffset = CIRCLE_CIRCUMFERENCE - (targetPercent / 100 * CIRCLE_CIRCUMFERENCE);
-
-        circularFill.style.strokeDasharray = CIRCLE_CIRCUMFERENCE;
-        circularFill.style.strokeDashoffset = CIRCLE_CIRCUMFERENCE;
-        circularText.textContent = "0%";
-
-        void circularFill.offsetWidth;
-
-        circularFill.style.transition = "stroke-dashoffset 1.2s cubic-bezier(0.22, 1, 0.36, 1)";
-        circularFill.style.strokeDashoffset = targetOffset;
+        setCircularProgress(0);
 
         var startTime = null;
         function animateText(timestamp) {
-            if (!startTime) startTime = timestamp;
+            if (version !== circularAnimationVersion) return;
+            circularAnimationFrame = null;
+            if (startTime === null) startTime = timestamp;
             var elapsed = timestamp - startTime;
             var progress = Math.min(elapsed / 1200, 1);
             var easedProgress = easeOutCubic(progress);
             var currentPercent = Math.round(easedProgress * targetPercent);
-            circularText.textContent = currentPercent + "%";
+            setCircularProgress(currentPercent);
 
             if (progress < 1) {
-                requestAnimationFrame(animateText);
-            } else {
-                circularText.textContent = targetPercent + "%";
+                circularAnimationFrame = requestAnimationFrame(animateText);
             }
         }
 
-        requestAnimationFrame(animateText);
+        circularAnimationFrame = requestAnimationFrame(animateText);
     }
 
     // ---- Animate progress bars from 0% to target ----
@@ -359,6 +436,13 @@
         updateOccupancyPanel();
         updateReservationStatusPanel();
         updateRecentReservations();
+        updateReservationEvidenceSummary();
+    });
+
+    var dashboardLink = document.querySelector('.sidebar__link[data-page="dashboard"]');
+    if (dashboardLink) dashboardLink.addEventListener("click", function () {
+        updateOccupancyPanel();
+        updateReservationEvidenceSummary();
     });
 
     function startAnimations() {
@@ -367,6 +451,7 @@
         updateOccupancyPanel();
         updateReservationStatusPanel();
         updateRecentReservations();
+        updateReservationEvidenceSummary();
         initQuickActions();
         animateStatistics();
         animateCircularProgress();
