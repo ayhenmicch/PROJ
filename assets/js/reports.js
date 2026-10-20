@@ -897,12 +897,16 @@
                         } else if (tbody) {
                             var headers = tableCard.querySelectorAll(".table thead th");
                             var colLabels = [];
-                            var headerWidths = [];
                             for (var h = 0; h < headers.length; h++) {
                                 colLabels.push(stripHtml(headers[h].textContent || headers[h].innerText || ""));
                             }
+                            // PDF-only labels and widths; the browser table is unchanged.
+                            if (colLabels.length === 6) colLabels[3] = "Scheduled Utilization";
                             var colCount = colLabels.length;
-                            var cellWidth = contentWidth / colCount;
+                            var proportions = colCount === 6 ? [0.15, 0.09, 0.23, 0.16, 0.13, 0.24] : colLabels.map(function () { return 1 / colCount; });
+                            var widths = proportions.map(function (share) { return contentWidth * share; });
+                            var offsets = [], columnX = margin, padding = 2;
+                            widths.forEach(function (width) { offsets.push(columnX); columnX += width; });
 
                             if (y + 15 > 297) { doc.addPage(); y = 22; }
                             doc.setFontSize(13);
@@ -912,29 +916,38 @@
 
                             doc.setFontSize(8);
                             doc.setFillColor(241, 245, 249);
-                            var wrappedHeaders = colLabels.map(function (label) { return doc.splitTextToSize(label, cellWidth - 2); });
+                            var wrappedHeaders = colLabels.map(function (label, column) { return doc.splitTextToSize(label, widths[column] - padding * 2); });
                             var headerHeight = Math.max.apply(null, wrappedHeaders.map(function (lines) { return lines.length * 4 + 3; }));
-                            if (y + headerHeight > 280) { doc.addPage(); y = 22; }
-                            doc.rect(margin, y - 4, contentWidth, headerHeight, "F");
-                            doc.setTextColor(51, 65, 85);
-                            for (var h = 0; h < colLabels.length; h++) {
-                                doc.text(wrappedHeaders[h], margin + h * cellWidth + 1, y);
+                            function drawMonthlyHeader() {
+                                if (y + headerHeight > 280) { doc.addPage(); y = 22; }
+                                doc.setFillColor(241, 245, 249);
+                                doc.rect(margin, y - 4, contentWidth, headerHeight, "F");
+                                doc.setTextColor(51, 65, 85);
+                                for (var h = 0; h < colLabels.length; h++) {
+                                    doc.text(wrappedHeaders[h], offsets[h] + padding, y);
+                                }
+                                y += headerHeight;
                             }
-                            y += headerHeight;
+                            drawMonthlyHeader();
 
                             var dataRows = tbody.querySelectorAll("tr");
                             for (var r = 0; r < dataRows.length; r++) {
-                                if (y > 280) { doc.addPage(); y = 22; }
                                 var cells = dataRows[r].querySelectorAll("td");
                                 var wrappedCells = [];
                                 for (var c = 0; c < cells.length && c < colCount; c++) {
-                                    wrappedCells.push(doc.splitTextToSize(stripHtml(cells[c].innerHTML || ""), cellWidth - 2));
+                                    var cellText = stripHtml(cells[c].innerHTML || "");
+                                    if (c === 5) {
+                                        // Browser badges contain decorative Unicode icons; export only their textual value.
+                                        var icon = cells[c].querySelector(".growth-badge__icon");
+                                        if (icon) cellText = cellText.replace(icon.textContent || "", "").trim() || "-";
+                                    }
+                                    wrappedCells.push(doc.splitTextToSize(cellText, widths[c] - padding * 2));
                                 }
                                 var rowHeight = Math.max(6, Math.max.apply(null, wrappedCells.map(function (lines) { return lines.length * 4 + 2; })));
-                                if (y + rowHeight > 280) { doc.addPage(); y = 22; }
+                                if (y + rowHeight > 280) { doc.addPage(); y = 22; drawMonthlyHeader(); }
                                 doc.setTextColor(51, 65, 85);
                                 for (var c = 0; c < cells.length && c < colCount; c++) {
-                                    doc.text(wrappedCells[c], margin + c * cellWidth + 1, y);
+                                    doc.text(wrappedCells[c], offsets[c] + padding, y);
                                 }
                                 y += rowHeight;
                             }
