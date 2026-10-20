@@ -708,7 +708,7 @@
                     <div class="page-header">
                         <div>
                             <h1 class="page-header__title">Reports & Analytics</h1>
-                            <p class="page-header__subtitle uk-hidden@s">View reservations, estimated booking values, and current operational occupancy.</p>
+                            <p class="page-header__subtitle">View reservations, estimated booking values, and current operational occupancy.</p>
                         </div>
                         <button class="btn btn--secondary" id="btnExportPDF">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18" aria-hidden="true">
@@ -776,7 +776,7 @@
                         </div>
                     </div>
 
-                    <div class="toolbar">
+                    <div class="toolbar" role="group" aria-label="Report filters">
                         <div class="toolbar__sort toolbar__sort--equal">
                             <label for="reportDateRange">Date Range</label>
                             <select id="reportDateRange" class="input uk-input">
@@ -882,7 +882,7 @@
                             <h3 class="card__title">Monthly Performance Summary</h3>
                         </div>
                             <p id="reportMonthlyExplanation" class="uk-text-meta">Estimated Booking Value uses saved booking rates for confirmed, checked-in and checked-out reservations; pending, cancelled, completed and unknown statuses are excluded. Full eligible values are assigned to the check-in month. Missing or invalid historical rates are Unknown/incomplete; not verified collected payments or earned revenue. Reservation counts and booked stays retain all statuses. Scheduled Room-Night Utilization counts unique matched room-nights for confirmed, checked-in and checked-out reservations, split by calendar month; it is not verified physical occupancy. It uses only reservations included by the selected check-in-date filters, divided by current room records (including maintenance rooms) times calendar days; historical inventory is unavailable. Unmatched rooms are excluded with warnings; invalid stays make identifiable months incomplete. Zero or unavailable inventory is Unknown. Months with no check-ins can still contain scheduled nights.</p>
-                        <div class="table-wrap">
+                        <div class="table-wrap" role="region" aria-label="Monthly performance table" aria-describedby="reportMonthlyExplanation" tabindex="0">
                             <table class="table">
                                 <thead>
                                     <tr>
